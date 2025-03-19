@@ -7,7 +7,7 @@ const siteMetadata = {
   language: 'en-us',
   theme: 'system', // system, dark or light
   siteUrl: 'https://syoka.icu',
-  siteRepo: 'https://github.com/teneous/tailwind-nextjs-starter-blog',
+  siteRepo: 'https://github.com/teneous',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo.png`,
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
   email: 'syoka9471@gmail.com',

@@ -1,143 +1,82 @@
 ---
-title: Deriving the OLS Estimator
-date: '2020-12-21'
-tags: ['next js', 'math', 'ols']
+title: 大模型压缩技术
+date: '2025-02-20'
+tags: ['LLM']
 draft: false
-summary: 'How to derive the OLS Estimator with matrix notation and a tour of math typesetting using markdown with the help of KaTeX.'
+summary: '**先介绍一下大模型压缩的时代背景**：从GPT3开始，模型的权重参数量级逐渐上升，对于硬件的要求越来越高。以GPT3为例，在FP16精度下，也需要325G的显存，如果以A100 80G的规格来算，至少需要5张。因此针对移动嵌入式设备运行算力有限的情况下，保证模型性能可接受的情况下，模型瘦身（参数下降，计算效率上升）就显得十分有必要。'
 ---
 
-# Introduction
+# 背景摘要
 
-Parsing and display of math equations is included in this blog template. Parsing of math is enabled by `remark-math` and `rehype-katex`.
-KaTeX and its associated font is included in `_document.js` so feel free to use it on any page.
-[^footnote]
+**先介绍一下大模型压缩的时代背景**：从GPT3开始，模型的权重参数量级逐渐上升，对于硬件的要求越来越高。以GPT3为例，在FP16精度下，也需要325G的显存，如果以A100 80G的规格来算，至少需要5张。因此针对移动嵌入式设备运行算力有限的情况下，保证模型性能可接受的情况下，模型瘦身（参数下降，计算效率上升）就显得十分有必要。
 
-[^footnote]: For the full list of supported TeX functions, check out the [KaTeX documentation](https://katex.org/docs/supported.html)
+当前大模型压缩主流技术主要分为4类：量化，剪枝，蒸馏，二值化；
 
-Inline math symbols can be included by enclosing the term between the `$` symbol.
+# 量化
 
-Math code blocks are denoted by `$$`.
+权重参数的体现主要是以浮点数的形式存在的，占32位。因此量化的核心就是将浮点数转换为8位，4位，1位的整数，这样模型的空间和计算量就会有显著下降，如下所示，但是精度也会随之下降。
 
-If you intend to use the `$` sign instead of math, you can escape it (`\$`), or specify the HTML entity (`&dollar;`) [^2]
+[https://static.googleusercontent.com/media/research.google.com/zh-CN//pubs/archive/37631.pdf](https://static.googleusercontent.com/media/research.google.com/zh-CN//pubs/archive/37631.pdf)
 
-Inline or manually enumerated footnotes are also supported. Click on the links above to see them in action.
+![image.png](https://syoka-ai.oss-cn-hangzhou.aliyuncs.com/blog/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF/%E9%87%8F%E5%8C%96.png)
 
-[^2]: \$10 and &dollar;20.
+量化方法主要分为三类：
 
-# Deriving the OLS Estimator
+- PTQ训练后量化
 
-Using matrix notation, let $n$ denote the number of observations and $k$ denote the number of regressors.
+    模型训练完后，直接对权重进行量化
 
-The vector of outcome variables $\mathbf{Y}$ is a $n \times 1$ matrix,
+- QAT量化感知训练
 
-```tex
-\mathbf{Y} = \left[\begin{array}
-  {c}
-  y_1 \\
-  . \\
-  . \\
-  . \\
-  y_n
-\end{array}\right]
-```
+    模型训练过程中引入量化操作，让模型提前适应低精度的表示形式。TensorRT就支持这种模式
 
-$$
-\mathbf{Y} = \left[\begin{array}
-  {c}
-  y_1 \\
-  . \\
-  . \\
-  . \\
-  y_n
-\end{array}\right]
-$$
+- QAF量化感知微调
 
-The matrix of regressors $\mathbf{X}$ is a $n \times k$ matrix (or each row is a $k \times 1$ vector),
+    基于预训练模型进行微调，同时加入量化操作
 
-```latex
-\mathbf{X} = \left[\begin{array}
-  {ccccc}
-  x_{11} & . & . & . & x_{1k} \\
-  . & . & . & . & .  \\
-  . & . & . & . & .  \\
-  . & . & . & . & .  \\
-  x_{n1} & . & . & . & x_{nn}
-\end{array}\right] =
-\left[\begin{array}
-  {c}
-  \mathbf{x}'_1 \\
-  . \\
-  . \\
-  . \\
-  \mathbf{x}'_n
-\end{array}\right]
-```
 
-$$
-\mathbf{X} = \left[\begin{array}
-  {ccccc}
-  x_{11} & . & . & . & x_{1k} \\
-  . & . & . & . & .  \\
-  . & . & . & . & .  \\
-  . & . & . & . & .  \\
-  x_{n1} & . & . & . & x_{nn}
-\end{array}\right] =
-\left[\begin{array}
-  {c}
-  \mathbf{x}'_1 \\
-  . \\
-  . \\
-  . \\
-  \mathbf{x}'_n
-\end{array}\right]
-$$
+# 剪枝
 
-The vector of error terms $\mathbf{U}$ is also a $n \times 1$ matrix.
+剪枝去除神经网络中不重要的连接或神经元，从而达到压缩模型的目的。
 
-At times it might be easier to use vector notation. For consistency, I will use the bold small x to denote a vector and capital letters to denote a matrix. Single observations are denoted by the subscript.
+基于权重的重要性的剪枝方法。
 
-## Least Squares
+[https://arxiv.org/pdf/1506.02626](https://arxiv.org/pdf/1506.02626)
 
-**Start**:  
-$$y_i = \mathbf{x}'_i \beta + u_i$$
+剪枝方法分为两类：
 
-**Assumptions**:
+- 结构化剪枝
 
-1. Linearity (given above)
-2. $E(\mathbf{U}|\mathbf{X}) = 0$ (conditional independence)
-3. rank($\mathbf{X}$) = $k$ (no multi-collinearity i.e. full rank)
-4. $Var(\mathbf{U}|\mathbf{X}) = \sigma^2 I_n$ (Homoskedascity)
+    按照一定的规则进行区域化裁剪，这种裁剪的整体压缩率不如非结构化剪枝。但是由于稠密性好，在推理上性能优异，在CNN网络中，速度能提升2～3倍。
 
-**Aim**:  
-Find $\beta$ that minimises the sum of squared errors:
+- 非结构化剪枝
 
-$$
-Q = \sum_{i=1}^{n}{u_i^2} = \sum_{i=1}^{n}{(y_i - \mathbf{x}'_i\beta)^2} = (Y-X\beta)'(Y-X\beta)
-$$
+    随机移除神经元或者连接，实现很高的压缩比，可以精准去除对模型影响最小的权重。劣势是在裁剪后的稀疏结构在硬件上很难高效运行，因为硬件倾向稠密结构。正常来说大小上，可以压缩50%，但推理效率很难提升。
 
-**Solution**:  
-Hints: $Q$ is a $1 \times 1$ scalar, by symmetry $\frac{\partial b'Ab}{\partial b} = 2Ab$.
 
-Take matrix derivative w.r.t $\beta$:
+# 蒸馏
 
-```tex
-\begin{aligned}
-  \min Q           & = \min_{\beta} \mathbf{Y}'\mathbf{Y} - 2\beta'\mathbf{X}'\mathbf{Y} +
-  \beta'\mathbf{X}'\mathbf{X}\beta \\
-                   & = \min_{\beta} - 2\beta'\mathbf{X}'\mathbf{Y} + \beta'\mathbf{X}'\mathbf{X}\beta \\
-  \text{[FOC]}~~~0 & =  - 2\mathbf{X}'\mathbf{Y} + 2\mathbf{X}'\mathbf{X}\hat{\beta}                  \\
-  \hat{\beta}      & = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}                              \\
-                   & = (\sum^{n} \mathbf{x}_i \mathbf{x}'_i)^{-1} \sum^{n} \mathbf{x}_i y_i
-\end{aligned}
-```
+使用教师大模型将知识输出给学生小模型，小模型去学习大模型的模式，这样可以在保证小模型小巧的同时，尽可能接近教师模型的性能。
 
-$$
-\begin{aligned}
-  \min Q           & = \min_{\beta} \mathbf{Y}'\mathbf{Y} - 2\beta'\mathbf{X}'\mathbf{Y} +
-  \beta'\mathbf{X}'\mathbf{X}\beta \\
-                   & = \min_{\beta} - 2\beta'\mathbf{X}'\mathbf{Y} + \beta'\mathbf{X}'\mathbf{X}\beta \\
-  \text{[FOC]}~~~0 & =  - 2\mathbf{X}'\mathbf{Y} + 2\mathbf{X}'\mathbf{X}\hat{\beta}                  \\
-  \hat{\beta}      & = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}                              \\
-                   & = (\sum^{n} \mathbf{x}_i \mathbf{x}'_i)^{-1} \sum^{n} \mathbf{x}_i y_i
-\end{aligned}
-$$
+![image.png](https://syoka-ai.oss-cn-hangzhou.aliyuncs.com/blog/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF/%E8%92%B8%E9%A6%8F.png)
+
+蒸馏的步骤：
+
+1. 训练一个性能优异的大模型
+2. 选择一个小模型作为学生模型，例如qwen2.5B
+3. 将大模型输出作为监督信息，和学生模型的输出进行对比，通过优化损失函数来优化学生模型
+
+再蒸馏结束后，小模型可以习得大模型的语言表示能力，在情感分类，文本分类可以得到不错的性能。在推理和压缩比上可以得到不错的效果，可以达到2～10倍。
+
+蒸馏效果非常依赖大模型本身的能力和小模型的学习能力
+
+# 二值化
+
+低功耗的IOT设备商运行
+
+这是一种极端的量化手段，它把神经网络中的权重和激活值都限制在了-1和1。由于这样的存储只用`1bit`存储，因此理论存储空间一下子减少为原来的1/32。
+
+![image.png](https://syoka-ai.oss-cn-hangzhou.aliyuncs.com/blog/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF/%E4%BA%8C%E5%80%BC%E5%8C%96.png)
+
+![image.png](https://syoka-ai.oss-cn-hangzhou.aliyuncs.com/blog/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E6%8A%80%E6%9C%AF/%E4%BA%8C%E5%80%BC%E5%8C%96B.png
+)
