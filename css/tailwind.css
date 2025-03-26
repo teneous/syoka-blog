@@ -207,9 +207,9 @@ input:-webkit-autofill:focus {
 }
 
 @layer components {
-  /* .glass-card {
+  .glass-card {
     @apply bg-white/40 dark:bg-gray-900/40 backdrop-blur-md border border-white/30 dark:border-gray-800/30 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300;
-  } */
+  }
 
   .terminal-card {
     @apply bg-gray-950 text-gray-100 rounded-lg overflow-hidden shadow-xl border border-gray-800;
@@ -235,9 +235,9 @@ input:-webkit-autofill:focus {
     @apply w-10 h-10 rounded-lg bg-primary-500/20 text-primary-500 flex items-center justify-center mb-3;
   }
 
-  /* .system-architecture-card {
-    @apply glass-card p-6;
-  } */
+   .system-architecture-card {
+    @apply bg-white/40 dark:bg-gray-900/40 backdrop-blur-md border border-white/30 dark:border-gray-800/30 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6;
+  } 
 
   .contact-chip {
     @apply flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full text-sm transition-all duration-200 hover:bg-primary-500/10;
