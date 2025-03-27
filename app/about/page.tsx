@@ -302,7 +302,7 @@ export default function Page() {
           {/* 终端风格介绍 */}
           <CommandPrompt>
             <div className="space-y-3">
-              <span className="text-green-400 font-semibold">Syoka@dev</span>
+              <span className="text-green-400 font-semibold">Syoka</span>
               <p className="text-gray-300">{t.intro}</p>
               <div className="flex gap-2 mt-3">
                 <span className="terminal-tag px-3 py-1 rounded-full text-xs font-medium bg-primary-500/20 text-primary-500">中文</span>
