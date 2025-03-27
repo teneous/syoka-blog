@@ -1,4 +1,5 @@
 const { fontFamily } = require('tailwindcss/defaultTheme')
+const colors = require('tailwindcss/colors')
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -9,6 +10,12 @@ module.exports = {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
     './css/**/*.{css,ts,tsx}',
+    './node_modules/pliny/**/*.js',
+    './app/**/*.{js,ts,jsx,tsx}',
+    './pages/**/*.{js,ts,tsx}',
+    './components/**/*.{js,ts,tsx}',
+    './layouts/**/*.{js,ts,tsx}',
+    './data/**/*.mdx',
   ],
   theme: {
     container: {
@@ -25,21 +32,7 @@ module.exports = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-          50: "var(--color-primary-50)",
-          100: "var(--color-primary-100)",
-          200: "var(--color-primary-200)",
-          300: "var(--color-primary-300)",
-          400: "var(--color-primary-400)",
-          500: "var(--color-primary-500)",
-          600: "var(--color-primary-600)",
-          700: "var(--color-primary-700)",
-          800: "var(--color-primary-800)",
-          900: "var(--color-primary-900)",
-          950: "var(--color-primary-950)",
-        },
+        primary: colors.pink,
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -64,6 +57,7 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        gray: colors.gray,
       },
       opacity: {
         '20': '0.2',
@@ -92,7 +86,7 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
+        sans: ['var(--font-space-grotesk)', ...fontFamily.sans],
       },
       keyframes: {
         "accordion-down": {
@@ -109,6 +103,44 @@ module.exports = {
         },
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
+        },
+        'fade-in-down': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(-10px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          },
+        },
+        'fade-in-up': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(10px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          },
+        },
+        'fade-in': {
+          '0%': {
+            opacity: '0'
+          },
+          '100%': {
+            opacity: '1'
+          },
+        },
+        'fade-in-right': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateX(-10px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateX(0)'
+          },
         }
       },
       animation: {
@@ -116,6 +148,10 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 3s ease-in-out infinite",
         "shimmer": "shimmer 2s infinite",
+        'fade-in-down': 'fade-in-down 0.5s ease-out',
+        'fade-in-up': 'fade-in-up 0.5s ease-out',
+        'fade-in': 'fade-in 0.5s ease-out',
+        'fade-in-right': 'fade-in-right 0.5s ease-out'
       },
       backdropBlur: {
         xs: '2px',
@@ -124,11 +160,21 @@ module.exports = {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      spacing: {
+        '9/16': '56.25%',
+      },
+      lineHeight: {
+        11: '2.75rem',
+        12: '3rem',
+        13: '3.25rem',
+        14: '3.5rem',
+      },
     },
   },
   plugins: [
     require("tailwindcss-animate"),
     require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
   ],
   future: {
     hoverOnlyWhenSupported: true,
