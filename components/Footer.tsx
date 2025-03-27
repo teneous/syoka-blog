@@ -1,10 +1,16 @@
 import Link from './Link'
 import siteMetadata from '@/data/siteMetadata'
 import { FiMail, FiGithub, FiLinkedin } from 'react-icons/fi'
+import Script from 'next/script'
 
 export default function Footer() {
   return (
     <footer className="border-t border-gray-200 dark:border-gray-800">
+      <Script
+        src="https://eu.umami.is/script.js"
+        data-website-id="your-website-id"
+        strategy="lazyOnload"
+      />
       <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
         <div className="py-8 flex flex-col items-center">
           <div className="flex space-x-6">

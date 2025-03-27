@@ -4,6 +4,7 @@ import Link from './Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
+import { FiTrendingUp } from 'react-icons/fi'
 
 const Header = () => {
   return (
@@ -36,6 +37,15 @@ const Header = () => {
             <div className="flex items-center space-x-4">
               <SearchButton />
               <ThemeSwitch />
+              <a
+                href="https://us.umami.is/websites/a708639c-b4bd-4454-9bc3-b4142536a6be"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-gray-700 dark:text-gray-300 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200"
+                aria-label="Analytics"
+              >
+                <FiTrendingUp className="h-5 w-5" />
+              </a>
               <MobileNav />
             </div>
           </div>

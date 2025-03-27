@@ -68,7 +68,7 @@ const content = {
           focus: "数据平台 & 离线计算"
         },
         {
-          name: "派拉科技",
+          name: "派拉软件",
           period: "2020 - 2022",
           role: "基础架构工程师",
           focus: "微服务 & 高可用架构"
@@ -136,7 +136,7 @@ const content = {
           focus: "Data Platform & Offline Computing"
         },
         {
-          name: "Pala Tech",
+          name: "Paraview",
           period: "2020 - 2022",
           role: "Infrastructure Engineer",
           focus: "Microservices & High Availability"
