@@ -68,9 +68,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <head>
-        <script 
-          defer 
-          src="https://cloud.umami.is/script.js" 
+        <script
+          defer
+          src="https://cloud.umami.is/script.js"
           data-website-id="a708639c-b4bd-4454-9bc3-b4142536a6be"
         />
       </head>

@@ -41,7 +41,7 @@ const Header = () => {
                 href="https://us.umami.is/websites/a708639c-b4bd-4454-9bc3-b4142536a6be"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 text-gray-700 dark:text-gray-300 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200"
+                className="p-2 text-gray-700 transition-colors duration-200 hover:text-violet-600 dark:text-gray-300 dark:hover:text-violet-400"
                 aria-label="Analytics"
               >
                 <FiTrendingUp className="h-5 w-5" />

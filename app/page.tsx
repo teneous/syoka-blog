@@ -6,43 +6,41 @@ import TechStack from '@/components/TechStack'
 export default async function Page() {
   const sortedPosts = sortPosts(allBlogs)
   const posts = allCoreContent(sortedPosts)
-  
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="bg-grid-pattern absolute inset-0 opacity-5"></div>
         <Hero />
       </div>
-      
+
       <div className="relative">
-        <div className="absolute -top-24 left-0 w-full h-24 bg-gradient-to-b from-transparent to-gray-50 dark:to-gray-900"></div>
+        <div className="absolute -top-24 left-0 h-24 w-full bg-gradient-to-b from-transparent to-gray-50 dark:to-gray-900"></div>
         <TechStack />
       </div>
 
       <section className="container mx-auto px-4 py-20">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-16 text-center">
+            <h2 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-4xl font-bold text-transparent dark:from-blue-400 dark:to-purple-400">
               Latest Posts
             </h2>
             <p className="mt-4 text-gray-600 dark:text-gray-400">
               Explore my latest thoughts and insights
             </p>
           </div>
-          
+
           <div className="grid gap-8 md:grid-cols-2">
             {posts.slice(0, 4).map((post) => (
-              <article 
+              <article
                 key={post.slug}
-                className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                className="group relative transform overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-800"
               >
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <h3 className="mb-2 text-xl font-semibold transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400">
                     {post.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 line-clamp-2">
-                    {post.summary}
-                  </p>
+                  <p className="line-clamp-2 text-gray-600 dark:text-gray-400">{post.summary}</p>
                 </div>
               </article>
             ))}

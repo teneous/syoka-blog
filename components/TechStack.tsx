@@ -2,16 +2,39 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { 
-  SiReact, SiTypescript, SiNextdotjs, SiTailwindcss, SiNodedotjs,
-  SiPython, SiOpenjdk, SiDocker, SiKubernetes, 
-  SiMongodb, SiPostgresql, SiRedis, SiGithub, SiLinux,
-  SiSpringboot, SiJetbrains, SiOpenai, SiMysql, SiGrafana,
-  SiGit, SiPostman, SiAnaconda, SiHuggingface,
-  SiApachekafka, SiPrometheus, SiElasticsearch,
-  SiNeo4J, SiApache, SiKibana, SiAuth0,
+import {
+  SiReact,
+  SiTypescript,
+  SiNextdotjs,
+  SiTailwindcss,
+  SiNodedotjs,
+  SiPython,
+  SiOpenjdk,
+  SiDocker,
+  SiKubernetes,
+  SiMongodb,
+  SiPostgresql,
+  SiRedis,
+  SiGithub,
+  SiLinux,
+  SiSpringboot,
+  SiJetbrains,
+  SiOpenai,
+  SiMysql,
+  SiGrafana,
+  SiGit,
+  SiPostman,
+  SiAnaconda,
+  SiHuggingface,
+  SiApachekafka,
+  SiPrometheus,
+  SiElasticsearch,
+  SiNeo4J,
+  SiApache,
+  SiKibana,
+  SiAuth0,
   SiAlibabadotcom,
-  SiOllama
+  SiOllama,
 } from 'react-icons/si'
 import { TbApi, TbBrandVscode } from 'react-icons/tb'
 import { BiLogoVisualStudio } from 'react-icons/bi'
@@ -38,7 +61,7 @@ export const techStacks: TechCategory[] = [
       { name: 'JetBrains', icon: SiJetbrains },
       { name: 'Docker', icon: SiDocker },
       { name: 'OpenAI', icon: SiOpenai },
-    ]
+    ],
   },
   {
     name: 'Languages',
@@ -46,7 +69,7 @@ export const techStacks: TechCategory[] = [
       { name: 'TypeScript', icon: SiTypescript },
       { name: 'Python', icon: SiPython },
       { name: 'Java', icon: SiOpenjdk },
-    ]
+    ],
   },
   {
     name: 'Databases',
@@ -56,7 +79,7 @@ export const techStacks: TechCategory[] = [
       { name: 'Redis', icon: SiRedis },
       { name: 'MySQL', icon: SiMysql },
       { name: 'Neo4j', icon: SiNeo4J },
-    ]
+    ],
   },
   {
     name: 'Middleware',
@@ -73,7 +96,7 @@ export const techStacks: TechCategory[] = [
       { name: 'Milvus', icon: GiArtificialIntelligence },
       { name: 'Langchain', icon: GiArtificialIntelligence },
       { name: 'Kibana', icon: SiKibana },
-    ]
+    ],
   },
   {
     name: 'DevOps & Tools',
@@ -85,8 +108,8 @@ export const techStacks: TechCategory[] = [
       { name: 'Insomnia', icon: SiPostman },
       { name: 'Conda', icon: SiAnaconda },
       { name: 'Hugging Face', icon: SiHuggingface },
-    ]
-  }
+    ],
+  },
 ]
 
 export default function TechStack() {
@@ -95,21 +118,19 @@ export default function TechStack() {
   return (
     <div className="py-12">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-8 dark:text-white">
-          Tech Stack
-        </h2>
-        
+        <h2 className="mb-8 text-center text-3xl font-bold dark:text-white">Tech Stack</h2>
+
         {/* Category Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
+        <div className="mb-12 flex flex-wrap justify-center gap-2">
           {techStacks.map((category) => (
             <button
               key={category.name}
               onClick={() => setActiveCategory(category.name)}
-              className={`px-4 py-2 text-sm rounded-lg transition-colors
-                ${activeCategory === category.name
+              className={`rounded-lg px-4 py-2 text-sm transition-colors ${
+                activeCategory === category.name
                   ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
                   : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
-                }`}
+              }`}
             >
               {category.name}
             </button>
@@ -117,22 +138,20 @@ export default function TechStack() {
         </div>
 
         {/* Tech Items Grid */}
-        <div
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
-        >
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {techStacks
-            .find(c => c.name === activeCategory)
+            .find((c) => c.name === activeCategory)
             ?.items.map((item) => {
               const Icon = item.icon
               return (
                 <motion.div
                   key={item.name}
-                  className="flex flex-col items-center p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow"
+                  className="flex flex-col items-center rounded-lg bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:bg-gray-800"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Icon className="w-8 h-8 mb-2 text-gray-600 dark:text-gray-300" />
-                  <span className="text-sm text-center text-gray-700 dark:text-gray-300">
+                  <Icon className="mb-2 h-8 w-8 text-gray-600 dark:text-gray-300" />
+                  <span className="text-center text-sm text-gray-700 dark:text-gray-300">
                     {item.name}
                   </span>
                 </motion.div>
@@ -142,4 +161,4 @@ export default function TechStack() {
       </div>
     </div>
   )
-} 
+}
