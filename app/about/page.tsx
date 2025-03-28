@@ -191,18 +191,18 @@ const LanguageSwitch = ({
 )
 
 const CommandPrompt = ({ children }: { children: React.ReactNode }) => (
-  <div className="terminal-card transform overflow-hidden rounded-xl border border-gray-700/50 bg-gray-900 font-mono text-sm shadow-xl transition-all duration-300 hover:scale-[1.01] dark:bg-gray-800">
-    <div className="flex items-center gap-2 border-b border-gray-700/50 bg-gray-800/50 p-3">
+  <div className="terminal-card transform overflow-hidden rounded-xl border border-gray-200 bg-gray-50 font-mono text-sm shadow-xl transition-all duration-300 hover:scale-[1.01] dark:border-gray-700/50 dark:bg-gray-900">
+    <div className="flex items-center gap-2 border-b border-gray-200 bg-gray-100/80 p-3 dark:border-gray-700/50 dark:bg-gray-800/50">
       <div className="h-3 w-3 rounded-full bg-red-500/80 shadow-lg shadow-red-500/20"></div>
       <div className="h-3 w-3 rounded-full bg-yellow-500/80 shadow-lg shadow-yellow-500/20"></div>
       <div className="h-3 w-3 rounded-full bg-green-500/80 shadow-lg shadow-green-500/20"></div>
     </div>
     <div className="space-y-3 p-6">
       <div className="flex items-center gap-2 opacity-80">
-        <span className="text-primary-400">$</span>
-        <span className="text-gray-300">whoami</span>
+        <span className="text-violet-500 dark:text-primary-400">$</span>
+        <span className="text-gray-700 dark:text-gray-300">whoami</span>
       </div>
-      <div className="border-primary-500/30 border-l-2 pl-4">{children}</div>
+      <div className="border-l-2 border-violet-500/30 pl-4 dark:border-primary-500/30">{children}</div>
     </div>
   </div>
 )
@@ -228,10 +228,10 @@ const FeatureCard = ({
 )
 
 const TechSection = ({ title, items }: { title: string; items: string[] }) => (
-  <div className="tech-section h-[360px] transform rounded-xl border border-violet-500/20 bg-gray-900/50 p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.01] hover:shadow-violet-500/10">
+  <div className="tech-section h-[360px] transform rounded-xl border border-violet-500/20 bg-white/80 p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.01] hover:shadow-violet-500/10 dark:bg-gray-900/50">
     <h3 className="mb-4 flex items-center gap-2 text-lg font-bold">
-      <GitBranch className="h-5 w-5 text-violet-400" />
-      <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+      <GitBranch className="h-5 w-5 text-violet-500 dark:text-violet-400" />
+      <span className="bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text text-transparent dark:from-violet-400 dark:to-fuchsia-400">
         {title}
       </span>
     </h3>
@@ -242,9 +242,9 @@ const TechSection = ({ title, items }: { title: string; items: string[] }) => (
           className="tech-item flex items-center gap-3 rounded-lg p-2 transition-colors duration-200 hover:bg-violet-500/10"
         >
           <div className="flex-shrink-0 rounded-md bg-violet-500/20 p-1.5">
-            <Zap className="h-4 w-4 text-violet-400" />
+            <Zap className="h-4 w-4 text-violet-500 dark:text-violet-400" />
           </div>
-          <span className="text-gray-300">{item}</span>
+          <span className="text-gray-700 dark:text-gray-300">{item}</span>
         </div>
       ))}
     </div>
@@ -252,10 +252,10 @@ const TechSection = ({ title, items }: { title: string; items: string[] }) => (
 )
 
 const ContactChip = ({ type, value }: { type: string; value: string }) => (
-  <div className="contact-chip inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-gray-900/50 px-4 py-2 transition-all duration-300 hover:border-violet-500/50">
-    <MessageSquare className="h-4 w-4 text-violet-400" />
-    <span className="font-medium text-gray-300">{type}:</span>
-    <span className="text-violet-400">{value}</span>
+  <div className="contact-chip inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-white/80 px-4 py-2 transition-all duration-300 hover:border-violet-500/50 dark:bg-gray-900/50">
+    <MessageSquare className="h-4 w-4 text-violet-500 dark:text-violet-400" />
+    <span className="font-medium text-gray-700 dark:text-gray-300">{type}:</span>
+    <span className="text-violet-500 dark:text-violet-400">{value}</span>
   </div>
 )
 
@@ -266,19 +266,19 @@ const CareerRoadmap = ({
   title: string
   companies: Array<{ name: string; period: string; role: string; focus: string }>
 }) => (
-  <div className="mt-12 rounded-xl border border-violet-500/20 bg-gray-900/50 p-8 backdrop-blur-sm">
-    <h3 className="mb-8 bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-2xl font-bold text-transparent">
+  <div className="mt-12 rounded-xl border border-violet-500/20 bg-white/80 p-8 backdrop-blur-sm dark:bg-gray-900/50">
+    <h3 className="mb-8 bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text text-2xl font-bold text-transparent dark:from-violet-400 dark:to-fuchsia-400">
       {title}
     </h3>
     <div className="relative">
       {/* 背景装饰 */}
-      <div className="absolute top-0 left-12 h-full w-1 bg-gradient-to-b from-violet-500/20 via-fuchsia-500/20 to-violet-500/20" />
+      <div className="absolute left-12 top-0 h-full w-1 bg-gradient-to-b from-violet-500/20 via-fuchsia-500/20 to-violet-500/20" />
 
       <div className="space-y-16">
         {companies.map((company, index) => (
           <div key={index} className="group relative">
             {/* 连接线装饰 */}
-            <div className="absolute top-8 left-12 h-[2px] w-8 bg-gradient-to-r from-violet-500/50 to-transparent" />
+            <div className="absolute left-12 top-8 h-[2px] w-8 bg-gradient-to-r from-violet-500/50 to-transparent" />
 
             <div className="flex items-start gap-8">
               {/* 时间节点 */}
@@ -287,8 +287,8 @@ const CareerRoadmap = ({
                   {/* 背景圆环 */}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 transition-colors duration-300 group-hover:from-violet-500/20 group-hover:to-fuchsia-500/20" />
                   {/* 公司名称 */}
-                  <div className="absolute inset-2 flex items-center justify-center rounded-full border border-violet-500/20 bg-gray-900/50 backdrop-blur-sm transition-colors duration-300 group-hover:border-violet-500/40">
-                    <span className="bg-gradient-to-br from-violet-400 to-fuchsia-400 bg-clip-text text-base font-bold text-transparent">
+                  <div className="absolute inset-2 flex items-center justify-center rounded-full border border-violet-500/20 bg-white/90 backdrop-blur-sm transition-colors duration-300 group-hover:border-violet-500/40 dark:bg-gray-900/50">
+                    <span className="bg-gradient-to-br from-violet-500 to-fuchsia-500 bg-clip-text text-base font-bold text-transparent dark:from-violet-400 dark:to-fuchsia-400">
                       {company.name}
                     </span>
                   </div>
@@ -297,15 +297,15 @@ const CareerRoadmap = ({
                 </div>
                 {/* 时间标签 */}
                 <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                  <span className="font-mono text-sm text-gray-400">{company.period}</span>
+                  <span className="font-mono text-sm text-gray-500 dark:text-gray-400">{company.period}</span>
                 </div>
               </div>
 
               {/* 内容卡片 */}
               <div className="flex-1 pt-4">
-                <div className="transform rounded-xl border border-violet-500/20 bg-gray-900/50 p-4 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-violet-500/40">
-                  <div className="mb-1 text-lg font-semibold text-gray-200">{company.role}</div>
-                  <div className="text-sm text-gray-400">{company.focus}</div>
+                <div className="transform rounded-xl border border-violet-500/20 bg-white/90 p-4 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-violet-500/40 dark:bg-gray-900/50">
+                  <div className="mb-1 text-lg font-semibold text-gray-800 dark:text-gray-200">{company.role}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">{company.focus}</div>
                 </div>
               </div>
             </div>
@@ -337,16 +337,16 @@ export default function Page() {
           {/* 终端风格介绍 */}
           <CommandPrompt>
             <div className="space-y-3">
-              <span className="font-semibold text-green-400">Syoka</span>
-              <p className="text-gray-300">{t.intro}</p>
+              <span className="font-semibold text-green-600 dark:text-green-400">Syoka</span>
+              <p className="text-gray-700 dark:text-gray-300">{t.intro}</p>
               <div className="mt-3 flex gap-2">
-                <span className="terminal-tag bg-primary-500/20 text-primary-500 rounded-full px-3 py-1 text-xs font-medium">
+                <span className="terminal-tag rounded-full bg-violet-500/20 px-3 py-1 text-xs font-medium text-violet-600 dark:text-violet-400">
                   中文
                 </span>
-                <span className="terminal-tag rounded-full bg-purple-500/20 px-3 py-1 text-xs font-medium text-purple-500">
+                <span className="terminal-tag rounded-full bg-purple-500/20 px-3 py-1 text-xs font-medium text-purple-600 dark:text-purple-400">
                   English
                 </span>
-                <span className="terminal-tag rounded-full bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-500">
+                <span className="terminal-tag rounded-full bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400">
                   日本語
                 </span>
               </div>
