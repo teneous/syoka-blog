@@ -62,7 +62,7 @@ const content = {
           focus: "AI 产品架构与研发"
         },
         {
-          name: "阿里巴巴",
+          name: "蚂蚁集团",
           period: "2022 - 2023",
           role: "大数据工程师",
           focus: "数据平台 & 离线计算"
@@ -130,7 +130,7 @@ const content = {
           focus: "AI Product Architecture & R&D"
         },
         {
-          name: "Alibaba",
+          name: "AntGroup",
           period: "2022 - 2023",
           role: "Big Data Engineer",
           focus: "Data Platform & Offline Computing"

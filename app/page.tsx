@@ -23,10 +23,10 @@ export default async function Page() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-              最新文章
+              Latest Posts
             </h2>
             <p className="mt-4 text-gray-600 dark:text-gray-400">
-              探索我的最新想法和见解
+              Explore my latest thoughts and insights
             </p>
           </div>
           

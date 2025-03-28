@@ -37,125 +37,130 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
     <SectionContainer>
       <ScrollTopAndComment />
       <article>
-        <div className="xl:divide-y xl:divide-gray-200 xl:dark:divide-gray-700">
-          <header className="pt-6 xl:pb-6">
-            <div className="space-y-1 text-center">
-              <dl className="space-y-10">
-                <div>
-                  <dt className="sr-only">Published on</dt>
-                  <dd className="text-base leading-6 font-medium text-gray-500 dark:text-gray-400">
-                    <time dateTime={date}>
-                      {new Date(date).toLocaleDateString(siteMetadata.locale, postDateTemplate)}
-                    </time>
-                  </dd>
-                </div>
-              </dl>
-              <div>
-                <PageTitle>{title}</PageTitle>
-              </div>
-            </div>
-          </header>
-          <div className="grid-rows-[auto_1fr] divide-y divide-gray-200 pb-8 xl:grid xl:grid-cols-4 xl:gap-x-6 xl:divide-y-0 dark:divide-gray-700">
-            <dl className="pt-6 pb-10 xl:border-b xl:border-gray-200 xl:pt-11 xl:dark:border-gray-700">
-              <dt className="sr-only">Authors</dt>
-              <dd>
-                <ul className="flex flex-wrap justify-center gap-4 sm:space-x-12 xl:block xl:space-y-8 xl:space-x-0">
-                  {authorDetails.map((author) => (
-                    <li className="flex items-center space-x-2" key={author.name}>
-                      {author.avatar && (
-                        <Image
-                          src={author.avatar}
-                          width={38}
-                          height={38}
-                          alt="avatar"
-                          className="h-10 w-10 rounded-full"
-                        />
-                      )}
-                      <dl className="text-sm leading-5 font-medium whitespace-nowrap">
-                        <dt className="sr-only">Name</dt>
-                        <dd className="text-gray-900 dark:text-gray-100">{author.name}</dd>
-                        <dt className="sr-only">Twitter</dt>
-                        <dd>
-                          {author.twitter && (
-                            <Link
-                              href={author.twitter}
-                              className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
-                            >
-                              {author.twitter
-                                .replace('https://twitter.com/', '@')
-                                .replace('https://x.com/', '@')}
-                            </Link>
-                          )}
-                        </dd>
-                      </dl>
-                    </li>
+        <div className="relative">
+          {/* 装饰背景 */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute -left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-violet-100/5 blur-3xl dark:bg-violet-900/5" />
+            <div className="absolute -right-1/4 top-1/3 h-[400px] w-[400px] rounded-full bg-emerald-100/5 blur-3xl dark:bg-emerald-900/5" />
+          </div>
+
+          <div className="space-y-8 xl:space-y-12">
+            <header>
+              <div className="space-y-4 pb-10 text-center">
+                {/* 标签 */}
+                <div className="flex justify-center gap-2">
+                  {tags?.map((tag) => (
+                    <Tag key={tag} text={tag} />
                   ))}
-                </ul>
-              </dd>
-            </dl>
-            <div className="divide-y divide-gray-200 xl:col-span-3 xl:row-span-2 xl:pb-0 dark:divide-gray-700">
-              <div className="prose dark:prose-invert max-w-none pt-10 pb-8">{children}</div>
-              <div className="pt-6 pb-6 text-sm text-gray-700 dark:text-gray-300">
-                <Link href={editUrl(filePath)}>View on GitHub</Link>
-              </div>
-              {siteMetadata.comments && (
-                <div
-                  className="pt-6 pb-6 text-center text-gray-700 dark:text-gray-300"
-                  id="comment"
-                >
-                  <Comments slug={slug} />
                 </div>
-              )}
+                {/* 标题 */}
+                <div className="relative space-y-1 pt-6">
+                  <PageTitle>{title}</PageTitle>
+                  {/* 装饰线条 */}
+                  <div className="absolute -bottom-4 left-1/2 h-px w-24 -translate-x-1/2 bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
+                </div>
+                {/* 作者信息 */}
+                <dl className="space-y-6 pt-6">
+                  <div>
+                    <dt className="sr-only">作者</dt>
+                    <dd>
+                      <ul className="flex items-center justify-center gap-8">
+                        {authorDetails.map((author) => (
+                          <li key={author.name} className="flex items-center gap-2">
+                            {author.avatar && (
+                              <Image
+                                src={author.avatar}
+                                width={38}
+                                height={38}
+                                alt="avatar"
+                                className="h-10 w-10 rounded-full bg-violet-100 dark:bg-violet-800"
+                              />
+                            )}
+                            <dl className="whitespace-nowrap text-sm">
+                              <dt className="sr-only">姓名</dt>
+                              <dd className="font-medium text-gray-800 dark:text-gray-200">
+                                {author.name}
+                              </dd>
+                              <dt className="sr-only">Twitter</dt>
+                              <dd>
+                                {author.twitter && (
+                                  <Link
+                                    href={author.twitter}
+                                    className="text-violet-700 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300"
+                                  >
+                                    {author.twitter.replace('https://twitter.com/', '@')}
+                                  </Link>
+                                )}
+                              </dd>
+                            </dl>
+                          </li>
+                        ))}
+                      </ul>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="sr-only">发布于</dt>
+                    <dd className="text-base font-medium text-gray-700 dark:text-gray-300">
+                      <time dateTime={date}>
+                        {new Date(date).toLocaleDateString(siteMetadata.locale, postDateTemplate)}
+                      </time>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </header>
+
+            <div className="prose max-w-none pb-8 pt-10 dark:prose-dark 
+              prose-headings:text-gray-800 
+              prose-p:text-gray-700 
+              prose-strong:text-gray-900
+              prose-a:text-violet-700
+              dark:prose-headings:text-gray-100 
+              dark:prose-p:text-gray-200
+              dark:prose-strong:text-gray-100
+              dark:prose-a:text-violet-400
+              prose-pre:bg-gray-100
+              dark:prose-pre:bg-gray-800
+              prose-code:text-gray-800
+              dark:prose-code:text-gray-200
+              prose-li:text-gray-700
+              dark:prose-li:text-gray-200">
+              {children}
             </div>
-            <footer>
-              <div className="divide-gray-200 text-sm leading-5 font-medium xl:col-start-1 xl:row-start-2 xl:divide-y dark:divide-gray-700">
-                {tags && (
-                  <div className="py-4 xl:py-8">
-                    <h2 className="text-xs tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                      Tags
-                    </h2>
-                    <div className="flex flex-wrap">
-                      {tags.map((tag) => (
-                        <Tag key={tag} text={tag} />
-                      ))}
+
+            {/* 导航链接 */}
+            {(next || prev) && (
+              <footer>
+                <div className="flex justify-between gap-4 rounded-2xl border border-gray-200/20 bg-white/5 p-6 text-sm backdrop-blur-sm dark:border-gray-800/20 dark:bg-gray-800/5">
+                  {prev && prev.path && (
+                    <div>
+                      <h2 className="mb-1 text-xs uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                        上一篇
+                      </h2>
+                      <Link
+                        href={`/${basePath}/${prev.path}`}
+                        className="text-violet-700 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300"
+                      >
+                        &larr; {prev.title}
+                      </Link>
                     </div>
-                  </div>
-                )}
-                {(next || prev) && (
-                  <div className="flex justify-between py-4 xl:block xl:space-y-8 xl:py-8">
-                    {prev && prev.path && (
-                      <div>
-                        <h2 className="text-xs tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                          Previous Article
-                        </h2>
-                        <div className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400">
-                          <Link href={`/${prev.path}`}>{prev.title}</Link>
-                        </div>
-                      </div>
-                    )}
-                    {next && next.path && (
-                      <div>
-                        <h2 className="text-xs tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                          Next Article
-                        </h2>
-                        <div className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400">
-                          <Link href={`/${next.path}`}>{next.title}</Link>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div className="pt-4 xl:pt-8">
-                <Link
-                  href={`/${basePath}`}
-                  className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
-                  aria-label="Back to the blog"
-                >
-                  &larr; Back to the blog
-                </Link>
-              </div>
-            </footer>
+                  )}
+                  {next && next.path && (
+                    <div className="text-right">
+                      <h2 className="mb-1 text-xs uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                        下一篇
+                      </h2>
+                      <Link
+                        href={`/${basePath}/${next.path}`}
+                        className="text-violet-700 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300"
+                      >
+                        {next.title} &rarr;
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </footer>
+            )}
           </div>
         </div>
       </article>
