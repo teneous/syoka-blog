@@ -113,9 +113,9 @@
   ::file-selector-button {
     @apply border-gray-200 dark:border-gray-800;
   }
-  
+
   body {
-    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen antialiased;
+    @apply min-h-screen bg-white text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100;
   }
 
   ::selection {
@@ -129,7 +129,7 @@
 
   a:focus-visible,
   button:focus-visible {
-    @apply outline-2 outline-solid rounded-sm outline-primary-500;
+    @apply outline-primary-500 rounded-sm outline-2 outline-solid;
   }
 }
 
@@ -149,13 +149,22 @@
 
 /* Animations */
 @keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 @keyframes blink-caret {
-  from, to { border-color: transparent }
-  50% { border-color: hsl(var(--primary)) }
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: hsl(var(--primary));
+  }
 }
 
 /* Utility styles */
@@ -208,15 +217,15 @@ input:-webkit-autofill:focus {
 
 @layer components {
   .glass-card {
-    @apply bg-white/40 dark:bg-gray-900/40 backdrop-blur-md border border-white/30 dark:border-gray-800/30 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300;
+    @apply rounded-xl border border-white/30 bg-white/40 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl dark:border-gray-800/30 dark:bg-gray-900/40;
   }
 
   .terminal-card {
-    @apply bg-gray-950 text-gray-100 rounded-lg overflow-hidden shadow-xl border border-gray-800;
+    @apply overflow-hidden rounded-lg border border-gray-800 bg-gray-950 text-gray-100 shadow-xl;
   }
 
   .terminal-tag {
-    @apply px-2 py-0.5 bg-primary-500/20 text-primary-400 rounded text-xs font-medium;
+    @apply bg-primary-500/20 text-primary-400 rounded px-2 py-0.5 text-xs font-medium;
   }
 
   /* .tech-section {
@@ -224,37 +233,30 @@ input:-webkit-autofill:focus {
   } */
 
   .tech-item {
-    @apply flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 p-2 rounded-lg hover:bg-primary-500/10 transition-all duration-200;
+    @apply hover:bg-primary-500/10 flex items-center gap-2 rounded-lg p-2 text-sm text-gray-600 transition-all duration-200 dark:text-gray-300;
   }
 
   .feature-card {
-    @apply p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200;
+    @apply rounded-lg bg-white/5 p-4 transition-all duration-200 hover:bg-white/10;
   }
 
   .feature-icon {
-    @apply w-10 h-10 rounded-lg bg-primary-500/20 text-primary-500 flex items-center justify-center mb-3;
+    @apply bg-primary-500/20 text-primary-500 mb-3 flex h-10 w-10 items-center justify-center rounded-lg;
   }
 
-   .system-architecture-card {
-    @apply bg-white/40 dark:bg-gray-900/40 backdrop-blur-md border border-white/30 dark:border-gray-800/30 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6;
-  } 
+  .system-architecture-card {
+    @apply rounded-xl border border-white/30 bg-white/40 p-6 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl dark:border-gray-800/30 dark:bg-gray-900/40;
+  }
 
   .contact-chip {
-    @apply flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full text-sm transition-all duration-200 hover:bg-primary-500/10;
+    @apply hover:bg-primary-500/10 flex items-center gap-2 rounded-full bg-gray-100 px-4 py-2 text-sm transition-all duration-200 dark:bg-gray-800;
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-primary-500 via-primary-400 to-primary-500 bg-clip-text text-transparent font-semibold;
+    @apply from-primary-500 via-primary-400 to-primary-500 bg-gradient-to-r bg-clip-text font-semibold text-transparent;
   }
 
   .prose-custom {
-    @apply prose prose-gray dark:prose-invert 
-    prose-headings:text-gray-900 dark:prose-headings:text-gray-100
-    prose-p:text-gray-700 dark:prose-p:text-gray-300
-    prose-a:text-primary-500 hover:prose-a:text-primary-600
-    prose-strong:text-gray-900 dark:prose-strong:text-white
-    prose-code:text-primary-500 dark:prose-code:text-primary-400
-    prose-pre:bg-gray-950 dark:prose-pre:bg-gray-900
-    prose-blockquote:border-l-primary-500 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300;
+    @apply prose prose-gray dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-primary-500 hover:prose-a:text-primary-600 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-primary-500 dark:prose-code:text-primary-400 prose-pre:bg-gray-950 dark:prose-pre:bg-gray-900 prose-blockquote:border-l-primary-500 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300;
   }
 }

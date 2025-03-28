@@ -11,7 +11,7 @@ export default function Home({ posts }) {
     <>
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         <div className="space-y-2 md:space-y-5">
-          <h1 className="mb-8 text-3xl font-bold md:text-4xl text-gray-900 dark:text-gray-100">
+          <h1 className="mb-8 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-100">
             Latest
           </h1>
           <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
