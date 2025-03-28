@@ -3,7 +3,7 @@ const colors = require('tailwindcss/colors')
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ['class'],
+  darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -20,81 +20,81 @@ module.exports = {
   theme: {
     container: {
       center: true,
-      padding: '2rem',
+      padding: "2rem",
       screens: {
-        '2xl': '1400px',
+        "2xl": "1400px",
       },
     },
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        primary: colors.pink,
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: 'var(--primary)',
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
         gray: colors.gray,
       },
       opacity: {
-        20: '0.2',
-        30: '0.3',
-        40: '0.4',
-        50: '0.5',
-        60: '0.6',
-        70: '0.7',
-        80: '0.8',
-        90: '0.9',
+        '20': '0.2',
+        '30': '0.3',
+        '40': '0.4',
+        '50': '0.5',
+        '60': '0.6',
+        '70': '0.7',
+        '80': '0.8',
+        '90': '0.9',
       },
       textColor: {
-        DEFAULT: 'hsl(var(--foreground))',
-        foreground: 'hsl(var(--foreground))',
+        DEFAULT: "hsl(var(--foreground))",
+        foreground: "hsl(var(--foreground))",
       },
       backgroundColor: {
-        DEFAULT: 'hsl(var(--background))',
-        background: 'hsl(var(--background))',
+        DEFAULT: "hsl(var(--background))",
+        background: "hsl(var(--background))",
       },
       borderColor: {
-        DEFAULT: 'hsl(var(--border))',
+        DEFAULT: "hsl(var(--border))",
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
         sans: ['var(--font-space-grotesk)', ...fontFamily.sans],
       },
       keyframes: {
-        'accordion-down': {
+        "accordion-down": {
           from: { height: 0 },
-          to: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
         float: {
@@ -107,51 +107,51 @@ module.exports = {
         'fade-in-down': {
           '0%': {
             opacity: '0',
-            transform: 'translateY(-10px)',
+            transform: 'translateY(-10px)'
           },
           '100%': {
             opacity: '1',
-            transform: 'translateY(0)',
+            transform: 'translateY(0)'
           },
         },
         'fade-in-up': {
           '0%': {
             opacity: '0',
-            transform: 'translateY(10px)',
+            transform: 'translateY(10px)'
           },
           '100%': {
             opacity: '1',
-            transform: 'translateY(0)',
+            transform: 'translateY(0)'
           },
         },
         'fade-in': {
           '0%': {
-            opacity: '0',
+            opacity: '0'
           },
           '100%': {
-            opacity: '1',
+            opacity: '1'
           },
         },
         'fade-in-right': {
           '0%': {
             opacity: '0',
-            transform: 'translateX(-10px)',
+            transform: 'translateX(-10px)'
           },
           '100%': {
             opacity: '1',
-            transform: 'translateX(0)',
+            transform: 'translateX(0)'
           },
-        },
+        }
       },
       animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
-        float: 'float 3s ease-in-out infinite',
-        shimmer: 'shimmer 2s infinite',
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "float": "float 3s ease-in-out infinite",
+        "shimmer": "shimmer 2s infinite",
         'fade-in-down': 'fade-in-down 0.5s ease-out',
         'fade-in-up': 'fade-in-up 0.5s ease-out',
         'fade-in': 'fade-in 0.5s ease-out',
-        'fade-in-right': 'fade-in-right 0.5s ease-out',
+        'fade-in-right': 'fade-in-right 0.5s ease-out'
       },
       backdropBlur: {
         xs: '2px',
@@ -172,7 +172,7 @@ module.exports = {
     },
   },
   plugins: [
-    require('tailwindcss-animate'),
+    require("tailwindcss-animate"),
     require('@tailwindcss/typography'),
     require('@tailwindcss/forms'),
   ],
@@ -184,24 +184,20 @@ module.exports = {
   },
   safelist: [
     {
-      pattern:
-        /bg-(primary|secondary|accent|white|gray)-(50|100|200|300|400|500|600|700|800|900|950)/,
+      pattern: /bg-(primary|secondary|accent|white|gray)-(50|100|200|300|400|500|600|700|800|900|950)/,
       variants: ['hover', 'dark'],
     },
     {
-      pattern:
-        /text-(primary|secondary|accent|white|gray)-(50|100|200|300|400|500|600|700|800|900|950)/,
+      pattern: /text-(primary|secondary|accent|white|gray)-(50|100|200|300|400|500|600|700|800|900|950)/,
       variants: ['hover', 'dark'],
     },
     {
-      pattern:
-        /border-(primary|secondary|accent|white|gray)-(50|100|200|300|400|500|600|700|800|900|950)/,
+      pattern: /border-(primary|secondary|accent|white|gray)-(50|100|200|300|400|500|600|700|800|900|950)/,
       variants: ['hover', 'dark'],
     },
     {
-      pattern:
-        /(bg|text|border)-(primary|secondary|accent|white|gray)-(50|100|200|300|400|500|600|700|800|900|950)\/(20|30|40|50|60|70|80|90)/,
+      pattern: /(bg|text|border)-(primary|secondary|accent|white|gray)-(50|100|200|300|400|500|600|700|800|900|950)\/(20|30|40|50|60|70|80|90)/,
       variants: ['hover', 'dark'],
     },
   ],
-}
+} 
