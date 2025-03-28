@@ -35,7 +35,7 @@ const Header = () => {
             </nav>
 
             <div className="flex items-center space-x-4">
-              <SearchButton />
+              {/*<SearchButton />*/}
               <ThemeSwitch />
               <a
                 href="https://us.umami.is/websites/a708639c-b4bd-4454-9bc3-b4142536a6be"
