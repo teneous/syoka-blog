@@ -10,7 +10,8 @@ import {
   SiGit, SiPostman, SiAnaconda, SiHuggingface,
   SiApachekafka, SiPrometheus, SiElasticsearch,
   SiNeo4J, SiApache, SiKibana, SiAuth0,
-  SiAlibabadotcom
+  SiAlibabadotcom,
+  SiOllama
 } from 'react-icons/si'
 import { TbApi, TbBrandVscode } from 'react-icons/tb'
 import { BiLogoVisualStudio } from 'react-icons/bi'
@@ -37,7 +38,6 @@ export const techStacks: TechCategory[] = [
       { name: 'JetBrains', icon: SiJetbrains },
       { name: 'Docker', icon: SiDocker },
       { name: 'OpenAI', icon: SiOpenai },
-      { name: 'PostgreSQL', icon: SiPostgresql },
     ]
   },
   {
@@ -63,11 +63,11 @@ export const techStacks: TechCategory[] = [
     items: [
       { name: 'Kafka', icon: SiApachekafka },
       { name: 'MaxCompute', icon: SiAlibabadotcom },
+      { name: 'ElasticSearch', icon: SiElasticsearch },
       { name: 'Prometheus', icon: SiPrometheus },
       { name: 'Skywalking', icon: FaSearch },
       { name: 'OAuth', icon: SiAuth0 },
-      { name: 'Nacos', icon: SiAlibabadotcom },
-      { name: 'Dubbo', icon: SiApache },
+      { name: 'Ollama', icon: SiOllama },
       { name: 'RestAPI', icon: TbApi },
       { name: 'Kong', icon: FaDatabase },
       { name: 'Milvus', icon: GiArtificialIntelligence },
@@ -76,7 +76,7 @@ export const techStacks: TechCategory[] = [
     ]
   },
   {
-    name: 'DevOps',
+    name: 'DevOps & Tools',
     items: [
       { name: 'Git', icon: SiGit },
       { name: 'Docker', icon: SiDocker },

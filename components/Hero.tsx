@@ -23,9 +23,9 @@ const codeString = `import asyncio
 
 async def journey():
     while True:
-        await learn()
-        await action()
-        await think()
+        await keep_learning()
+        await take_action()
+        await deep_thinking()
 
 asyncio.run(journey())`
 
