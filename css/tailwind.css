@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import 'tailwindcss';
 @plugin "@tailwindcss/forms";
 @plugin '@tailwindcss/typography';
@@ -57,66 +61,113 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+  :root {
+    --background: 220 33% 98%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 262 83.3% 57.8%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 262 83.3% 57.8%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 262 83.3% 57.8%;
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 263 70% 50%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 263 70% 50%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 263 70% 50%;
+  }
+
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
+    @apply border-gray-200 dark:border-gray-800;
+  }
+
+  body {
+    @apply min-h-screen bg-white text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100;
+  }
+
+  ::selection {
+    @apply bg-primary-500/20 text-gray-900 dark:text-white;
   }
 
   a,
   button {
-    outline-color: var(--color-primary-500);
+    outline-color: hsl(var(--primary));
   }
 
   a:focus-visible,
   button:focus-visible {
-    outline: 2px solid;
-    border-radius: var(--radius-sm);
-    outline-color: var(--color-primary-500);
+    @apply outline-primary-500 rounded-sm outline-2 outline-solid;
   }
 }
 
 @layer utilities {
-  .prose {
-    & a {
-      color: var(--color-primary-500);
-      &:hover {
-        color: var(--color-primary-600);
-      }
-      & code {
-        color: var(--color-primary-400);
-      }
-    }
-    & :where(h1, h2) {
-      font-weight: 700;
-      letter-spacing: var(--tracking-tight);
-    }
-    & h3 {
-      font-weight: 600;
-    }
-    & :where(code):not(pre code) {
-      color: var(--color-indigo-500);
-    }
+  .text-balance {
+    text-wrap: balance;
   }
 
-  .prose-invert {
-    & a {
-      color: var(--color-primary-500);
-      &:hover {
-        color: var(--color-primary-400);
-      }
-      & code {
-        color: var(--color-primary-400);
-      }
-    }
-    & :where(h1, h2, h3, h4, h5, h6) {
-      color: var(--color-gray-100);
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
     }
   }
 }
 
+/* Animations */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: hsl(var(--primary));
+  }
+}
+
+/* Utility styles */
 .task-list-item::before {
   @apply hidden;
 }
@@ -137,16 +188,6 @@
   @apply my-5;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-/* https://stackoverflow.com/questions/61083813/how-to-avoid-internal-autofill-selected-style-to-be-applied */
 input:-webkit-autofill,
 input:-webkit-autofill:focus {
   transition:
@@ -172,4 +213,50 @@ input:-webkit-autofill:focus {
 .linkicon {
   display: inline-block;
   vertical-align: middle;
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-xl border border-white/30 bg-white/40 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl dark:border-gray-800/30 dark:bg-gray-900/40;
+  }
+
+  .terminal-card {
+    @apply overflow-hidden rounded-lg border border-gray-800 bg-gray-950 text-gray-100 shadow-xl;
+  }
+
+  .terminal-tag {
+    @apply bg-primary-500/20 text-primary-400 rounded px-2 py-0.5 text-xs font-medium;
+  }
+
+  /* .tech-section {
+    @apply glass-card p-6 hover:scale-[1.02] transition-all duration-300;
+  } */
+
+  .tech-item {
+    @apply hover:bg-primary-500/10 flex items-center gap-2 rounded-lg p-2 text-sm text-gray-600 transition-all duration-200 dark:text-gray-300;
+  }
+
+  .feature-card {
+    @apply rounded-lg bg-white/5 p-4 transition-all duration-200 hover:bg-white/10;
+  }
+
+  .feature-icon {
+    @apply bg-primary-500/20 text-primary-500 mb-3 flex h-10 w-10 items-center justify-center rounded-lg;
+  }
+
+  .system-architecture-card {
+    @apply rounded-xl border border-white/30 bg-white/40 p-6 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl dark:border-gray-800/30 dark:bg-gray-900/40;
+  }
+
+  .contact-chip {
+    @apply hover:bg-primary-500/10 flex items-center gap-2 rounded-full bg-gray-100 px-4 py-2 text-sm transition-all duration-200 dark:bg-gray-800;
+  }
+
+  .gradient-text {
+    @apply from-primary-500 via-primary-400 to-primary-500 bg-gradient-to-r bg-clip-text font-semibold text-transparent;
+  }
+
+  .prose-custom {
+    @apply prose prose-gray dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-primary-500 hover:prose-a:text-primary-600 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-primary-500 dark:prose-code:text-primary-400 prose-pre:bg-gray-950 dark:prose-pre:bg-gray-900 prose-blockquote:border-l-primary-500 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300;
+  }
 }

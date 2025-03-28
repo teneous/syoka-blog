@@ -1,14 +1,12 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { slug } from 'github-slugger'
 import { formatDate } from 'pliny/utils/formatDate'
 import { CoreContent } from 'pliny/utils/contentlayer'
 import type { Blog } from 'contentlayer/generated'
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
-import tagData from 'app/tag-data.json'
 
 interface PaginationProps {
   totalPages: number
@@ -23,148 +21,137 @@ interface ListLayoutProps {
 
 function Pagination({ totalPages, currentPage }: PaginationProps) {
   const pathname = usePathname()
-  const segments = pathname.split('/')
-  const lastSegment = segments[segments.length - 1]
-  const basePath = pathname
-    .replace(/^\//, '') // Remove leading slash
-    .replace(/\/page\/\d+$/, '') // Remove any trailing /page
-  console.log(pathname)
-  console.log(basePath)
+  const basePath = pathname.split('/')[1]
   const prevPage = currentPage - 1 > 0
   const nextPage = currentPage + 1 <= totalPages
 
   return (
-    <div className="space-y-2 pt-6 pb-8 md:space-y-5">
-      <nav className="flex justify-between">
-        {!prevPage && (
-          <button className="cursor-auto disabled:opacity-50" disabled={!prevPage}>
-            Previous
-          </button>
-        )}
-        {prevPage && (
+    <div className="mt-16 flex items-center justify-between">
+      <div className="flex-1">
+        {prevPage ? (
           <Link
             href={currentPage - 1 === 1 ? `/${basePath}/` : `/${basePath}/page/${currentPage - 1}`}
             rel="prev"
+            className="group inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
           >
+            <svg
+              className="h-4 w-4 transition-transform group-hover:-translate-x-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
             Previous
           </Link>
+        ) : (
+          <span className="text-sm text-gray-400 dark:text-gray-600">Previous</span>
         )}
-        <span>
-          {currentPage} of {totalPages}
-        </span>
-        {!nextPage && (
-          <button className="cursor-auto disabled:opacity-50" disabled={!nextPage}>
+      </div>
+      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+        Page {currentPage} of {totalPages}
+      </span>
+      <div className="flex-1 text-right">
+        {nextPage ? (
+          <Link
+            href={`/${basePath}/page/${currentPage + 1}`}
+            rel="next"
+            className="group inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+          >
             Next
-          </button>
-        )}
-        {nextPage && (
-          <Link href={`/${basePath}/page/${currentPage + 1}`} rel="next">
-            Next
+            <svg
+              className="h-4 w-4 transition-transform group-hover:translate-x-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
+        ) : (
+          <span className="text-sm text-gray-400 dark:text-gray-600">Next</span>
         )}
-      </nav>
+      </div>
     </div>
   )
 }
 
-export default function ListLayoutWithTags({
-  posts,
-  title,
-  initialDisplayPosts = [],
-  pagination,
-}: ListLayoutProps) {
-  const pathname = usePathname()
-  // const tagCounts = tagData as Record<string, number>
-  // const tagKeys = Object.keys(tagCounts)
-  // const sortedTags = tagKeys.sort((a, b) => tagCounts[b] - tagCounts[a])
-
+export default function ListLayout({ posts, initialDisplayPosts = [], pagination }: ListLayoutProps) {
   const displayPosts = initialDisplayPosts.length > 0 ? initialDisplayPosts : posts
 
   return (
-    <>
-      <div>
-        <div className="pt-6 pb-6">
-          <h1 className="text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:hidden sm:text-4xl sm:leading-10 md:text-6xl md:leading-14 dark:text-gray-100">
-            {title}
-          </h1>
-        </div>
-        <div className="flex sm:space-x-24">
-          {/*<div className="hidden h-full max-h-screen max-w-[280px] min-w-[280px] flex-wrap overflow-auto rounded-sm bg-gray-50 pt-5 shadow-md sm:flex dark:bg-gray-900/70 dark:shadow-gray-800/40">*/}
-          {/*  <div className="px-6 py-4">*/}
-          {/*    {pathname.startsWith('/blog') ? (*/}
-          {/*      <h3 className="text-primary-500 font-bold uppercase">All Posts</h3>*/}
-          {/*    ) : (*/}
-          {/*      <Link*/}
-          {/*        href={`/blog`}*/}
-          {/*        className="hover:text-primary-500 dark:hover:text-primary-500 font-bold text-gray-700 uppercase dark:text-gray-300"*/}
-          {/*      >*/}
-          {/*        All Posts*/}
-          {/*      </Link>*/}
-          {/*    )}*/}
-          {/*    <ul>*/}
-          {/*      {sortedTags.map((t) => {*/}
-          {/*        return (*/}
-          {/*          <li key={t} className="my-3">*/}
-          {/*            {decodeURI(pathname.split('/tags/')[1]) === slug(t) ? (*/}
-          {/*              <h3 className="text-primary-500 inline px-3 py-2 text-sm font-bold uppercase">*/}
-          {/*                {`${t} (${tagCounts[t]})`}*/}
-          {/*              </h3>*/}
-          {/*            ) : (*/}
-          {/*              <Link*/}
-          {/*                href={`/tags/${slug(t)}`}*/}
-          {/*                className="hover:text-primary-500 dark:hover:text-primary-500 px-3 py-2 text-sm font-medium text-gray-500 uppercase dark:text-gray-300"*/}
-          {/*                aria-label={`View posts tagged ${t}`}*/}
-          {/*              >*/}
-          {/*                {`${t} (${tagCounts[t]})`}*/}
-          {/*              </Link>*/}
-          {/*            )}*/}
-          {/*          </li>*/}
-          {/*        )*/}
-          {/*      })}*/}
-          {/*    </ul>*/}
-          {/*  </div>*/}
-          {/*</div>*/}
-          <div>
-            <ul>
-              {displayPosts.map((post) => {
-                const { path, date, title, summary, tags } = post
-                return (
-                  <li key={path} className="py-5">
-                    <article className="flex flex-col space-y-2 xl:space-y-0">
-                      <dl>
-                        <dt className="sr-only">Published on</dt>
-                        <dd className="text-base leading-6 font-medium text-gray-500 dark:text-gray-400">
-                          <time dateTime={date} suppressHydrationWarning>
-                            {formatDate(date, siteMetadata.locale)}
-                          </time>
-                        </dd>
-                      </dl>
-                      <div className="space-y-3">
-                        <div>
-                          <h2 className="text-2xl leading-8 font-bold tracking-tight">
-                            <Link href={`/${path}`} className="text-gray-900 dark:text-gray-100">
-                              {title}
-                            </Link>
-                          </h2>
-                          <div className="flex flex-wrap">
-                            {tags?.map((tag) => <Tag key={tag} text={tag} />)}
-                          </div>
-                        </div>
-                        <div className="prose max-w-none text-gray-500 dark:text-gray-400">
-                          {summary}
-                        </div>
-                      </div>
-                    </article>
-                  </li>
-                )
-              })}
-            </ul>
-            {pagination && pagination.totalPages > 1 && (
-              <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} />
-            )}
-          </div>
-        </div>
-      </div>
-    </>
+    <div className="space-y-16">
+      {!displayPosts.length && 'No posts found.'}
+      {displayPosts.map((post) => {
+        const { slug, date, title, summary, tags } = post
+        return (
+          <article
+            key={slug}
+            className="group relative rounded-2xl bg-white/30 p-6 transition-all hover:bg-white/50 dark:bg-gray-800/30 dark:hover:bg-gray-800/50"
+          >
+            {/* 装饰边框 */}
+            <div className="absolute inset-0 rounded-2xl border border-gray-200/50 dark:border-gray-700/50" />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-transparent to-violet-100/20 opacity-0 transition-opacity group-hover:opacity-100 dark:to-violet-900/20" />
+            
+            <div className="relative space-y-5">
+              {/* 日期和标签 */}
+              <div className="flex items-center gap-4 text-sm">
+                <time
+                  dateTime={date}
+                  className="font-medium text-violet-600 dark:text-violet-400"
+                >
+                  {formatDate(date, siteMetadata.locale)}
+                </time>
+                <div className="flex flex-wrap gap-2">
+                  {tags?.map((tag) => (
+                    <Tag key={tag} text={tag} />
+                  ))}
+                </div>
+              </div>
+
+              {/* 标题 */}
+              <h2 className="font-serif text-2xl font-medium tracking-tight text-gray-900 dark:text-gray-100">
+                <Link
+                  href={`/blog/${slug}`}
+                  className="decoration-violet-500/30 hover:decoration-violet-500/50 dark:decoration-violet-400/30 dark:hover:decoration-violet-400/50"
+                >
+                  {title}
+                </Link>
+              </h2>
+
+              {/* 摘要 */}
+              <p className="leading-relaxed text-gray-600 dark:text-gray-400">{summary}</p>
+
+              {/* 阅读更多 */}
+              <div className="pt-2">
+                <Link
+                  href={`/blog/${slug}`}
+                  className="group/link inline-flex items-center gap-2 text-sm font-medium text-violet-600 transition-colors hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
+                  aria-label={`Read "${title}"`}
+                >
+                  Read more
+                  <svg
+                    className="h-4 w-4 transition-transform group-hover/link:translate-x-0.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          </article>
+        )
+      })}
+      {pagination && pagination.totalPages > 1 && (
+        <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} />
+      )}
+    </div>
   )
 }

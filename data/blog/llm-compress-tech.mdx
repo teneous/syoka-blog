@@ -1,0 +1,79 @@
+---
+title: Large Model Compression Techniques
+date: '2025-02-08'
+tags: ['LLM']
+draft: false
+summary: Let's first introduce the background of the era of large model compression, starting from GPT3, the magnitude of the weight parameters of the model has gradually risen, and the requirements for hardware have become higher and higher. Taking GPT3 as an example, under FP16 precision, 325G of memory is also required, and if the specification of A100 80G is taken as an example, at least 5 sheets are needed. Therefore, for mobile embedded devices running on limited arithmetic, to ensure that the model performance is acceptable,
+---
+
+# Background Summary
+
+**Let's first introduce the background of the era of large model compression**: starting from GPT3, the magnitude of the weight parameters of the model has gradually risen, and the requirements for hardware have become higher and higher. Taking GPT3 as an example, under FP16 precision, 325G of memory is also required, and if the specification of A100 80G is taken as an example, at least 5 sheets are needed. Therefore, for mobile embedded devices running on limited arithmetic, to ensure that the model performance is acceptable, the model thinning (parameters down, computational efficiency up) becomes very necessary.
+
+The current mainstream technology of large model compression is mainly divided into four categories: quantization, pruning, distillation, binarization;
+
+# Quantization
+
+The embodiment of weight parameters is mainly in the form of floating point numbers, accounting for 32 bits. Therefore, the core of quantization is to convert floating-point numbers into 8-bit, 4-bit and 1-bit integers, so that the space and computation of the model will be significantly reduced, as shown below, but the accuracy will also be reduced.
+
+[Google Paper](https://static.googleusercontent.com/media/research.google.com/zh-CN//pubs/archive/37631.pdf)
+
+![image.png](/static/images/LargeModelCompressionTechniques/image1.png)
+
+Quantization methods are divided into three main categories:
+
+- PTQ post-training quantization
+
+  Quantization of weights directly after model training
+
+- QAT quantization-aware training
+
+  Quantization operations are introduced during model training to allow the model to adapt to low-precision representations in advance.TensorRT supports this pattern
+
+- QAF quantization-aware fine-tuning
+
+  Fine-tuning based on the pre-trained model, while adding quantization operations
+
+# Pruning
+
+Pruning removes unimportant connections or neurons from the neural network to compress the model.
+
+Pruning method based on importance of weights.
+
+[https://arxiv.org/pdf/1506.02626](https://arxiv.org/pdf/1506.02626)
+
+Pruning methods are categorized into two types:
+
+- Structured pruning
+
+  Regionalized pruning according to certain rules, the overall compression rate of this pruning is not as good as unstructured pruning. But due to good densification, it performs well in inference and can increase the speed by 2 to 3 times in CNN networks.
+
+- Unstructured Pruning
+
+  Randomly removes neurons or connections to achieve very high compression ratios and can accurately remove weights that minimize the impact on the model. The disadvantage is that the sparse structure after pruning is difficult to run efficiently on hardware, which favors dense structures. Normally on size, it can be compressed by 50%, but it is difficult to improve inference efficiency.
+
+# Distillation
+
+Use the teacher's large model to output knowledge to the student's small model, and the small model to learn the pattern of the large model, so that it can be as close as possible to the performance of the teacher's model while ensuring that the small model is compact.
+
+![image.png](/static/images/LargeModelCompressionTechniques/image2.png)
+
+Steps in distillation:
+
+1.  Train a large model with excellent performance
+2.  Choose a small model as the student model, e.g. qwen2.5B
+3.  Compare the output of the large model as supervised information with the output of the student model, and optimize the student model by optimizing the loss function
+
+At the end of re-distillation, the small model can acquire the language representation ability of the big model, and can get good performance in sentiment classification, text classification. Inference and compression ratio can get good results, can reach 2 to 10 times.
+
+The distillation effect is very dependent on the ability of the big model itself and the learning ability of the small model
+
+# Binarization
+
+Low-power IOT device vendors run
+
+This is an extreme means of quantization, which limits the weights and activation values in a neural network to -1 and 1. Since such storage is stored in only `1bit`, the theoretical storage space is reduced at once to 1/32 of its original size.
+
+![image.png](/static/images/LargeModelCompressionTechniques/image3.png)
+
+![image.png](/static/images/LargeModelCompressionTechniques/image4.png)
