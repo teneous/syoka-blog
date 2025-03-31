@@ -3,11 +3,15 @@ import headerNavLinks from '@/data/headerNavLinks'
 import Link from '@/components/common/Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
-import { FiTrendingUp } from 'react-icons/fi'
 
 const Header = () => {
   return (
     <header className="relative z-50 border-b border-gray-200/10 bg-white/60 py-6 backdrop-blur-sm dark:border-gray-800/10 dark:bg-gray-950/60">
+      <script
+        defer
+        src="/umami/script.js"
+        data-website-id="f99876fa-9817-4b73-88df-83501b4b2278"
+      ></script>
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* 标题 */}
@@ -36,15 +40,6 @@ const Header = () => {
             <div className="flex items-center space-x-4">
               {/*<SearchButton />*/}
               <ThemeSwitch />
-              <a
-                href="https://us.umami.is/websites/a708639c-b4bd-4454-9bc3-b4142536a6be"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-gray-700 transition-colors duration-200 hover:text-violet-600 dark:text-gray-300 dark:hover:text-violet-400"
-                aria-label="Analytics"
-              >
-                <FiTrendingUp className="h-5 w-5" />
-              </a>
               <MobileNav />
             </div>
           </div>
