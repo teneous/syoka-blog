@@ -22,4 +22,4 @@ export interface ContentType {
     title: string
     companies: Company[]
   }
-} 
+}

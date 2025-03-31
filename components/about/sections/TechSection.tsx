@@ -1,5 +1,6 @@
 import React from 'react'
 import { GitBranch, Zap } from 'lucide-react'
+import SkillCard from '../cards/SkillCard'
 
 interface TechSectionProps {
   title: string
@@ -16,15 +17,7 @@ export const TechSection: React.FC<TechSectionProps> = ({ title, items }) => (
     </h3>
     <div className="space-y-3">
       {items.map((item, index) => (
-        <div
-          key={index}
-          className="tech-item flex items-center gap-3 rounded-lg p-2 transition-colors duration-200 hover:bg-violet-500/10"
-        >
-          <div className="flex-shrink-0 rounded-md bg-violet-500/20 p-1.5">
-            <Zap className="h-4 w-4 text-violet-500 dark:text-violet-400" />
-          </div>
-          <span className="text-gray-700 dark:text-gray-300">{item}</span>
-        </div>
+        <SkillCard key={index} icon={Zap} title={item} description="" />
       ))}
     </div>
   </div>

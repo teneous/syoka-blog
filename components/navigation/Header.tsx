@@ -1,9 +1,8 @@
 import siteMetadata from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
-import Link from './Link'
+import Link from '@/components/common/Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
-import SearchButton from './SearchButton'
 import { FiTrendingUp } from 'react-icons/fi'
 
 const Header = () => {

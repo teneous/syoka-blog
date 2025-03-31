@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { FiGithub, FiTwitter, FiLinkedin, FiMail } from 'react-icons/fi'
+import { FiGithub, FiLinkedin, FiMail } from 'react-icons/fi'
 import { TypeAnimation } from 'react-type-animation'
 import { Highlight, themes } from 'prism-react-renderer'
 import { IconType } from 'react-icons'

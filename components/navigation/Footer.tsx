@@ -1,6 +1,6 @@
-import Link from './Link'
+import Link from '@/components/common/Link'
 import siteMetadata from '@/data/siteMetadata'
-import { FiMail, FiGithub, FiLinkedin } from 'react-icons/fi'
+import { FiGithub, FiLinkedin, FiMail } from 'react-icons/fi'
 import Script from 'next/script'
 
 export default function Footer() {

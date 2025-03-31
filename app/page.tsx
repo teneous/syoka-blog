@@ -1,7 +1,7 @@
 import { sortPosts, allCoreContent } from 'pliny/utils/contentlayer'
 import { allBlogs } from 'contentlayer/generated'
-import Hero from '@/components/Hero'
-import TechStack from '@/components/TechStack'
+import Hero from '@/components/common/Hero'
+import TechStack from '@/components/common/TechStack'
 
 export default async function Page() {
   const sortedPosts = sortPosts(allBlogs)

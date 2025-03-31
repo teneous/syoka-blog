@@ -5,12 +5,12 @@ import 'remark-github-blockquote-alert/alert.css'
 import { Space_Grotesk } from 'next/font/google'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
-import Header from '@/components/Header'
-import SectionContainer from '@/components/SectionContainer'
-import Footer from '@/components/Footer'
 import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
+import SectionContainer from '@/components/layout/SectionContainer'
+import Header from '@/components/navigation/Header'
+import Footer from '@/components/navigation/Footer'
 
 const space_grotesk = Space_Grotesk({
   subsets: ['latin'],

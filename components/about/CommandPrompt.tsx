@@ -13,12 +13,14 @@ export const CommandPrompt: React.FC<CommandPromptProps> = ({ children }) => (
     </div>
     <div className="space-y-3 p-6">
       <div className="flex items-center gap-2 opacity-80">
-        <span className="text-violet-500 dark:text-primary-400">$</span>
+        <span className="dark:text-primary-400 text-violet-500">$</span>
         <span className="text-gray-700 dark:text-gray-300">whoami</span>
       </div>
-      <div className="border-l-2 border-violet-500/30 pl-4 dark:border-primary-500/30">{children}</div>
+      <div className="dark:border-primary-500/30 border-l-2 border-violet-500/30 pl-4">
+        {children}
+      </div>
     </div>
   </div>
 )
 
-export default CommandPrompt 
+export default CommandPrompt

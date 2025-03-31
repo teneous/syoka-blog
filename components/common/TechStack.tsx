@@ -3,43 +3,36 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  SiReact,
-  SiTypescript,
-  SiNextdotjs,
-  SiTailwindcss,
-  SiNodedotjs,
-  SiPython,
-  SiOpenjdk,
+  SiAlibabadotcom,
+  SiAnaconda,
+  SiApachekafka,
+  SiAuth0,
   SiDocker,
+  SiElasticsearch,
+  SiGit,
+  SiGrafana,
+  SiHuggingface,
+  SiJetbrains,
+  SiKibana,
   SiKubernetes,
   SiMongodb,
-  SiPostgresql,
-  SiRedis,
-  SiGithub,
-  SiLinux,
-  SiSpringboot,
-  SiJetbrains,
-  SiOpenai,
   SiMysql,
-  SiGrafana,
-  SiGit,
-  SiPostman,
-  SiAnaconda,
-  SiHuggingface,
-  SiApachekafka,
-  SiPrometheus,
-  SiElasticsearch,
   SiNeo4J,
-  SiApache,
-  SiKibana,
-  SiAuth0,
-  SiAlibabadotcom,
+  SiNextdotjs,
   SiOllama,
+  SiOpenai,
+  SiOpenjdk,
+  SiPostgresql,
+  SiPostman,
+  SiPrometheus,
+  SiPython,
+  SiRedis,
+  SiSpringboot,
+  SiTypescript,
 } from 'react-icons/si'
-import { TbApi, TbBrandVscode } from 'react-icons/tb'
-import { BiLogoVisualStudio } from 'react-icons/bi'
+import { TbApi } from 'react-icons/tb'
 import { GiArtificialIntelligence } from 'react-icons/gi'
-import { FaSearch, FaDatabase } from 'react-icons/fa'
+import { FaDatabase, FaSearch } from 'react-icons/fa'
 import { IconType } from 'react-icons'
 
 interface TechItem {

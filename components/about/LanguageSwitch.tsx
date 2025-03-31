@@ -32,4 +32,4 @@ export const LanguageSwitch: React.FC<LanguageSwitchProps> = ({ language, setLan
   </div>
 )
 
-export default LanguageSwitch 
+export default LanguageSwitch

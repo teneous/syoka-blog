@@ -1,14 +1,22 @@
 import { IconType } from 'react-icons'
-import React from 'react'
+import { Zap } from 'lucide-react'
 
-interface FeatureCardProps {
-  icon: IconType
+interface SkillCardProps {
+  icon?: IconType
   title: string
   description: string
+  className?: string
 }
 
-export const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, title, description }) => (
-  <div className="tech-item hover:bg-primary-500/5 flex items-center gap-3 rounded-lg p-2 transition-colors duration-200">
+export const SkillCard = ({
+  icon: Icon = Zap,
+  title,
+  description,
+  className = '',
+}: SkillCardProps) => (
+  <div
+    className={`tech-item hover:bg-primary-500/5 flex items-center gap-3 rounded-lg p-2 transition-colors duration-200 ${className}`}
+  >
     <div className="bg-primary-500/10 flex-shrink-0 rounded-md p-1.5">
       <Icon className="text-primary-500 h-4 w-4" />
     </div>
@@ -19,4 +27,4 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, title, des
   </div>
 )
 
-export default FeatureCard
+export default SkillCard
