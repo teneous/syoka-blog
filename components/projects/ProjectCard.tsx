@@ -13,26 +13,24 @@ interface ProjectCardProps {
 const statusColors = {
   active: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
   completed: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  planning: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+  planning: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ title, description, stack, status, link }) => {
   return (
     <div className="group relative transform overflow-hidden rounded-2xl border border-violet-500/20 bg-gradient-to-br from-white/80 via-purple-50/20 to-fuchsia-50/20 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-lg dark:from-gray-900/80 dark:via-purple-900/20 dark:to-fuchsia-900/20">
       {/* 项目标题 */}
-      <h3 className="mb-3 text-xl font-bold text-gray-900 dark:text-gray-100">
-        {title}
-      </h3>
+      <h3 className="mb-3 text-xl font-bold text-gray-900 dark:text-gray-100">{title}</h3>
 
       {/* 状态标签 */}
-      <span className={`mb-4 inline-block rounded-full px-3 py-1 text-xs font-medium ${statusColors[status]}`}>
+      <span
+        className={`mb-4 inline-block rounded-full px-3 py-1 text-xs font-medium ${statusColors[status]}`}
+      >
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
 
       {/* 项目描述 */}
-      <p className="mb-4 text-gray-600 dark:text-gray-400">
-        {description}
-      </p>
+      <p className="mb-4 text-gray-600 dark:text-gray-400">{description}</p>
 
       {/* 技术栈标签 */}
       <div className="mb-4 flex flex-wrap gap-2">
@@ -69,10 +67,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ title, description, stack, st
       </div>
 
       {/* 装饰效果 */}
-      <div className="absolute -right-24 -top-24 h-48 w-48 rounded-full bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 blur-3xl transition-opacity duration-300 group-hover:opacity-70" />
+      <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 blur-3xl transition-opacity duration-300 group-hover:opacity-70" />
       <div className="absolute -bottom-16 -left-16 h-32 w-32 rounded-full bg-gradient-to-br from-purple-500/5 to-fuchsia-500/5 blur-2xl transition-opacity duration-300 group-hover:opacity-70" />
     </div>
   )
 }
 
-export default ProjectCard 
+export default ProjectCard

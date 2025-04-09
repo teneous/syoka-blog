@@ -23,11 +23,7 @@ export const content: Record<'zh' | 'en', ContentType> = {
     },
     dataPlatforms: {
       title: '数据平台',
-      items: [
-        'OLAP 查询引擎优化',
-        '数据平台架构与开发',
-        '企业级数据治理方案',
-      ],
+      items: ['OLAP 查询引擎优化', '数据平台架构与开发', '企业级数据治理方案'],
     },
     systemArchitecture: {
       title: '系统架构亮点',
