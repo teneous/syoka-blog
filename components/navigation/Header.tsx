@@ -3,6 +3,7 @@ import headerNavLinks from '@/data/headerNavLinks'
 import Link from '@/components/common/Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
+import Trend from './Trend'
 
 const Header = () => {
   return (
@@ -39,6 +40,7 @@ const Header = () => {
 
             <div className="flex items-center space-x-4">
               {/*<SearchButton />*/}
+              <Trend />
               <ThemeSwitch />
               <MobileNav />
             </div>

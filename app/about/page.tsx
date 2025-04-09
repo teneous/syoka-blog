@@ -53,7 +53,7 @@ const ContactChip = ({ type, value }: { type: string; value: string }) => (
 )
 
 export default function Page() {
-  const [language, setLanguage] = useState<Language>('zh')
+  const [language, setLanguage] = useState<Language>('en')
   const author = allAuthors.find((p) => p.slug === 'default') as Authors
   const mainContent = coreContent(author)
   const t = content[language]
@@ -70,13 +70,13 @@ export default function Page() {
             <p className="text-gray-700 dark:text-gray-300">{t.intro}</p>
             <div className="mt-3 flex gap-2">
               <span className="terminal-tag rounded-full bg-violet-500/20 px-3 py-1 text-xs font-medium text-violet-600 dark:text-violet-400">
-                中文
+                {language === 'en' ? 'Chinese' : '中文'}
               </span>
               <span className="terminal-tag rounded-full bg-purple-500/20 px-3 py-1 text-xs font-medium text-purple-600 dark:text-purple-400">
-                English
+                {language === 'en' ? 'English' : '英文'}
               </span>
               <span className="terminal-tag rounded-full bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400">
-                日本語
+                {language == 'en' ? 'Japanese' : '日本語'}
               </span>
             </div>
           </div>

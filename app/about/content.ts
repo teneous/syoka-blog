@@ -4,7 +4,7 @@ export const content: Record<'zh' | 'en', ContentType> = {
   zh: {
     intro: '我是一名热衷于构建高性能系统的全栈工程师，专注于将 AI 能力无缝集成到生产环境中。',
     backendCore: {
-      title: '⚡ 后端核心',
+      title: '后端核心',
       items: [
         'SpringBoot / Spring Cloud 微服务架构',
         '分布式系统设计与优化',
@@ -13,29 +13,27 @@ export const content: Record<'zh' | 'en', ContentType> = {
       ],
     },
     aiEngineering: {
-      title: '🧠 AI 工程',
+      title: 'AI 工程',
       items: [
-        '大规模 Agent & RAG 系统实现',
+        '企业级 Agent & RAG 系统实现',
         'LLM 模型微调与部署',
         'TTS/ASR 多模态系统集成',
         'AI 系统工程化实践',
       ],
     },
     dataPlatforms: {
-      title: '📊 数据平台',
+      title: '数据平台',
       items: [
         'OLAP 查询引擎优化',
-        '大规模 ETL Pipeline 设计',
         '数据平台架构与开发',
         '企业级数据治理方案',
       ],
     },
     systemArchitecture: {
-      title: '🔧 系统架构亮点',
+      title: '系统架构亮点',
       items: [
         '构建支持百万级并发的分布式系统',
         '将 AI 能力无缝集成到业务系统',
-        '优化 PB 级数据查询性能',
         '打造高可用的技术基础设施',
       ],
     },
@@ -73,7 +71,7 @@ export const content: Record<'zh' | 'en', ContentType> = {
     intro:
       "I'm a full-stack engineer passionate about building high-performance systems and seamlessly integrating AI capabilities into production environments.",
     backendCore: {
-      title: '⚡ Backend Core',
+      title: 'Backend Core',
       items: [
         'SpringBoot / Spring Cloud Microservices',
         'Distributed System Design & Optimization',
@@ -82,29 +80,27 @@ export const content: Record<'zh' | 'en', ContentType> = {
       ],
     },
     aiEngineering: {
-      title: '🧠 AI Engineering',
+      title: 'AI Engineering',
       items: [
-        'Large-scale Agent & RAG System Implementation',
+        'Enterprise-level Agent & RAG System Implementation',
         'LLM Model Fine-tuning & Deployment',
         'TTS/ASR Multimodal System Integration',
         'AI System Engineering Practices',
       ],
     },
     dataPlatforms: {
-      title: '📊 Data Platforms',
+      title: 'Data Platforms',
       items: [
         'OLAP Query Engine Optimization',
-        'Large-scale ETL Pipeline Design',
         'Data Platform Architecture & Development',
         'Enterprise Data Governance Solutions',
       ],
     },
     systemArchitecture: {
-      title: '🔧 System Architecture',
+      title: 'System Architecture',
       items: [
         'Million-level Concurrent System Development',
         'Seamless AI Capability Integration',
-        'PB-level Data Query Optimization',
         'High-availability Infrastructure',
       ],
     },

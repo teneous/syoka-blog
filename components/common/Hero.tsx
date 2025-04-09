@@ -138,7 +138,7 @@ export default function Hero() {
             >
               <SocialLink href="https://github.com/teneous" icon={FiGithub} label="GitHub" />
               <SocialLink
-                href="https://www.linkedin.com/in/syoka-kai-564678315/"
+                href="https://www.linkedin.com/in/x-syoka-564678315/"
                 icon={FiLinkedin}
                 label="LinkedIn"
               />
