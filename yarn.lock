@@ -6247,12 +6247,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^12.6.2":
-  version: 12.6.2
-  resolution: "framer-motion@npm:12.6.2"
+"framer-motion@npm:^12.6.3":
+  version: 12.6.3
+  resolution: "framer-motion@npm:12.6.3"
   dependencies:
-    motion-dom: ^12.6.1
-    motion-utils: ^12.5.0
+    motion-dom: ^12.6.3
+    motion-utils: ^12.6.3
     tslib: ^2.4.0
   peerDependencies:
     "@emotion/is-prop-valid": "*"
@@ -6265,7 +6265,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 54658a2688f5fc50c5530539f9a807056ee6e4fa3d4af8bfe0ea7e0d67ffdf3b568a0f5e8fabbff9efc6d7fde78b404db369ef67b0be6341a36ed9be4e54f9b5
+  checksum: 6e64166bbef6810f933f5ed4a0c40457b16bd8ef9c9fb4746aa5bf5303ab7b79475144e8b03b9388bbdab3291316a43fa749171c5fe85d98a6839e44a27bfaae
   languageName: node
   linkType: hard
 
@@ -9055,19 +9055,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"motion-dom@npm:^12.6.1":
-  version: 12.6.1
-  resolution: "motion-dom@npm:12.6.1"
+"motion-dom@npm:^12.6.3":
+  version: 12.6.3
+  resolution: "motion-dom@npm:12.6.3"
   dependencies:
-    motion-utils: ^12.5.0
-  checksum: 937e9d7a5f6513fc9cada4cadf2297ed34d7259366230cc55da662935ae782c383e6f6170bbe04c3fcc1bfdbcbf7212a66448c206898727b2e1b12c3fab882b1
+    motion-utils: ^12.6.3
+  checksum: f0b8c55bbd966f128834d53d39d1130cdde4b4902d94f71b2b3ffeba368034acee664b9fdba9f42e3448ff949bd9b3e53ff008328bda991dfee8d2ad92ec4a29
   languageName: node
   linkType: hard
 
-"motion-utils@npm:^12.5.0":
-  version: 12.5.0
-  resolution: "motion-utils@npm:12.5.0"
-  checksum: 347169ab97d8b3720b363afad6c9f4e8999490d1d95c70aaa8f83333be1b8b4e11c5f25564a9809fb091160fad2184403222e5b383be1bba004243c8b47497fe
+"motion-utils@npm:^12.6.3":
+  version: 12.6.3
+  resolution: "motion-utils@npm:12.6.3"
+  checksum: 09eebcd883566f706de7f5a7402d6f0a1ad7a5af526903abd8b1f8024728f2720308a1409319938dd2dad875cfd4e520cfb2a9754aa3b6a64597e9e66ef6273b
   languageName: node
   linkType: hard
 
@@ -11621,7 +11621,7 @@ __metadata:
     eslint-config-next: 15.1.4
     eslint-config-prettier: ^9.1.0
     eslint-plugin-prettier: ^5.2.0
-    framer-motion: ^12.6.2
+    framer-motion: ^12.6.3
     github-slugger: ^2.0.0
     globals: ^15.12.0
     gray-matter: ^4.0.2

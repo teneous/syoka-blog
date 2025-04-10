@@ -4,9 +4,9 @@ import { usePathname } from 'next/navigation'
 import { formatDate } from 'pliny/utils/formatDate'
 import { CoreContent } from 'pliny/utils/contentlayer'
 import type { Blog } from 'contentlayer/generated'
-import Link from '@/components/Link'
-import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
+import Link from '@/components/common/Link'
+import Tag from '@/components/ui/Tag'
 
 interface PaginationProps {
   totalPages: number
@@ -40,7 +40,12 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Previous
           </Link>
@@ -76,7 +81,11 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
   )
 }
 
-export default function ListLayout({ posts, initialDisplayPosts = [], pagination }: ListLayoutProps) {
+export default function ListLayout({
+  posts,
+  initialDisplayPosts = [],
+  pagination,
+}: ListLayoutProps) {
   const displayPosts = initialDisplayPosts.length > 0 ? initialDisplayPosts : posts
 
   return (
@@ -92,20 +101,15 @@ export default function ListLayout({ posts, initialDisplayPosts = [], pagination
             {/* 装饰边框 */}
             <div className="absolute inset-0 rounded-2xl border border-gray-200/50 dark:border-gray-700/50" />
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-transparent to-violet-100/20 opacity-0 transition-opacity group-hover:opacity-100 dark:to-violet-900/20" />
-            
+
             <div className="relative space-y-5">
               {/* 日期和标签 */}
               <div className="flex items-center gap-4 text-sm">
-                <time
-                  dateTime={date}
-                  className="font-medium text-violet-600 dark:text-violet-400"
-                >
+                <time dateTime={date} className="font-medium text-violet-600 dark:text-violet-400">
                   {formatDate(date, siteMetadata.locale)}
                 </time>
                 <div className="flex flex-wrap gap-2">
-                  {tags?.map((tag) => (
-                    <Tag key={tag} text={tag} />
-                  ))}
+                  {tags?.map((tag) => <Tag key={tag} text={tag} />)}
                 </div>
               </div>
 

@@ -12,7 +12,7 @@ const siteMetadata = {
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
   email: 'syoka9471@gmail.com',
   github: 'https://github.com/teneous',
-  linkedin: 'https://www.linkedin.com/in/syoka-kai-564678315/',
+  linkedin: 'https://www.linkedin.com/in/x-syoka-564678315/',
   locale: 'en-US',
   // set to true if you want a navbar fixed to the top
   stickyNav: false,

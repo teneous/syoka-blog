@@ -1,5 +1,5 @@
-import Image from './Image'
-import Link from './Link'
+import Link from '@/components/common/Link'
+import Image from '@/components/mdx/Image'
 
 const Card = ({ title, description, imgSrc, href }) => (
   <div className="md max-w-[544px] p-4 md:w-1/2">

@@ -1,14 +1,13 @@
 import { ReactNode } from 'react'
 import { CoreContent } from 'pliny/utils/contentlayer'
 import type { Blog, Authors } from 'contentlayer/generated'
-import Comments from '@/components/Comments'
-import Link from '@/components/Link'
-import PageTitle from '@/components/PageTitle'
-import SectionContainer from '@/components/SectionContainer'
-import Image from '@/components/Image'
-import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
-import ScrollTopAndComment from '@/components/ScrollTopAndComment'
+import SectionContainer from '@/components/layout/SectionContainer'
+import ScrollTopAndComment from '@/components/blog/ScrollTopAndComment'
+import Tag from '@/components/ui/Tag'
+import Image from '@/components/mdx/Image'
+import PageTitle from '@/components/common/PageTitle'
+import Link from '@/components/common/Link'
 
 const editUrl = (path) => `${siteMetadata.siteRepo}/blob/main/data/${path}`
 const discussUrl = (path) =>
@@ -40,8 +39,8 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
         <div className="relative">
           {/* 装饰背景 */}
           <div className="absolute inset-0 -z-10">
-            <div className="absolute -left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-violet-100/5 blur-3xl dark:bg-violet-900/5" />
-            <div className="absolute -right-1/4 top-1/3 h-[400px] w-[400px] rounded-full bg-emerald-100/5 blur-3xl dark:bg-emerald-900/5" />
+            <div className="absolute top-0 -left-1/4 h-[500px] w-[500px] rounded-full bg-violet-100/5 blur-3xl dark:bg-violet-900/5" />
+            <div className="absolute top-1/3 -right-1/4 h-[400px] w-[400px] rounded-full bg-emerald-100/5 blur-3xl dark:bg-emerald-900/5" />
           </div>
 
           <div className="space-y-8 xl:space-y-12">
@@ -49,9 +48,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
               <div className="space-y-4 pb-10 text-center">
                 {/* 标签 */}
                 <div className="flex justify-center gap-2">
-                  {tags?.map((tag) => (
-                    <Tag key={tag} text={tag} />
-                  ))}
+                  {tags?.map((tag) => <Tag key={tag} text={tag} />)}
                 </div>
                 {/* 标题 */}
                 <div className="relative space-y-1 pt-6">
@@ -76,7 +73,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
                                 className="h-10 w-10 rounded-full bg-violet-100 dark:bg-violet-800"
                               />
                             )}
-                            <dl className="whitespace-nowrap text-sm">
+                            <dl className="text-sm whitespace-nowrap">
                               <dt className="sr-only">姓名</dt>
                               <dd className="font-medium text-gray-800 dark:text-gray-200">
                                 {author.name}
@@ -110,21 +107,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
               </div>
             </header>
 
-            <div className="prose max-w-none pb-8 pt-10 dark:prose-dark 
-              prose-headings:text-gray-800 
-              prose-p:text-gray-700 
-              prose-strong:text-gray-900
-              prose-a:text-violet-700
-              dark:prose-headings:text-gray-100 
-              dark:prose-p:text-gray-200
-              dark:prose-strong:text-gray-100
-              dark:prose-a:text-violet-400
-              prose-pre:bg-gray-100
-              dark:prose-pre:bg-gray-800
-              prose-code:text-gray-800
-              dark:prose-code:text-gray-200
-              prose-li:text-gray-700
-              dark:prose-li:text-gray-200">
+            <div className="prose dark:prose-dark prose-headings:text-gray-800 prose-p:text-gray-700 prose-strong:text-gray-900 prose-a:text-violet-700 dark:prose-headings:text-gray-100 dark:prose-p:text-gray-200 dark:prose-strong:text-gray-100 dark:prose-a:text-violet-400 prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-code:text-gray-800 dark:prose-code:text-gray-200 prose-li:text-gray-700 dark:prose-li:text-gray-200 max-w-none pt-10 pb-8">
               {children}
             </div>
 
@@ -134,7 +117,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
                 <div className="flex justify-between gap-4 rounded-2xl border border-gray-200/20 bg-white/5 p-6 text-sm backdrop-blur-sm dark:border-gray-800/20 dark:bg-gray-800/5">
                   {prev && prev.path && (
                     <div>
-                      <h2 className="mb-1 text-xs uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                      <h2 className="mb-1 text-xs tracking-wide text-gray-600 uppercase dark:text-gray-300">
                         上一篇
                       </h2>
                       <Link
@@ -147,7 +130,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
                   )}
                   {next && next.path && (
                     <div className="text-right">
-                      <h2 className="mb-1 text-xs uppercase tracking-wide text-gray-600 dark:text-gray-300">
+                      <h2 className="mb-1 text-xs tracking-wide text-gray-600 uppercase dark:text-gray-300">
                         下一篇
                       </h2>
                       <Link
