@@ -16,7 +16,6 @@
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
   /* Colors */
-  /* Copied from https://tailwindcss.com/docs/theme#default-theme-variable-reference */
   --color-primary-50: oklch(0.971 0.014 343.198);
   --color-primary-100: oklch(0.948 0.028 342.258);
   --color-primary-200: oklch(0.899 0.061 343.231);
@@ -259,5 +258,251 @@ input:-webkit-autofill:focus {
 
   .prose-custom {
     @apply prose prose-gray dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-primary-500 hover:prose-a:text-primary-600 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-primary-500 dark:prose-code:text-primary-400 prose-pre:bg-gray-950 dark:prose-pre:bg-gray-900 prose-blockquote:border-l-primary-500 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300;
+  }
+
+  /* 全局 Markdown 表格样式 */
+  .prose table {
+    @apply mx-auto my-8 w-full overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-lg dark:border-gray-700/80 dark:bg-gray-800/50;
+    border-spacing: 0;
+    border-collapse: separate;
+  }
+
+  .prose thead {
+    @apply bg-gray-50 dark:bg-gray-800;
+  }
+
+  /* 表格样式 - 确保所有表头居中 */
+  .prose table th,
+  table th {
+    @apply text-center align-middle;
+    text-align: center !important;
+  }
+
+  /* 第一列样式 */
+  .prose th:first-child,
+  .prose td:first-child,
+  th:first-child,
+  td:first-child {
+    @apply sticky left-0 border-r border-gray-200 bg-gray-50 align-middle font-bold dark:border-gray-700 dark:bg-gray-800;
+    min-width: 100px;
+    width: 100px;
+    text-align: center !important;
+    padding: 1rem;
+  }
+
+  /* 确保第一列表头居中 - 高特异性选择器 */
+  .prose table thead tr th:first-child,
+  table thead tr th:first-child {
+    text-align: center !important;
+  }
+
+  .prose th {
+    @apply border-b border-gray-200 px-8 py-4 text-center align-middle text-sm font-bold tracking-wider text-gray-900 uppercase dark:border-gray-700 dark:text-gray-100;
+    min-width: 200px;
+  }
+
+  .prose tbody tr {
+    @apply border-b border-gray-200/60 transition-colors dark:border-gray-700/60;
+  }
+
+  .prose tbody tr:hover {
+    @apply bg-gray-50 dark:bg-gray-800/50;
+  }
+
+  .prose td {
+    @apply px-8 py-4 text-center align-middle text-sm text-gray-700 dark:text-gray-300;
+    min-width: 200px;
+  }
+
+  /* 表格内的列表样式 */
+  td ul,
+  td ol {
+    @apply mx-auto my-2 inline-block text-left;
+    padding: 0;
+    max-width: fit-content;
+  }
+
+  td li {
+    @apply my-1 pl-4 leading-relaxed;
+    text-align: left;
+  }
+
+  /* 表格内的强调文本 */
+  td strong,
+  th strong {
+    @apply font-bold text-gray-900 dark:text-gray-50;
+  }
+
+  /* 表格内的换行 */
+  td br {
+    @apply my-1.5 block content-[''];
+  }
+
+  /* 确保表格可以水平滚动 */
+  div:has(> table) {
+    @apply overflow-x-auto;
+  }
+
+  /* 标签样式 */
+  .tag {
+    @apply bg-primary-100/80 text-primary-800 dark:bg-primary-900/20 dark:text-primary-300 border-primary-200/80 dark:border-primary-700/30 hover:bg-primary-200/80 dark:hover:bg-primary-800/30 m-0.5 inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all duration-200;
+  }
+
+  /* 列表样式 */
+  .prose ul > li::before {
+    @apply bg-gray-500 dark:bg-gray-400;
+  }
+
+  .prose ol > li::before {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+
+  /* 引用样式 */
+  .prose blockquote {
+    @apply border-primary-500 my-8 border-l-4 bg-gray-50 px-6 py-4 dark:bg-gray-800/50;
+  }
+
+  .prose blockquote p {
+    @apply text-gray-700 first:mt-0 last:mb-0 dark:text-gray-300;
+  }
+
+  /* 代码块样式 */
+  .prose pre {
+    @apply overflow-x-auto rounded-xl bg-gray-900 p-4 dark:bg-gray-950;
+  }
+
+  .prose code {
+    @apply rounded bg-gray-100 px-1.5 py-0.5 font-mono text-sm dark:bg-gray-800;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0 text-gray-200 dark:text-gray-300;
+  }
+
+  /* 全局 Markdown 样式 */
+  .prose {
+    @apply max-w-none;
+
+    /* 标题样式 */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      @apply font-bold text-gray-900 dark:text-gray-100;
+    }
+
+    /* 段落样式 */
+    p {
+      @apply leading-relaxed text-gray-700 dark:text-gray-300;
+    }
+
+    /* 链接样式 */
+    a {
+      @apply text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors duration-200;
+    }
+
+    /* 表格样式 */
+    table {
+      @apply mx-auto my-8 w-full overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-lg dark:border-gray-700/80 dark:bg-gray-800/50;
+      border-spacing: 0;
+      border-collapse: separate;
+    }
+
+    thead {
+      @apply bg-gray-50 dark:bg-gray-800;
+    }
+
+    /* 第一列样式 */
+    th:first-child,
+    td:first-child {
+      @apply sticky left-0 border-r border-gray-200 bg-gray-50 align-middle font-bold dark:border-gray-700 dark:bg-gray-800;
+      min-width: 100px;
+      width: 100px;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    th {
+      @apply border-b border-gray-200 px-8 py-4 text-center align-middle text-sm font-bold tracking-wider text-gray-900 uppercase dark:border-gray-700 dark:text-gray-100;
+      min-width: 200px;
+    }
+
+    tr {
+      @apply border-b border-gray-200/60 transition-colors dark:border-gray-700/60;
+    }
+
+    tr:hover td {
+      @apply bg-gray-50/80 dark:bg-gray-700/30;
+    }
+
+    tr:hover td:first-child {
+      @apply bg-gray-100/80 dark:bg-gray-600/30;
+    }
+
+    td {
+      @apply px-8 py-4 text-center align-middle text-sm text-gray-700 dark:text-gray-300;
+      min-width: 200px;
+    }
+
+    /* 表格内的列表样式 */
+    td ul,
+    td ol {
+      @apply mx-auto my-2 inline-block text-left;
+      padding: 0;
+      max-width: fit-content;
+    }
+
+    td li {
+      @apply my-1 pl-4 leading-relaxed;
+      text-align: left;
+    }
+
+    /* 表格内的强调文本 */
+    td strong,
+    th strong {
+      @apply font-bold text-gray-900 dark:text-gray-50;
+    }
+
+    /* 表格内的换行 */
+    td br {
+      @apply my-1.5 block content-[''];
+    }
+
+    /* 确保表格可以水平滚动 */
+    div:has(> table) {
+      @apply overflow-x-auto;
+    }
+  }
+
+  /* 表格内容整体居中 */
+  .prose table,
+  table {
+    @apply text-center;
+  }
+
+  /* 单元格内内容居中 */
+  .prose td,
+  .prose th,
+  td,
+  th {
+    @apply text-center align-middle;
+    text-align: center !important;
+    vertical-align: middle !important;
+  }
+
+  /* 表格内的列表样式 - 居中显示 */
+  td ul,
+  td ol {
+    @apply mx-auto my-2 inline-block text-left;
+    padding: 0;
+    max-width: fit-content;
+  }
+
+  /* 增加列表项前标记的左边距 */
+  td li {
+    @apply my-1 pl-4 leading-relaxed;
+    text-align: left;
   }
 }

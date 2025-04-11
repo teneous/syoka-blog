@@ -1,15 +1,6 @@
 import React from 'react'
 import ProjectCard from '@/components/projects/ProjectCard'
-
-const projects = [
-  {
-    title: 'Text2Cypher',
-    description: '基于大语言模型将自然语言转换为 Cypher 查询语句的工具',
-    stack: ['Python', 'Langchain', 'Neo4j', 'PolarDB'],
-    status: 'active' as const,
-    link: 'https://github.com/teneous/text2cypher',
-  },
-]
+import { projects } from '@/data/projects'
 
 export default function ProjectsPage() {
   return (
