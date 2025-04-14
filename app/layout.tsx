@@ -69,7 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           defer
-          src="/umami/script.js"
+          src="/stats/script.js"
           data-website-id="f99876fa-9817-4b73-88df-83501b4b2278"
         ></script>
       </head>

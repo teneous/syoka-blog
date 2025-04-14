@@ -19,8 +19,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 RUN npm install -g pnpm
-ENV NODE_OPTIONS="--max-old-space-size=4096"
-RUN pnpm run build
+RUN pnpm run build --verbose
 
 
 FROM base AS runner
