@@ -61,16 +61,6 @@ export default async function Page() {
               </Link>
             ))}
           </div>
-
-          <div className="mt-12 text-center">
-            <Link
-              href="/blog"
-              className="inline-flex items-center rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 text-white transition-all hover:scale-105 hover:shadow-lg dark:from-blue-500 dark:to-purple-500"
-            >
-              <span>查看所有文章</span>
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </div>
         </div>
       </section>
     </main>

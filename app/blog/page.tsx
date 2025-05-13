@@ -34,7 +34,7 @@ export default async function BlogPage() {
                 Thinking Deeply
               </h1>
               <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                Technology, Innovation, and Beyond
+                Technology, Innovation and Beyond
               </p>
             </div>
             {/* 装饰线条 */}
