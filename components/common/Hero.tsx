@@ -19,12 +19,12 @@ const SocialLink = ({
     href={href}
     target="_blank"
     rel="noopener noreferrer"
-    className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+    className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 transition-colors duration-200 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
     whileHover={{ scale: 1.1 }}
     whileTap={{ scale: 0.95 }}
   >
     <span className="sr-only">{label}</span>
-    <Icon className="h-6 w-6" />
+    <Icon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
   </motion.a>
 )
 
@@ -131,18 +131,22 @@ export default function Hero() {
             </motion.div>
 
             <motion.div
-              className="flex justify-center space-x-6"
+              className="flex justify-center space-x-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.8 }}
             >
-              <SocialLink href="https://github.com/teneous" icon={FiGithub} label="GitHub" />
+              <SocialLink
+                href="https://github.com/teneous"
+                icon={FiGithub}
+                label="访问我的 GitHub"
+              />
               <SocialLink
                 href="https://www.linkedin.com/in/x-syoka-564678315/"
                 icon={FiLinkedin}
-                label="LinkedIn"
+                label="访问我的 LinkedIn"
               />
-              <SocialLink href="mailto:syoka9471@gmail.com" icon={FiMail} label="Email" />
+              <SocialLink href="mailto:syoka9471@gmail.com" icon={FiMail} label="发送邮件给我" />
             </motion.div>
           </motion.div>
         </div>
