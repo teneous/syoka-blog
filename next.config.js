@@ -66,7 +66,7 @@ const unoptimized = process.env.UNOPTIMIZED ? true : undefined
  **/
 module.exports = () => {
   const plugins = [withContentlayer, withBundleAnalyzer]
-  return plugins.reduce((acc, next) => next(acc), {
+  const nextConfig = plugins.reduce((acc, next) => next(acc), {
     output: 'standalone',
     basePath,
     reactStrictMode: true,
@@ -82,6 +82,7 @@ module.exports = () => {
         },
       ],
       unoptimized,
+      domains: ['weread.qq.com'],
     },
     async headers() {
       return [
@@ -100,4 +101,6 @@ module.exports = () => {
       return config
     },
   })
+
+  return nextConfig
 }
