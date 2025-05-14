@@ -66,11 +66,14 @@ const unoptimized = process.env.UNOPTIMIZED ? true : undefined
  **/
 module.exports = () => {
   const plugins = [withContentlayer, withBundleAnalyzer]
-  return plugins.reduce((acc, next) => next(acc), {
+  const nextConfig = plugins.reduce((acc, next) => next(acc), {
     output: 'standalone',
     basePath,
     reactStrictMode: true,
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+    env: {
+      WEREAD_COOKIE: process.env.WEREAD_COOKIE,
+    },
     eslint: {
       dirs: ['app', 'components', 'layouts', 'scripts'],
     },
@@ -79,6 +82,18 @@ module.exports = () => {
         {
           protocol: 'https',
           hostname: 'picsum.photos',
+        },
+        {
+          protocol: 'https',
+          hostname: '*.weread.qq.com',
+        },
+        {
+          protocol: 'https',
+          hostname: '*.qlogo.cn',
+        },
+        {
+          protocol: 'https',
+          hostname: '*.image.myqcloud.com',
         },
       ],
       unoptimized,
@@ -100,4 +115,6 @@ module.exports = () => {
       return config
     },
   })
+
+  return nextConfig
 }

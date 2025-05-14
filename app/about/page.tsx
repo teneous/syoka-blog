@@ -1,7 +1,7 @@
 'use client'
 
 import { Authors, allAuthors } from 'contentlayer/generated'
-import AuthorLayout from '@/layouts/AuthorLayout'
+import AuthorLayout from '@/components/layouts/AuthorLayout'
 import { coreContent } from 'pliny/utils/contentlayer'
 import {
   Terminal,

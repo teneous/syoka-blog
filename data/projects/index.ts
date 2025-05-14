@@ -22,6 +22,6 @@ export const projects: Project[] = [
     stack: ['SpringAI', 'MCP'],
     status: 'active',
     link: 'https://github.com/teneous/spring-ai-tutorials',
-    isPrivate: false,
+    isPrivate: true,
   },
 ]

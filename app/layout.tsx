@@ -7,9 +7,10 @@ import { SearchProvider, SearchConfig } from 'pliny/search'
 import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
-import SectionContainer from '@/components/layout/SectionContainer'
+import SectionContainer from '@/components/layouts/SectionContainer'
 import Header from '@/components/navigation/Header'
 import Footer from '@/components/navigation/Footer'
+import DevToolsDetector from '@/components/common/DevToolsDetector'
 
 const space_grotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -102,6 +103,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </SearchProvider>
             <Footer />
           </SectionContainer>
+          <DevToolsDetector />
         </ThemeProviders>
       </body>
     </html>

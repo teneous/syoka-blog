@@ -1,7 +1,7 @@
 import { allCoreContent, sortPosts } from 'pliny/utils/contentlayer'
 import { allBlogs } from 'contentlayer/generated'
 import { genPageMetadata } from 'app/seo'
-import ListLayout from '@/layouts/ListLayoutWithTags'
+import ListLayout from '@/components/layouts/ListLayoutWithTags'
 
 const POSTS_PER_PAGE = 5
 
@@ -34,7 +34,7 @@ export default async function BlogPage() {
                 Thinking Deeply
               </h1>
               <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                Technology, Innovation, and Beyond
+                Technology, Innovation and Beyond
               </p>
             </div>
             {/* 装饰线条 */}
