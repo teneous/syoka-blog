@@ -8,7 +8,8 @@ class WeReadAPI {
   private baseUrl = 'https://weread.qq.com'
 
   private constructor() {
-    this.cookie = process.env.WEREAD_COOKIE || ''
+    this.cookie = process.env.NEXT_PUBLIC_WEREAD_COOKIE || ''
+    console.log('WeReadAPI Cookie:', this.cookie)
     this.vid = this.extractVidFromCookie()
   }
 

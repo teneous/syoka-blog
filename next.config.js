@@ -71,6 +71,9 @@ module.exports = () => {
     basePath,
     reactStrictMode: true,
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+    env: {
+      NEXT_PUBLIC_WEREAD_COOKIE: process.env.NEXT_PUBLIC_WEREAD_COOKIE,
+    },
     eslint: {
       dirs: ['app', 'components', 'layouts', 'scripts'],
     },
