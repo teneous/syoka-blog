@@ -9,4 +9,3 @@ services:
       - '3000:3000'
     environment:
       NODE_ENV: development
-      NEXT_PUBLIC_WEREAD_COOKIE: ${WEREAD_COOKIE}

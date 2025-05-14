@@ -72,7 +72,7 @@ module.exports = () => {
     reactStrictMode: true,
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
     env: {
-      NEXT_PUBLIC_WEREAD_COOKIE: process.env.NEXT_PUBLIC_WEREAD_COOKIE,
+      WEREAD_COOKIE: process.env.WEREAD_COOKIE,
     },
     eslint: {
       dirs: ['app', 'components', 'layouts', 'scripts'],
@@ -83,9 +83,20 @@ module.exports = () => {
           protocol: 'https',
           hostname: 'picsum.photos',
         },
+        {
+          protocol: 'https',
+          hostname: '*.weread.qq.com',
+        },
+        {
+          protocol: 'https',
+          hostname: '*.qlogo.cn',
+        },
+        {
+          protocol: 'https',
+          hostname: '*.image.myqcloud.com',
+        },
       ],
       unoptimized,
-      domains: ['weread.qq.com'],
     },
     async headers() {
       return [
