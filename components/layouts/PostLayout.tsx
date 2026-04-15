@@ -48,7 +48,9 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
               <div className="space-y-4 pb-10 text-center">
                 {/* 标签 */}
                 <div className="flex justify-center gap-2">
-                  {tags?.map((tag) => <Tag key={tag} text={tag} />)}
+                  {tags?.map((tag) => (
+                    <Tag key={tag} text={tag} />
+                  ))}
                 </div>
                 {/* 标题 */}
                 <div className="relative space-y-1 pt-6">

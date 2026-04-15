@@ -109,7 +109,9 @@ export default function ListLayout({
                   {formatDate(date, siteMetadata.locale)}
                 </time>
                 <div className="flex flex-wrap gap-2">
-                  {tags?.map((tag) => <Tag key={tag} text={tag} />)}
+                  {tags?.map((tag) => (
+                    <Tag key={tag} text={tag} />
+                  ))}
                 </div>
               </div>
 
