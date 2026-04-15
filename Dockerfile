@@ -10,9 +10,6 @@ COPY package.json pnpm-lock.yaml ./
 RUN ls -la /app
 RUN npm install -g pnpm
 RUN pnpm install --shamefully-hoist
-RUN pnpm add katex
-
-
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
