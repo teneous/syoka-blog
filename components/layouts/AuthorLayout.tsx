@@ -56,10 +56,21 @@ export default function AuthorLayout({ children, content }: Props) {
                 <div className="font-medium text-gray-700 dark:text-gray-300">{motor}</div>
                 <div className="text-gray-600 dark:text-gray-400">{company}</div>
 
-                <div className="mt-6 flex items-center justify-center space-x-4">
-                  <div className="transform transition-transform duration-200 hover:scale-110">
-                    <SocialIcon kind="mail" href={`mailto:${email}`} />
+                {email && (
+                  <div className="mt-3 flex flex-col items-center gap-1">
+                    <span className="text-xs font-semibold tracking-widest text-gray-400 uppercase dark:text-gray-500">
+                      Contact
+                    </span>
+                    <a
+                      href={`mailto:${email}`}
+                      className="text-sm text-violet-500 hover:underline dark:text-violet-400"
+                    >
+                      {email}
+                    </a>
                   </div>
+                )}
+
+                <div className="mt-6 flex items-center justify-center space-x-4">
                   <div className="transform transition-transform duration-200 hover:scale-110">
                     <SocialIcon kind="github" href={github} />
                   </div>
