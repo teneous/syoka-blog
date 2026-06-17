@@ -30,6 +30,7 @@ public/sitemap.xml
 
 # misc
 .DS_Store
+*.tsbuildinfo
 
 # debug
 *.log
@@ -45,6 +46,9 @@ yarn-error.log*
 
 # Contentlayer
 .contentlayer
+
+# Local brainstorming previews
+.superpowers/
 
 # env files
 .env

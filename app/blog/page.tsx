@@ -5,10 +5,10 @@ import ListLayout from '@/components/layouts/ListLayoutWithTags'
 
 const POSTS_PER_PAGE = 5
 
-export const metadata = genPageMetadata({ title: 'Blog' })
+export const metadata = genPageMetadata({ title: 'Notes' })
 
 export default async function BlogPage() {
-  const posts = allCoreContent(sortPosts(allBlogs))
+  const posts = allCoreContent(sortPosts(allBlogs.filter((post) => !post.draft)))
   const pageNumber = 1
   const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE)
   const initialDisplayPosts = posts.slice(0, POSTS_PER_PAGE * pageNumber)
@@ -18,31 +18,20 @@ export default async function BlogPage() {
   }
 
   return (
-    <div className="relative min-h-screen">
-      {/* 背景装饰 */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-0 -left-1/4 h-[500px] w-[500px] rounded-full bg-violet-100/20 blur-3xl dark:bg-violet-900/20" />
-        <div className="absolute top-1/3 -right-1/4 h-[400px] w-[400px] rounded-full bg-emerald-100/20 blur-3xl dark:bg-emerald-900/20" />
-      </div>
-
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <div className="relative space-y-12">
-          {/* 页面标题区域 */}
-          <div className="relative pt-24 pb-8 text-center">
-            <div className="relative z-10">
-              <h1 className="font-serif text-4xl font-medium tracking-tight text-gray-900 dark:text-gray-100">
-                Thinking Deeply
-              </h1>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                Technology, Innovation and Beyond
-              </p>
-            </div>
-            {/* 装饰线条 */}
-            <div className="absolute bottom-0 left-1/2 h-px w-24 -translate-x-1/2 bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-4xl">
+        <div className="space-y-12">
+          <div className="pt-12 pb-4">
+            <h1 className="text-4xl leading-tight font-semibold tracking-tight text-gray-950 md:text-5xl dark:text-white">
+              Notes
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-8 text-gray-600 dark:text-gray-400">
+              Public thinking on AI systems, architecture, data platforms, product engineering,
+              creative workflows, and team delivery.
+            </p>
           </div>
 
-          {/* 文章列表 */}
-          <div className="relative">
+          <div>
             <ListLayout
               posts={posts}
               initialDisplayPosts={initialDisplayPosts}

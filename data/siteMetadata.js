@@ -1,9 +1,9 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'Syoka Blog',
+  title: 'Syoka Studio',
   author: 'Syoka',
-  headerTitle: 'Syoka Blog',
-  description: 'A daily blog of syoka',
+  headerTitle: 'Syoka Studio',
+  description: 'AI-native products, systems, and creative workflows by Syoka Studio.',
   language: 'en-us',
   theme: 'system', // system, dark or light
   siteUrl: 'https://syoka.icu',

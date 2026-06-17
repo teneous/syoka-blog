@@ -2,6 +2,7 @@ import { ReactNode } from 'react'
 import Image from '@/components/mdx/Image'
 import type { Authors } from 'contentlayer/generated'
 import SocialIcon from '@/components/social-icons'
+import LocalizedText from '@/components/common/LocalizedText'
 
 interface Props {
   children: ReactNode
@@ -9,94 +10,67 @@ interface Props {
 }
 
 export default function AuthorLayout({ children, content }: Props) {
-  const { name, avatar, occupation, motor, company, email, twitter, bluesky, linkedin, github } =
-    content
+  const { name, avatar, motor, email, twitter, bluesky, linkedin, github } = content
 
   return (
-    <>
-      <div className="relative min-h-screen">
-        {/* 装饰背景 */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute top-0 -left-1/4 h-[500px] w-[500px] rounded-full bg-violet-100/10 blur-3xl dark:bg-violet-900/10" />
-          <div className="absolute top-1/3 right-0 h-[400px] w-[400px] rounded-full bg-emerald-100/10 blur-3xl dark:bg-emerald-900/10" />
+    <div className="min-h-screen">
+      <div className="space-y-10 pt-12 pb-20">
+        <div>
+          <h1 className="text-4xl leading-tight font-semibold tracking-tight text-gray-950 md:text-5xl dark:text-white">
+            <LocalizedText en="About" zh="关于" />
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-8 text-gray-600 dark:text-gray-400">
+            <LocalizedText
+              en="Notes on technical judgment, project practice, and long-term observations around AI agents, system architecture, and data platforms."
+              zh="记录 AI Agent、系统架构、数据平台方向的技术判断、项目实践和长期观察。"
+            />
+          </p>
         </div>
 
-        <div className="space-y-8">
-          <div className="relative space-y-2 pt-6 pb-8 md:space-y-5">
-            <h1 className="relative font-serif text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-100">
-              About
-              <div className="absolute -bottom-2 left-0 h-1 w-20 bg-gradient-to-r from-violet-500 to-emerald-500" />
-            </h1>
-          </div>
+        <div className="grid items-start gap-8 xl:grid-cols-[320px_1fr]">
+          <aside className="rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-gray-800 dark:bg-gray-900/60">
+            <div className="flex flex-col items-center">
+              {avatar && (
+                <Image
+                  src={avatar}
+                  alt="avatar"
+                  width={160}
+                  height={160}
+                  className="h-40 w-40 rounded-full border border-gray-200 object-cover dark:border-gray-800"
+                />
+              )}
+              <h2 className="mt-6 text-2xl font-semibold tracking-tight text-gray-950 dark:text-white">
+                {name}
+              </h2>
+              <p className="mt-2 text-center text-sm leading-6 text-gray-600 dark:text-gray-400">
+                {motor}
+              </p>
 
-          <div className="items-start space-y-2 xl:grid xl:grid-cols-3 xl:space-y-0 xl:gap-x-8">
-            {/* 个人信息卡片 */}
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/40 to-white/20 p-6 pt-8 shadow-xl backdrop-blur-sm transition duration-300 hover:shadow-2xl dark:from-gray-800/40 dark:to-gray-800/20">
-              {/* 装饰效果 */}
-              <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.05] to-emerald-500/[0.05] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              <div className="absolute inset-0 rounded-2xl border border-white/10 dark:border-gray-800/10" />
+              {email && (
+                <a
+                  href={`mailto:${email}`}
+                  className="mt-6 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-950 transition hover:border-gray-950 dark:border-gray-700 dark:bg-gray-950 dark:text-white dark:hover:border-gray-400"
+                >
+                  {email}
+                </a>
+              )}
 
-              <div className="relative flex flex-col items-center">
-                {avatar && (
-                  <div className="relative">
-                    <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-violet-500/20 to-emerald-500/20 blur" />
-                    <Image
-                      src={avatar}
-                      alt="avatar"
-                      width={192}
-                      height={192}
-                      className="relative h-48 w-48 rounded-full border-2 border-white/20 object-cover transition duration-300 group-hover:border-white/40 dark:border-gray-800/20 dark:group-hover:border-gray-800/40"
-                    />
-                  </div>
-                )}
-                <h3 className="relative mt-6 bg-gradient-to-br from-gray-900 to-gray-600 bg-clip-text pb-2 text-2xl font-bold tracking-tight text-transparent dark:from-gray-100 dark:to-gray-400">
-                  {name}
-                </h3>
-                <div className="font-medium text-gray-700 dark:text-gray-300">{occupation}</div>
-                <div className="font-medium text-gray-700 dark:text-gray-300">{motor}</div>
-                <div className="text-gray-600 dark:text-gray-400">{company}</div>
-
-                {email && (
-                  <div className="mt-3 flex flex-col items-center gap-1">
-                    <span className="text-xs font-semibold tracking-widest text-gray-400 uppercase dark:text-gray-500">
-                      Contact
-                    </span>
-                    <a
-                      href={`mailto:${email}`}
-                      className="text-sm text-violet-500 hover:underline dark:text-violet-400"
-                    >
-                      {email}
-                    </a>
-                  </div>
-                )}
-
-                <div className="mt-6 flex items-center justify-center space-x-4">
-                  <div className="transform transition-transform duration-200 hover:scale-110">
-                    <SocialIcon kind="github" href={github} />
-                  </div>
-                  <div className="transform transition-transform duration-200 hover:scale-110">
-                    <SocialIcon kind="linkedin" href={linkedin} />
-                  </div>
-                  <div className="transform transition-transform duration-200 hover:scale-110">
-                    <SocialIcon kind="x" href={twitter} />
-                  </div>
-                  <div className="transform transition-transform duration-200 hover:scale-110">
-                    <SocialIcon kind="bluesky" href={bluesky} />
-                  </div>
-                </div>
+              <div className="mt-6 flex items-center justify-center space-x-4">
+                <SocialIcon kind="github" href={github} />
+                <SocialIcon kind="linkedin" href={linkedin} />
+                <SocialIcon kind="x" href={twitter} />
+                <SocialIcon kind="bluesky" href={bluesky} />
               </div>
             </div>
+          </aside>
 
-            {/* 内容区域 */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/30 to-white/10 p-8 shadow-xl backdrop-blur-sm xl:col-span-2 dark:from-gray-800/30 dark:to-gray-800/10">
-              <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.02] to-emerald-500/[0.02]" />
-              <div className="prose dark:prose-invert prose-headings:text-gray-800 prose-p:text-gray-700 prose-strong:text-gray-900 prose-a:text-violet-700 dark:prose-headings:text-gray-100 dark:prose-p:text-gray-200 dark:prose-strong:text-gray-100 dark:prose-a:text-violet-400 relative max-w-none">
-                {children}
-              </div>
+          <section className="rounded-lg border border-gray-200 bg-white p-8 dark:border-gray-800 dark:bg-gray-950">
+            <div className="prose dark:prose-invert prose-headings:text-gray-950 prose-p:text-gray-700 prose-strong:text-gray-950 prose-a:text-violet-700 dark:prose-headings:text-white dark:prose-p:text-gray-300 dark:prose-strong:text-white dark:prose-a:text-violet-400 max-w-none">
+              {children}
             </div>
-          </div>
+          </section>
         </div>
       </div>
-    </>
+    </div>
   )
 }

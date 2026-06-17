@@ -1,5 +1,0 @@
-@layer components {
-  .glass-card {
-    @apply border border-white/20 bg-white/30 shadow-xl backdrop-blur-md dark:border-gray-700/30 dark:bg-gray-800/30;
-  }
-}

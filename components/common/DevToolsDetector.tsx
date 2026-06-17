@@ -22,7 +22,12 @@ declare global {
 
 const DevToolsDetector = () => {
   useEffect(() => {
+    let hasLogged = false
+
     const detectDevTools = () => {
+      if (hasLogged) return
+      hasLogged = true
+
       const consoleStyles = {
         title: [
           'color: #7C3AED',
@@ -116,14 +121,16 @@ const DevToolsDetector = () => {
     const intervalId = setInterval(() => checkDevTools(), 500)
 
     // 监听控制台打开快捷键
-    window.addEventListener('keydown', (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (
         e.key === 'F12' ||
         ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'i')
       ) {
         detectDevTools()
       }
-    })
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
 
     // 初始化时检查
     if (
@@ -137,6 +144,7 @@ const DevToolsDetector = () => {
     // 清理定时器
     return () => {
       clearInterval(intervalId)
+      window.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
 

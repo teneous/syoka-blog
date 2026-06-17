@@ -44,5 +44,13 @@
     ".contentlayer/generated/**/*.json",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "*.config.js", "next.config.js", "postcss.config.js", ".eslintrc.js"]
+  "exclude": [
+    "node_modules",
+    "*.config.js",
+    "*.config.mjs",
+    "eslint.config.mjs",
+    "next.config.js",
+    "postcss.config.js",
+    ".eslintrc.js"
+  ]
 }

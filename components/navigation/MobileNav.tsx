@@ -2,29 +2,32 @@
 
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react'
 import { clearAllBodyScrollLocks, disableBodyScroll, enableBodyScroll } from 'body-scroll-lock'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import headerNavLinks from '@/data/headerNavLinks'
 import Link from '@/components/common/Link'
+import LocalizedNavTitle from './LocalizedNavTitle'
 
 const MobileNav = () => {
   const [navShow, setNavShow] = useState(false)
-  const navRef = useRef(null)
+  const navRef = useRef<HTMLElement | null>(null)
 
-  const onToggleNav = () => {
+  const onToggleNav = useCallback(() => {
     setNavShow((status) => {
-      if (status) {
-        enableBodyScroll(navRef.current)
-      } else {
-        // Prevent scrolling
-        disableBodyScroll(navRef.current)
+      const nav = navRef.current
+      if (nav) {
+        if (status) {
+          enableBodyScroll(nav)
+        } else {
+          disableBodyScroll(nav)
+        }
       }
       return !status
     })
-  }
+  }, [])
 
   useEffect(() => {
     return clearAllBodyScrollLocks
-  })
+  }, [])
 
   return (
     <>
@@ -79,7 +82,7 @@ const MobileNav = () => {
                     className="hover:text-primary-500 dark:hover:text-primary-400 mb-4 py-2 pr-4 text-2xl font-bold tracking-widest text-gray-900 outline outline-0 dark:text-gray-100"
                     onClick={onToggleNav}
                   >
-                    {link.title}
+                    <LocalizedNavTitle title={link.title} />
                   </Link>
                 ))}
               </nav>

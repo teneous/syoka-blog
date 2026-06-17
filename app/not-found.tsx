@@ -39,14 +39,8 @@ const CodeWindow = ({ children }: { children: React.ReactNode }) => (
 export default function NotFound() {
   return (
     <div className="relative flex min-h-[70vh] flex-col items-center justify-center py-12">
-      {/* Background animation effect */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800" />
-        <div className="absolute inset-0 opacity-20 dark:opacity-10">
-          <div className="animate-blob absolute top-0 -left-4 h-72 w-72 rounded-full bg-purple-300 mix-blend-multiply blur-xl filter" />
-          <div className="animate-blob animation-delay-2000 absolute top-0 -right-4 h-72 w-72 rounded-full bg-yellow-300 mix-blend-multiply blur-xl filter" />
-          <div className="animate-blob animation-delay-4000 absolute -bottom-8 left-20 h-72 w-72 rounded-full bg-pink-300 mix-blend-multiply blur-xl filter" />
-        </div>
       </div>
 
       <div className="relative container mx-auto px-4">

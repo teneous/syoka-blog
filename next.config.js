@@ -12,9 +12,9 @@ const ContentSecurityPolicy = `
   default-src 'self';
   script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app analytics.umami.is;
   style-src 'self' 'unsafe-inline';
-  img-src * blob: data:;
+  img-src 'self' blob: data: https://picsum.photos https://*.githubusercontent.com https://avatars.githubusercontent.com;
   media-src *.s3.amazonaws.com;
-  connect-src *;
+  connect-src 'self' giscus.app analytics.umami.is;
   font-src 'self';
   frame-src giscus.app
 `
@@ -71,9 +71,6 @@ module.exports = () => {
     basePath,
     reactStrictMode: true,
     pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
-    env: {
-      WEREAD_COOKIE: process.env.WEREAD_COOKIE,
-    },
     eslint: {
       dirs: ['app', 'components', 'layouts', 'scripts'],
     },
@@ -82,18 +79,6 @@ module.exports = () => {
         {
           protocol: 'https',
           hostname: 'picsum.photos',
-        },
-        {
-          protocol: 'https',
-          hostname: '*.weread.qq.com',
-        },
-        {
-          protocol: 'https',
-          hostname: '*.qlogo.cn',
-        },
-        {
-          protocol: 'https',
-          hostname: '*.image.myqcloud.com',
         },
       ],
       unoptimized,

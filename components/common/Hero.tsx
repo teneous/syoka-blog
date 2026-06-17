@@ -1,156 +1,80 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { FiGithub, FiLinkedin, FiMail } from 'react-icons/fi'
-import { TypeAnimation } from 'react-type-animation'
-import { Highlight, themes } from 'prism-react-renderer'
-import { IconType } from 'react-icons'
+import Link from '@/components/common/Link'
+import { ArrowRight } from 'lucide-react'
+import StudioPipeline from './StudioPipeline'
+import { useLanguage } from './useLanguage'
 
-const SocialLink = ({
-  href,
-  icon: Icon,
-  label,
-}: {
-  href: string
-  icon: IconType
-  label: string
-}) => (
-  <motion.a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 transition-colors duration-200 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
-    whileHover={{ scale: 1.1 }}
-    whileTap={{ scale: 0.95 }}
-  >
-    <span className="sr-only">{label}</span>
-    <Icon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
-  </motion.a>
-)
-
-const codeString = `import asyncio
-
-async def journey():
-    while True:
-        await keep_learning()
-        await take_action()
-        await deep_thinking()
-
-asyncio.run(journey())`
-
-const CodeWindow = ({ children }: { children: React.ReactNode }) => (
-  <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-xl bg-[#011627] shadow-2xl">
-    <div className="flex h-8 items-center bg-gray-800/50 px-4">
-      <div className="flex space-x-2">
-        <div className="h-3 w-3 rounded-full bg-red-500" />
-        <div className="h-3 w-3 rounded-full bg-yellow-500" />
-        <div className="h-3 w-3 rounded-full bg-green-500" />
-      </div>
-      <div className="flex flex-1 justify-center">
-        <span className="text-xs text-gray-400">journey.py</span>
-      </div>
-    </div>
-    {children}
-  </div>
-)
+const copy = {
+  en: {
+    title: 'From business problems to shippable solutions.',
+    description:
+      'Focused on AI Agent ecosystems, data foundations, system architecture, and multi-end engineering, moving business problems toward solution design, product implementation, and continuous iteration.',
+    primary: 'View Works',
+    secondary: 'About Focus',
+    stats: ['AI Agent', 'Data', 'Architecture', 'Multi-end'],
+  },
+  zh: {
+    title: '从商业问题到可交付方案',
+    description:
+      '围绕 AI Agent 生态、数据底座、系统架构和多端工程，把商业问题推进到方案设计、产品实现和持续迭代。',
+    primary: '查看项目',
+    secondary: '了解方向',
+    stats: ['AI Agent', '数据底座', '系统架构', '多端工程'],
+  },
+}
 
 export default function Hero() {
+  const { language } = useLanguage()
+  const t = copy[language]
+
   return (
-    <div className="relative flex min-h-[80vh] items-center">
-      {/* 背景动画效果 */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800" />
-        <div className="absolute inset-0 opacity-20 dark:opacity-10">
-          <div className="animate-blob absolute top-0 -left-4 h-72 w-72 rounded-full bg-purple-300 mix-blend-multiply blur-xl filter" />
-          <div className="animate-blob animation-delay-2000 absolute top-0 -right-4 h-72 w-72 rounded-full bg-yellow-300 mix-blend-multiply blur-xl filter" />
-          <div className="animate-blob animation-delay-4000 absolute -bottom-8 left-20 h-72 w-72 rounded-full bg-pink-300 mix-blend-multiply blur-xl filter" />
+    <section className="relative overflow-hidden border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
+        <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-end">
+          <div>
+            <h1 className="max-w-3xl text-4xl leading-[1.04] font-semibold tracking-tight text-gray-950 sm:text-5xl lg:text-[3.35rem] dark:text-white">
+              {t.title}
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-gray-600 sm:text-lg sm:leading-8 dark:text-gray-300">
+              {t.description}
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/projects"
+                className="inline-flex items-center justify-center rounded-md bg-gray-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-gray-800 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
+              >
+                {t.primary}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+              <Link
+                href="/about"
+                className="inline-flex items-center justify-center rounded-md border border-gray-300 px-5 py-3 text-sm font-medium text-gray-900 transition hover:border-gray-950 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-100 dark:hover:border-gray-300 dark:hover:bg-gray-900"
+              >
+                {t.secondary}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:justify-self-end">
+            {t.stats.map((item) => (
+              <div
+                key={item}
+                className="rounded-md border border-gray-200 px-3 py-2 text-center text-xs font-medium text-gray-600 dark:border-gray-800 dark:text-gray-400"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative mt-9">
+          <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-lg border border-violet-500/20 dark:border-violet-400/20" />
+          <StudioPipeline />
         </div>
       </div>
-
-      <div className="relative container mx-auto px-4">
-        <div className="mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <motion.h1
-              className="mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-5xl font-bold text-transparent md:text-6xl dark:from-blue-400 dark:to-purple-400"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              Hi, I'm syoka
-            </motion.h1>
-
-            <motion.div
-              className="mb-8 text-xl text-gray-600 md:text-2xl dark:text-gray-300"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              <TypeAnimation
-                sequence={['Full Stack Developer', 2000, 'AI Engineer', 2000]}
-                wrapper="div"
-                speed={20}
-                repeat={Infinity}
-              />
-            </motion.div>
-
-            <motion.div
-              className="mb-12"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
-              <CodeWindow>
-                <Highlight theme={themes.nightOwl} code={codeString} language="python">
-                  {({ className, style, tokens, getLineProps, getTokenProps }) => (
-                    <pre
-                      className={`${className} p-6 text-left text-[15px] leading-7`}
-                      style={{ ...style, background: 'transparent', tabSize: 4 }}
-                    >
-                      {tokens.map((line, i) => (
-                        <div
-                          key={i}
-                          {...getLineProps({ line })}
-                          style={{ minHeight: '1.75rem', display: 'flex' }}
-                        >
-                          <span style={{ whiteSpace: 'pre-wrap' }}>
-                            {line.map((token, key) => (
-                              <span key={key} {...getTokenProps({ token })} />
-                            ))}
-                          </span>
-                        </div>
-                      ))}
-                    </pre>
-                  )}
-                </Highlight>
-              </CodeWindow>
-            </motion.div>
-
-            <motion.div
-              className="flex justify-center space-x-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-            >
-              <SocialLink
-                href="https://github.com/teneous"
-                icon={FiGithub}
-                label="访问我的 GitHub"
-              />
-              <SocialLink
-                href="https://www.linkedin.com/in/x-syoka-564678315/"
-                icon={FiLinkedin}
-                label="访问我的 LinkedIn"
-              />
-              <SocialLink href="mailto:syoka9471@gmail.com" icon={FiMail} label="发送邮件给我" />
-            </motion.div>
-          </motion.div>
-        </div>
-      </div>
-    </div>
+    </section>
   )
 }
