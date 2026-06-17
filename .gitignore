@@ -31,6 +31,8 @@ public/sitemap.xml
 # misc
 .DS_Store
 *.tsbuildinfo
+.idea/
+.claude/settings.local.json
 
 # debug
 *.log
