@@ -1,0 +1,240 @@
+---
+title: 如何打造高效的人机协作团队
+date: '2026-07-05'
+tags: ['AI', 'Claude', 'Agent']
+draft: false
+summary: Anthropic 关于 multiplayer agent 的内部实践复盘：公开工作、角色分工、北极星目标和渐进式信任，决定了人机团队能不能真正跑起来。
+---
+
+<div className="not-prose my-10 overflow-hidden rounded-xl border border-violet-200/60 bg-gradient-to-br from-violet-50 via-white to-emerald-50 p-6 shadow-sm dark:border-violet-900/40 dark:from-violet-950/30 dark:via-gray-950 dark:to-emerald-950/20">
+  <div className="text-xs font-semibold tracking-[0.22em] text-violet-600 uppercase dark:text-violet-300">
+    Anthropic Practice Notes
+  </div>
+  <h2 className="mt-3 text-2xl font-semibold tracking-tight text-gray-950 dark:text-white">
+    agent 没有发明团队管理的新规则，它只是让旧规则的执行成本变得更低，也让欠账暴露得更快。
+  </h2>
+  <div className="mt-4 max-w-3xl text-sm leading-7 text-gray-700 dark:text-gray-300">
+    这篇文章整理了 Anthropic 对多人协作 agent 的内部实践总结。原文讲 Claude Tag 一类工具如何把 AI
+    从“个人助理”推向“团队成员”，但真正值得记住的不是工具名，而是四个组织基本功：公开工作、明确角色、设定北极星，以及按可靠性逐步放权。
+  </div>
+  <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium">
+    <span className="rounded-full bg-white/80 px-3 py-1 text-violet-700 ring-1 ring-violet-200 dark:bg-gray-900/70 dark:text-violet-200 dark:ring-violet-900">
+      原文：Building Effective Human-Agent Teams
+    </span>
+    <span className="rounded-full bg-white/80 px-3 py-1 text-emerald-700 ring-1 ring-emerald-200 dark:bg-gray-900/70 dark:text-emerald-200 dark:ring-emerald-900">
+      主题：多人协作 agent
+    </span>
+    <span className="rounded-full bg-white/80 px-3 py-1 text-gray-700 ring-1 ring-gray-200 dark:bg-gray-900/70 dark:text-gray-200 dark:ring-gray-800">
+      类型：实践观察
+    </span>
+  </div>
+</div>
+
+[Building Effective Human-Agent Teams](https://claude.com/blog/building-effective-human-agent-teams) · Anthropic · 2026-06-24
+
+过去和 AI 一起工作，就是一个人对着一个聊天窗口。后来 AI 逐渐能接住复杂的长任务：写代码、做研究、财务分析。用法也从终端、IDE 蔓延到表格和幻灯片，但本质上还是“单机游戏”：一个人带一个 agent，干自己手头的活。
+
+Claude Tag 这类工具的出现正在改变这件事。人和 agent 现在待在同一个工作区里，围绕团队共同的目标协作。工作开始像一场多人游戏：一群人定战略，Claude 负责执行。Anthropic 内部花了好几个月验证让人机团队真正跑起来需要什么，这篇文章讲的就是什么叫多人协作的 agent，以及他们摸索出的四条经验。
+
+![单人协作和多人协作的对比](/static/images/building-effective-human-agent-teams/image1.png)
+
+<div className="not-prose my-10 grid gap-3 md:grid-cols-4">
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-violet-600 dark:text-violet-300">01</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">公开工作</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      让 agent 能检索到团队真实上下文。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-violet-600 dark:text-violet-300">02</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">角色分工</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      人和 agent 都要知道自己该负责什么。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-violet-600 dark:text-violet-300">03</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">北极星目标</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      主动性来自清晰、稳定、可引用的方向。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-violet-600 dark:text-violet-300">04</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">渐进信任</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      自主权要靠可验证的战绩一点点挣。
+    </div>
+  </div>
+</div>
+
+# 什么是 multiplayer agent
+
+所谓 multiplayer agent，指的是同时和很多人一起工作的 AI。它和普通 agent 一样有自己的记忆和技能，但有两点很不一样：它持有独立的凭证（credentials），而且常驻在工作真正发生的地方。在 Anthropic，就是 Slack 这样的协作工具里。
+
+![团队频道里的 agent 协作示例](/static/images/building-effective-human-agent-teams/image2.png)
+
+要让 agent 在团队频道里有实际产出，三样东西缺一不可：
+
+- 持久的记忆，才能记住目标并围绕目标调整执行；
+- 不绑定在任何个人身上的独立凭证，才能在安全、可预期的护栏内行动；
+- 对组织信息持续而广泛的访问权，才能搞清楚这家公司怎么运转，替团队把事做成。
+
+这三样构成了技术地基。但光有地基不够，团队还需要新的工作方式和共同的规范。下面四条经验说的就是这个。
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-violet-500 bg-violet-50 px-5 py-4 text-sm leading-7 text-violet-950 dark:bg-violet-950/30 dark:text-violet-100">
+  <strong>一句话判断：</strong>如果一个 agent
+  只能看见你单独喂给它的片段，它最多是个人助理；只有当它能进入团队真实工作流，它才可能成为团队成员。
+</div>
+
+# 经验一：公开工作，给 agent 足够宽的上下文
+
+Anthropic 的团队主动、公开地共享信息，有 agent 在的团队尤其如此，因为 agent 对组织的全部理解都来自可检索的文本：Slack、代码、文档、会议纪要。私聊、走廊里的交谈、受限文档，这些统统喂不进 agent 的脑子。<strong>对 agent 来说，没写下来、搜不到的信息，等于不存在。</strong>
+
+GitLab 靠一本公开的 Handbook 支撑起两千人的全远程协作，“不写进手册就等于没发生”是他们十年前就在执行的纪律。agent 没有发明这条规则，只是让违反它的惩罚变得即时了。
+
+他们不逐个文档、逐个频道地决定 agent 能看什么，而是划出少数几条清晰的安全边界，直接作用于整个 Slack 工作区、会议转录和文档库。边界之内，上下文自动流向每一个成员，不分人还是 AI。这不仅扩大了大家能拿到的信息量，还消除了“这个频道要不要公开、这份文档能不能给那个人看、这个 agent 有没有资格读那条线程”之类的日常纠结。人跟 agent 一样，都不擅长应付逐条授权的软边界。几条清晰的工作区级边界，把这种决策疲劳整个拿掉了。
+
+透明的回报是实打实的：读得到会议决策的 agent，不会再去建议已经被砍掉的项目；看得到其他团队产品文档的 agent，会把别人验证过的方案推荐给你；而且 agent 读文本的速度比人快几个数量级，经常翻出人早就漏掉的相关工作。在一个节奏很快的行业里，Anthropic 的团队重度依赖 agent 来保持信息同步。
+
+落到具体做法上，“公开工作”是这样的：
+
+- 在公司层面选定少数几条安全边界，工作区和文档共享设置与之一一对应；
+- 新建的沟通频道默认组织内公开，所有决策必须落到频道、文档或会议纪要里；
+- 写文档和纪要时就考虑 agent 能不能搜到，agent 已经是团队文档的主要读者之一；
+- 确保 AI 拿得到干活所需的工具和信息。
+
+把信息默认设为内部公开，对很多公司意味着文化上的转变。但有上下文的人机团队和没有的，差距大到没法忽视。当然，有些交互确实敏感，只该留在一个人和 AI 之间。这种情况可以直接给 @Claude 发私信，或者用 Claude.ai、Claude Cowork，通过个人 MCP 连接器访问私有信息，对话内容保持私密。
+
+<div className="not-prose my-8 rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-100">
+  <div className="font-semibold">注意：公开不是无边界。</div>
+  <div className="mt-2">
+    文中的做法不是“所有东西都给 AI
+    看”，而是把逐条授权改成少数清晰边界。好处是省掉大量决策疲劳；代价是边界内的信息暴露面会变大。真正落地时，需要额外考虑
+    prompt injection、敏感文档分级、审计日志和最小权限。
+  </div>
+</div>
+
+# 经验二：每个人、每个 agent 都有明确角色和趁手的工具
+
+人机团队共用一份名单、一套产出物、一个工作空间。agent 有自己的凭证、技能和工具权限，不同 agent 的角色也各不相同：一个负责项目的数据分析，另一个掌管并执行设计规范，第三个做研究综述。项目启动时，人先跟 agent 聊，商量出角色怎么分、人机之间怎么配合。
+
+分工定下来之后，一个 agent 可能会再拉起别的 agent，让具体任务落在记忆和权限都合适的执行者手上。工具必须配齐：做数据分析的要有 BigQuery，做 QA 的可能需要 Playwright MCP。
+
+人通常和 agent 在同一批线程里干活，但人握着只有人能承担的角色，保证最重要的决策始终经过人的判断。<strong>没有明确的分工，大家就会各自在旁边养一支私人 AI 队伍，重复劳动，把团队的上下文撕碎。</strong>指标统计是最典型的例子：让一个 multiplayer agent 把活干一次，所有人看同一份数字。
+
+在 Anthropic，明确的角色分工长这样：
+
+- 一份人和 agent 共同认可的任务分配表，谁干什么写得清清楚楚；
+- 所有人在共享线程里工作，任何人都能接着别人的进度往下做；
+- 每个成员，不管是人还是 agent，都有完成本职所需的工具；
+- 给 agent 的角色和职权范围写成文字。
+
+比如几个 Claude agent 分担一个代码库的日常维护：反馈分类、排期、写代码、review、汇报状态，各管一摊、各按各的节奏，人负责定目标和验收。
+
+Anthropic 有个工程团队开始给人和 agent 编花名册（roster），因为这让推进工作变得具体得多。他们很快发现：明确的角色让责任归属一目了然，不管是单个任务还是整个团队的职责范围；用 skill 文件定义 agent 的角色之后，专业化变得容易，公司里其他人也能照着快速复制同类 agent；项目变复杂就加新 agent 盯新领域，比如后来加了一个 release manager agent 专管发版。这些方法让人对团队的心智模型能跟着 agent 数量一起扩张。
+
+![人机团队的角色花名册](/static/images/building-effective-human-agent-teams/image3.png)
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-emerald-500 bg-emerald-50 px-5 py-4 text-sm leading-7 text-emerald-950 dark:bg-emerald-950/25 dark:text-emerald-100">
+  <strong>实践提醒：</strong>不要只写“让 Claude 帮忙”。更好的描述是：这个 agent
+  负责什么、能调用哪些工具、什么时候需要上报人、输出物由谁验收。
+</div>
+
+# 经验三：立一颗北极星，agent 才会主动
+
+Anthropic 有些 agent 只做被指派的任务，但最有价值的那些会主动提出新项目、新工作流。这通常发生在一个已经给足上下文、分清角色的团队再补上一样东西之后：北极星目标。
+
+北极星是宏大、覆盖面广的目标，帮团队判断哪些任务和工作流值得做。在 Anthropic，北极星永远由人来定，而且必须扎根在公司使命和业务目标上。目标白纸黑字写清楚之后分享给团队里的 agent，然后，这一步很关键，由人来挑选哪些 agent 有资格主动建议新工作流。不是每个 agent 都积累了做好这件事所需的能力和信任。
+
+举个例子：一个内部工具团队的北极星是“让产品 onboarding 更有帮助”，一个 agent 主动建议修改 onboarding 流程里的报错文案，改完之后第二周，onboarding 成功率有了可测量的提升。
+
+一周的指标变化作为证据相当薄弱，文中也没提有没有对照组。这类厂商博客里的内部案例本来就无法复核，看个方向就好，别当成效果承诺。
+
+具体做法是：人先讨论、争论，然后写下一个有野心的北极星；把它分享给 agent，并点名谁可以主动推荐新工作流；同时在日历上保护好高质量的人类时间，让会议聚焦在最重要的事情上。一颗清晰的北极星给了 agent 稳定的方向感，也给了它们真正有意义的主动出手的机会。
+
+<div className="not-prose my-8 rounded-lg border border-gray-200 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-800 dark:border-gray-800 dark:bg-gray-900/70 dark:text-gray-200">
+  <div className="font-semibold">我的理解</div>
+  <div className="mt-2">
+    北极星不是口号，而是 agent
+    判断“要不要主动多做一步”的依据。没有北极星，主动性就容易变成乱加戏；有北极星，agent
+    才能把零碎上下文收束到同一个方向上。
+  </div>
+</div>
+
+# 经验四：信任是一点点攒出来的
+
+<strong>Anthropic 给 agent 的自主权，和它被验证过的可靠性成正比，然后再有意识地逐步扩大。</strong>
+工程师最终能放心让团队里的 agent 独立处理 500 个 bug 修复，但起点绝不是这样。
+
+新同事入职，你需要时间摸清他的能力、磨合出工作节奏，往往要经过好几轮反馈，才能把“这活到底该怎么干”的隐性知识一点点讲透。agent 也一样：你得拿各种任务去试，才知道它擅长什么、目标怎么描述才清楚、需要哪些 skill 文件、什么样的 prompt 能引出想要的行为。而且模型更新之后还要重测。原来的 prompt 可能要改写，原来有用的护栏反而可能束缚住更聪明的模型，让它没法去找更有创造性的解法。
+
+他们还发现，最好的长期运行的 agent，在人来看之前就有很多办法自己验证工作。代码有测试，这不稀奇，但其他工作大多也能验证：技术文档可以套 rubric 和 style guide。人来定标准，确保交给 agent 的每样活都有办法检验，质量就不会漂移。另外，就像人类团队一样，让一个 agent 干活、另一个 agent 检查，往往很有效。这套结构被称作 Doer-Verifier。
+
+要留意的是，如果干活的和检查的是同一个基座模型，两者共享盲区，verifier 能抓住粗心错误，但对系统性的认知偏差检出率存疑。它更接近 code review 的四眼原则，而不是独立审计。
+
+攒信任的具体做法：
+
+- 起步阶段人工 review 每一份产出，给反馈，顺手沉淀出验收清单；
+- 让 agent 把“调用 verifier agent 检查自己”内置进任务流程；
+- 把复盘做进循环，让 agent 检讨自己的失误，工作质量随时间上升；
+- 按任务类型记录每个 agent 挣到了哪些自主权，重复成功之后再按类型扩大范围。
+
+![积压工作处理流程](/static/images/building-effective-human-agent-teams/image4.png)
+
+Anthropic 一位工程负责人接手了一个积压严重的新团队。为了摸清家底，他拉了几个人、几个 agent 一起清 backlog：一组 agent 通读全部积压项，查清有没有人在做，给无主的项打复杂度分；另一组从清单里过滤出中低复杂度的项，直接产出代码改动。
+
+最开始，人工 review agent 做的每一个决定，标出需要人参与的那些；随后他们教会 agent 主动把这类决定上抛，保证凡是有艰难取舍的决策，环里一定有人。每周，团队让 agent 编一份带“教训与失误”的周报，让它们记住错误、不再重犯。慢慢地，这位负责人能放手交出去的代码改动越来越复杂，花在日常指导上的时间越来越少。
+
+等 agent 足够独立之后，他又教了它们一课：<strong>把人的注意力当成稀缺资源来对待</strong>。把问题攒起来一次性问完，复述关键上下文让人快速进入状态，控制每个人同时要看的事项数量。有的团队干脆专设一个 agent，唯一职责就是决定哪些沟通值得打包上报给人。也有团队给 agent 设定每天的工作量上限，让人能真正消化 agent 的产出。这既保住了人自己看重的技能，也让需要人工 review 的事项维持在可持续的数量上。
+
+# 动手前先问自己五个问题
+
+<div className="not-prose my-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950">
+  <div className="text-sm font-semibold text-gray-950 dark:text-white">人机团队自查清单</div>
+  <div className="mt-4 space-y-3 text-sm leading-6 text-gray-700 dark:text-gray-300">
+    <label className="flex gap-3">
+      <input type="checkbox" disabled className="mt-1 h-4 w-4 rounded border-gray-300" />
+      <span>agent 和人需要的信息与权限，是否都做到了公开且可检索？</span>
+    </label>
+    <label className="flex gap-3">
+      <input type="checkbox" disabled className="mt-1 h-4 w-4 rounded border-gray-300" />
+      <span>你能不能写出团队的完整名单（人加 agent），并说清每个成员各管什么？</span>
+    </label>
+    <label className="flex gap-3">
+      <input type="checkbox" disabled className="mt-1 h-4 w-4 rounded border-gray-300" />
+      <span>团队里的每个人、每个 agent，是否都有干好本职的工具？</span>
+    </label>
+    <label className="flex gap-3">
+      <input type="checkbox" disabled className="mt-1 h-4 w-4 rounded border-gray-300" />
+      <span>关键的工作产出，有没有 rubric 或测试可以验收？</span>
+    </label>
+    <label className="flex gap-3">
+      <input type="checkbox" disabled className="mt-1 h-4 w-4 rounded border-gray-300" />
+      <span>团队有没有一颗所有人都能随时对齐的北极星？</span>
+    </label>
+  </div>
+</div>
+
+# 写在最后
+
+<strong>这些模式没有一个是新的，至少对人来说不是。</strong>
+清晰的北极星、明确的分工、扎实的文档、共同的质量标准、允许从错误中学习的空间，这些是我们讲了几十年的健康团队习惯。agent
+只是让跳过它们的代价变得更高了。从 agent 身上收益最大的团队，恰恰是把这些基本功执行得最认真的团队。
+
+---
+
+# 后记
+
+这篇文章最有意思的地方是它的反讽结构：一家最前沿的 AI 公司，花几千字讲怎么用 agent，结论却是“把老生常谈的团队管理做扎实”。我觉得这个结论是可信的。agent 放大的是组织原有的信息习惯。文档文化好的公司，喂出来的 agent 就聪明；靠口头和私聊运转的公司，agent 拿到的上下文是空的，再强的模型也只能是摆设。
+
+所以判断你的团队适不适合上 multiplayer agent，先看看你们的决策有多少真正落在了可检索的文档里，这比纠结选哪家模型重要得多。
+
+读的时候也要记住这是厂商博客：案例全部来自 Anthropic 内部，只有成功样本，没有失败数据，也无法复核。但抛开产品本身，工作区级的安全边界、按可靠性逐步放权、Doer-Verifier 这几个做法是产品无关的，今天就可以拿去用。
+
+# 参考资料
+
+- [Building Effective Human-Agent Teams](https://claude.com/blog/building-effective-human-agent-teams) — 原文
+- [GitLab Handbook](https://handbook.gitlab.com/) — handbook-first 的全远程协作文化，“公开工作”的前 agent 时代范本
+- [How Anthropic Teams Use Claude Code](https://www.anthropic.com/news/how-anthropic-teams-use-claude-code) — 同系列的内部实践文章

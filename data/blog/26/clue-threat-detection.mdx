@@ -1,0 +1,163 @@
+---
+title: Anthropic 的安全团队怎么用 Claude Code 造出威胁检测平台
+date: '2026-07-05'
+tags: ['AI', 'Claude', 'Security']
+draft: false
+summary: Anthropic 检测平台工程团队用 Claude Code 一周搭出安全调查平台 CLUE：AI 先分诊告警、自然语言查所有安全日志，误报率从 33% 降到 7%，差异化全在内部上下文。
+---
+
+<div className="not-prose my-10 overflow-hidden rounded-xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50 via-white to-rose-50 p-6 shadow-sm dark:border-emerald-900/40 dark:from-emerald-950/30 dark:via-gray-950 dark:to-rose-950/20">
+  <div className="text-xs font-semibold tracking-[0.22em] text-emerald-600 uppercase dark:text-emerald-300">
+    Anthropic Security Notes
+  </div>
+  <h2 className="mt-3 text-2xl font-semibold tracking-tight text-gray-950 dark:text-white">
+    关键是给 Claude 边界——能用什么工具、能碰什么数据——而把策略留白。
+  </h2>
+  <div className="mt-4 max-w-3xl text-sm leading-7 text-gray-700 dark:text-gray-300">
+    Anthropic 检测平台工程团队在日常工作之外，用 Claude Code 造出了检测响应平台
+    CLUE：概念验证一天跑起来，设计文档到正式实现一周完成。告警在人看到之前先过一遍 AI
+    分诊，分析师用自然语言查所有安全日志，过去几小时的手工关联三四分钟跑完。
+  </div>
+  <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium">
+    <span className="rounded-full bg-white/80 px-3 py-1 text-emerald-700 ring-1 ring-emerald-200 dark:bg-gray-900/70 dark:text-emerald-200 dark:ring-emerald-900">
+      原文：How Anthropic's Cybersecurity Team Built a Threat Detection Platform
+    </span>
+    <span className="rounded-full bg-white/80 px-3 py-1 text-rose-700 ring-1 ring-rose-200 dark:bg-gray-900/70 dark:text-rose-200 dark:ring-rose-900">
+      主题：AI 驱动的安全运营
+    </span>
+    <span className="rounded-full bg-white/80 px-3 py-1 text-gray-700 ring-1 ring-gray-200 dark:bg-gray-900/70 dark:text-gray-200 dark:ring-gray-800">
+      类型：实践案例
+    </span>
+  </div>
+</div>
+
+[How Anthropic's Cybersecurity Team Built a Threat Detection Platform with Claude Code](https://claude.com/blog/how-anthropic-uses-claude-cybersecurity) · Anthropic（主角：检测平台工程团队技术负责人 Jackie Bow）· 2026-05-12
+
+Jackie Bow 整个职业生涯都在想象一种工具：它能摸到真正要紧的上下文——不只是日志和告警，还有 Slack 里的讨论、内部文档、组织里口口相传的经验，这些才是判断"这是真威胁还是噪音"的依据——而且不需要人肉去翻这些数据。加入 Anthropic 之后，她终于有机会把它造出来，合作者就是 Claude。
+
+她带的检测平台工程团队做的是防御性安全：发现威胁、响应潜在入侵，而不是主动挖漏洞。日常工作是盯着系统里的可疑活动、给安全告警分诊、在异常演变成事故之前把它查清楚。对一家在造越来越强的 AI 模型的公司，这份工作是地基性的——Anthropic 的负责任扩展政策（Responsible Scaling Policy）把产品发布直接绑在安全承诺上，所以这个团队的工作实际上决定着公司什么能安全地发出去。
+
+"我觉得现在是安全工程师的黄金时代，"Bow 说，"我终于能把那些一直希望自己拥有的工具造出来了。"
+
+# 问题：数据和告警把人淹了
+
+安全负责人对这个场景太熟了。一条告警响了，分析师打开终端，开始那套熟悉的仪式：在五六个工具之间来回跳，每个工具有自己的查询语言和心智模型。他们得同时维持对多个平台的熟练度，还要在不同界面和查询语法之间不停切换。每次调查都变成一场数据考古，从一堆互不连通的系统里拼碎片。对多数团队来说，简单的调查要耗几个小时，复杂的能拖上好几天。
+
+"一个人一天能认真看的告警就那么多，超过了，看的深度就往下掉，"Bow 说。
+
+她的团队决定动手解决，先问了自己三个问题：什么在消耗我们的精力？什么是重复劳动？什么在阻止我们做真正有影响的工作？答案很清楚：告警分诊能吃掉几个小时，分析师才能确认威胁是不是真的；跨系统的手工关联拖慢一切；查询语言和界面之间的反复切换制造认知负担，而且一天下来越积越重。公司在长大，攻击面在长大，压在安全团队身上的需求也在长大。"不借助 Claude 这样的东西，我们不可能扩张到能满足 Anthropic 的需要，"Bow 说。
+
+# 解法：CLUE，让 Claude 自己去查证据
+
+几个月里，团队造出了 CLUE（Claude Looks Up Evidence），一个重新设想安全调查方式的检测响应平台。它不是往工具栈里再加一块仪表盘，而是给出一个由 Claude 驱动的自然语言界面，通过工具调用直接连着 Anthropic 的内部系统。
+
+用 Claude Code 来造 CLUE，把传统的软件开发周期压缩了不止一个量级——团队是在日常工作之外把这套系统做出来的。概念验证一天就跑起来了；设计文档、开发步骤、正式实现，一周之内全部完成。"我们做的很大一部分事情，就是在跟 Claude Code 对话，"Bow 回忆，"它既是设计伙伴，也是协作者。"
+
+真正扭转她认知的是一个小事。她让 Claude Code 给 CLUE 的界面加一个按钮，心里已经做好了跟 JavaScript 框架和 CSS 缠斗的准备。结果 Claude Code 当场实现了，而且做得比她自己做更好。
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-emerald-500 bg-emerald-50 px-5 py-4 text-sm leading-7 text-emerald-950 dark:bg-emerald-950/30 dark:text-emerald-100">
+  "那一刻我意识到，我不再被自己的技术能力限制了。我能造出任何我想得到的东西。"
+</div>
+
+## CLUE Triage：告警先过一遍 AI 的手
+
+告警流进来时，CLUE Triage 在人看到之前先做第一轮分诊。Claude 用工具从 Anthropic 各处系统里给每条告警补上下文——Slack 消息、内部文档、代码仓库、数据仓库——然后给出定性：误报、真报、恶意、还是预期行为，每条都附一个置信度分数，分析师由此知道注意力该往哪放。
+
+这个"补上下文"的步骤，解的是每个安全分析师都认得的题：告警到手时都是孤立信号。一次失败登录，一个不寻常的 API 调用，一处配置变更——没有上下文，这些就是噪音；有了上下文（这个用户是谁、最近在干什么、这个行为符不符合他们团队的惯例），清晰的信号才浮出来。**"内部上下文就是那块缺失的拼图，有了它，告警才能在你自己的环境里被读懂。"**
+
+## CLUE Investigate：用自然语言查所有安全日志
+
+有了 CLUE，分析师可以用自然语言查询所有安全关键日志。想知道"这个系统过去一天所有的失败登录"？直接问，Claude 会执行必要的 SQL。"Claude 写精确查询的水平比人高得多，"Bow 说。工具内部跑的是一个 agent 循环：一个编排者向子 agent 下指令，子 agent 并行执行查询、汇集发现，最后综合成连贯的调查摘要。过去要几小时的手工关联，现在三四分钟跑完。
+
+数字能说明密度：平均每次调查 25 次工具调用、将近 11 条查询——远超一个分析师手工操作的合理上限，而且精度更高。这些工具调用里的每一次，放在过去都意味着多开一个控制台、多切一次界面。
+
+但真正的差异化不在速度，在内部上下文。CLUE 通过工具直连 Anthropic 的系统，Claude 拿得到外部安全平台永远碰不到的组织知识：告警响了，它可以去 Slack 看看团队是不是讨论过计划内维护，可以查数据仓库了解基线行为，可以翻代码仓库搞清楚一个服务到底是干什么的。这一点反过来读更有意思：它其实是在论证"安全工具自建"的可行性——护城河不是模型（谁都租得到），是模型和内部系统的打通深度。Microsoft Security Copilot 这类商用产品恰恰卡在这里，它进不了你的 Slack 和代码库。
+
+## 一个演示：数据治理审查
+
+团队用一个常见的数据治理场景演示过 CLUE 的能力：检查三名外包人员过去两个月有没有访问过不该看的文档。按 Bow 的说法，这类调查手工做至少要半天——查访问日志、比对权限、核对文档密级。交给 CLUE，Claude 读懂请求、拟好计划、生成把技术复杂度包起来的详细查询，几分钟出结果：一份摘要加处理建议，每条执行过的查询全程可见。
+
+# 效果怎么量
+
+造 CLUE 时团队就想好了：不能只凭"感觉快了"，要能拿数字说话。
+
+<div className="not-prose my-10 grid gap-3 md:grid-cols-3">
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-300">误报少了</div>
+    <div className="mt-2 text-2xl font-semibold tracking-tight text-gray-950 dark:text-white">
+      33% → 7%
+    </div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      CLUE Triage 上线前，大约每三条告警就有一条是误报；现在这个比例降到了
+      7%，分析师的时间花在真正要紧的信号上。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-300">覆盖宽了</div>
+    <div className="mt-2 text-2xl font-semibold tracking-tight text-gray-950 dark:text-white">
+      每条告警
+    </div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      比速度更重要的也许是"现在能看多少"。过去低置信度的信号根本没人看——没时间；现在每条进来的告警都会被补全上下文，批处理消化掉的数千条信号，过去只是仪表盘上的背景噪音。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-300">时间账</div>
+    <div className="mt-2 text-2xl font-semibold tracking-tight text-gray-950 dark:text-white">
+      省 5–10 倍
+    </div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      按 30 天的使用量算，CLUE 自动执行了约 12,000 条查询、27,000 次工具调用，这些活手工做估计要
+      1,870 小时（234 人天）——相当于比手工分诊省 5 到 10 倍时间。
+    </div>
+  </div>
+</div>
+
+还有他们承认没量清楚的：准确率比速度难度量。团队会复核 CLUE 的定性结论、记录分歧，但"Claude 抓到了多少人会漏掉的东西、又漏掉了多少人能抓到的东西"，这个反馈闭环还在搭。调查全程的转录帮了忙：每次调查都能审计，Claude 查了什么、结论怎么来的，一条条可查。
+
+<div className="not-prose my-8 rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-100">
+  <div className="font-semibold">这组数字要打两层折扣。</div>
+  <div className="mt-2">
+    一是全部出自自家团队测自家产品，页脚还注明结果基于自家的 Sonnet 和 Opus 模型；二是误报率从 33%
+    降到 7%
+    只说了一半——分诊自动化真正的风险是漏报，把真攻击定性成"预期行为"的代价远大于多看几条误报，而这恰好落在他们自己承认"还没量清楚"的那一块里。
+  </div>
+</div>
+
+# 下一步：让 Claude 用 Claude 的方式调查
+
+AI 研究里有个说法叫"苦涩的教训"（the bitter lesson）：把人类特有的推理方式编码进模型，长期看总是干不过给模型通用能力、让它自己找路子。Bow 的团队一直在想这对检测响应意味着什么。
+
+"CLUE 开发早期，我们争论过要把 Claude 的调查路径限制到什么程度，"Bow 说，"SOAR 时代的本能是：写 playbook，定义每一步，让流程确定下来。但我们反复注意到一件事：当我们给 Claude 探索的余地——给它工具和一个目标，而不是一套死板的步骤——它经常走出我们不会预设的调查路径。有些路径翻出了我们本来会漏掉的上下文。"
+
+**关键是给 Claude 边界——能用什么工具、能碰什么数据——而把策略留白。**这个认识决定了 CLUE 接下来往哪走：
+
+- **从被动到主动**：今天的 CLUE 是响应式的，告警触发、Claude 调查。但这套架构撑得起更有野心的玩法：持续探索。不等检测规则触发，Claude agent 可以主动猎捕可疑模式——不匹配任何已写规则的异常，单看正常、合起来不对劲的行为。
+- **从自己身上学**：每次调查的转录都存了下来。这个语料库正在变成一个 Claude 可以查询的知识库——过去的调查是怎么展开的、什么样的路径有效。日积月累，CLUE 会形成一种任何人类分析师都维持不了的组织记忆。
+- **拥抱不确定性**：传统安全工具把不一致当 bug，CLUE 把它当特性。同一条告警在不同日子可能被用不同方式调查，这没关系——有时第二条路恰好找到第一条路漏掉的东西。团队正在实验并行跑多套调查策略、比较结果。
+
+**"安全运营的苦涩教训是什么？我们花了很多年造那些把'人类怎么调查'编码进去的系统。下一代工具应该给模型调查的能力，让它找到比我们预设的更好的路。"**
+
+<div className="not-prose my-8 rounded-lg border border-rose-200 bg-rose-50 px-5 py-4 text-sm leading-7 text-rose-950 dark:border-rose-900/50 dark:bg-rose-950/20 dark:text-rose-100">
+  <div className="font-semibold">有一个安全问题这篇文章只字未提。</div>
+  <div className="mt-2">
+    让 LLM 读
+    Slack、文档、代码来给告警定性，等于给攻击者开了一条新通道——往这些渠道里塞精心构造的内容（提示注入），就可能影响
+    Claude
+    的定性判断，比如诱导它把真实入侵标成"计划内维护"。检测平台自己成了攻击面，这对一篇安全团队写的文章来说是个显眼的缺口。
+  </div>
+</div>
+
+---
+
+# 后记
+
+这篇最值得带走的不是 CLUE 本身，而是它背后的买卖判断变了：当一个安全团队一周就能搭出贴合自己环境的调查平台，"买商用 SOC 产品还是自建"这道题的答案开始翻转。文章说得很清楚，差异化全在内部上下文——而这恰恰是任何外部产品给不了、只有自建才能吃到的部分。
+
+另一条暗线是信任的放权节奏：先让 Claude 分诊但人复核每个结论，记录分歧，再逐步扩大自主范围——这和 Anthropic 那篇讲人机团队的文章（"自主权和被验证过的可靠性成正比"）是同一套方法在安全场景的落地。两篇对照着读，能看出他们内部推 agent 的路数是一致的：不是一步到位的自动化，是带审计的逐步让权。
+
+# 参考资料
+
+- [How Anthropic's Cybersecurity Team Built a Threat Detection Platform with Claude Code](https://claude.com/blog/how-anthropic-uses-claude-cybersecurity) — 原文
+- [The Bitter Lesson](http://www.incompleteideas.net/IncIdeas/BitterLesson.html) — Rich Sutton，2019。"苦涩的教训"的出处，两千字短文，值得一读
+- [Building Effective Human-Agent Teams](https://claude.com/blog/building-effective-human-agent-teams) — Anthropic 讲人机团队协作的姊妹篇，信任放权那套方法的通用版

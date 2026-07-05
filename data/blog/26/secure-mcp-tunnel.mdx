@@ -1,0 +1,160 @@
+---
+title: 让私有 MCP 服务器可达，但不公开它
+date: '2026-07-05'
+tags: ['AI', 'MCP', 'OpenAI', 'Security']
+draft: false
+summary: OpenAI Secure MCP Tunnel 的设计复盘：用一条只出不进的出站 HTTPS 隧道，把私有 MCP 服务器接进 ChatGPT 和 Codex，服务器始终留在客户自己的网络管控之内。
+---
+
+<div className="not-prose my-10 overflow-hidden rounded-xl border border-sky-200/60 bg-gradient-to-br from-sky-50 via-white to-amber-50 p-6 shadow-sm dark:border-sky-900/40 dark:from-sky-950/30 dark:via-gray-950 dark:to-amber-950/20">
+  <div className="text-xs font-semibold tracking-[0.22em] text-sky-600 uppercase dark:text-sky-300">
+    OpenAI Engineering Notes
+  </div>
+  <h2 className="mt-3 text-2xl font-semibold tracking-tight text-gray-950 dark:text-white">
+    团队最看重的那些 MCP 服务器，往往正是他们最不愿意暴露到公网上的。
+  </h2>
+  <div className="mt-4 max-w-3xl text-sm leading-7 text-gray-700 dark:text-gray-300">
+    Secure MCP Tunnel
+    把"可达性"整个翻了过来：先出手的是私有的那一侧。客户在自己的环境里跑一个小巧、可审查的开源客户端，由它主动向
+    OpenAI 发起出站 HTTPS 连接，私有服务器不必接受任何入站流量，也没有多出更宽的网络连通。
+  </div>
+  <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium">
+    <span className="rounded-full bg-white/80 px-3 py-1 text-sky-700 ring-1 ring-sky-200 dark:bg-gray-900/70 dark:text-sky-200 dark:ring-sky-900">
+      原文：Making Private MCP Servers Reachable Without Making Them Public
+    </span>
+    <span className="rounded-full bg-white/80 px-3 py-1 text-amber-700 ring-1 ring-amber-200 dark:bg-gray-900/70 dark:text-amber-200 dark:ring-amber-900">
+      主题：私有 MCP 接入
+    </span>
+    <span className="rounded-full bg-white/80 px-3 py-1 text-gray-700 ring-1 ring-gray-200 dark:bg-gray-900/70 dark:text-gray-200 dark:ring-gray-800">
+      类型：架构设计
+    </span>
+  </div>
+</div>
+
+[Making Private MCP Servers Reachable Without Making Them Public](https://developers.openai.com/blog/connect-private-mcp-servers-to-openai-products) · OpenAI · 2026-06-26
+
+OpenAI 做 Secure MCP Tunnel 的起点是一个很实际的矛盾：**团队最看重的那些 MCP 服务器，往往正是他们最不愿意暴露到公网上的。**
+
+MCP 让 AI 系统接外部工具和数据这件事变容易了，但最值钱的 MCP 服务器大多跑在企业内网、私有服务网格、开发者的笔记本里——这些环境生来就是拒绝公网入站流量的。过去要把它们接进托管的 AI 产品，团队往往得开公网端点、部署额外的代理设施，或者往敏感链路里塞进一个新的网络运营方。
+
+Secure MCP Tunnel 的思路简单得多：客户在自己的私有环境里跑一个小客户端，由它主动向 OpenAI 发起一条出站 HTTPS 连接。客户端只做三件事：接收 MCP 请求；转发给批准过的本地服务器；把响应和通知从同一条连接送回去。ChatGPT、Codex 这些产品用的还是标准的 MCP 请求/响应模型，服务器本身始终留在客户已有的网络管控之内。
+
+要把这个思路做得可靠又安全，得同时解决几个工程问题：保住服务器的私有网络边界、支持 MCP 的流式传输和鉴权流程、给团队一个能自己检查和运维的客户端。整个设计围绕一小组原则展开：
+
+<div className="not-prose my-10 grid gap-3 md:grid-cols-4">
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-sky-600 dark:text-sky-300">01</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">只出不进的连接</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      私有的那一侧先出手，服务器不接受入站流量。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-sky-600 dark:text-sky-300">02</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">显式配置的目的地</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      客户端只触达批准过的本地服务器。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-sky-600 dark:text-sky-300">03</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">
+      兼容 MCP 的流式与通知
+    </div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      流式传输和鉴权流程原样支持。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-sky-600 dark:text-sky-300">04</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">
+      客户自己运行、可以审查
+    </div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      开源客户端住在客户边界内，归客户管。
+    </div>
+  </div>
+</div>
+
+# 现成的三条路，各有各的别扭
+
+今天想让一个私有服务可达，通常就三种做法：开公网端点、用第三方隧道、拿 VPN 或对等连接把网络接通。
+
+公网端点靠削弱边界换来易访问。第三方隧道商能很快打通，但也在链路里多塞了一个要审查、要签约、要运维、要信任的供应商——对企业团队这不是小事，隧道商会同时进入安全评审、采购流程、运维手册，还成为元数据暴露面的一部分，而这套系统的初衷恰恰是让私有工具保持私有。VPN 和对等连接靠建立大范围的网络连通来解决可达性，对一次窄窄的 MCP 集成来说，机器开得太大了。ngrok、Cloudflare Tunnel 干的就是"第三方隧道"这件事，出站反向隧道在技术上早就是成熟套路。这个产品真正卖的不是隧道，而是"把第三方从信任链里拿掉"——你反正已经把数据发给 OpenAI 的模型了，隧道也交给它，要信任的名单就没有变长。
+
+Secure MCP Tunnel 的做法更聚焦：不要求客户搬服务器、不扩大网络边界、不引入新的连接商，而是在私有服务器旁边放一个小巧、可审查的开源客户端，由它来发起并控制通往 OpenAI 的连接。**它把"可达性"整个翻了过来：先出手的是私有的那一侧。**OpenAI 产品把 MCP 请求发到 OpenAI 托管的隧道端点，隧道服务把活儿排进某条具体隧道的队列，早就守在私有服务器旁边的客户端通过出站 HTTPS 把活儿取走，本地转发，再沿原路把响应送回去。产品拿到一条正常的 MCP 请求路径，私有服务器不必接受任何入站流量，也没有多出更宽的网络连通。
+
+![请求的完整生命周期：产品把 MCP 请求发到 OpenAI 托管的端点，客户端用出站 HTTPS 长轮询把排队的 JSON-RPC 取走，本地调用私有 MCP 服务器，响应沿同一条隧道原路返回——自始至终没有一条通向私有服务器的入站路径](/static/images/secure-mcp-tunnel/image1.png)
+
+# 为什么从 long-poll 起步
+
+传输方式特意选了运维上最无聊的一种。出站 HTTPS 是企业防火墙、代理环境和平台团队最熟悉的东西；长轮询（long-poll）让客户端只领取自己处理得动的工作量，客户端队列天然有了背压点，不会被鼓励去无限缓冲。
+
+这个选择也让交付出来的东西容易推理：产品把 MCP JSON-RPC 发到托管端点；隧道服务托着这个请求，直到客户端返回最终响应；需要流式结果时，隧道会把中间的 server-sent events 一路转发。对产品来说这就是一条普通的 MCP 请求/响应路径，而 MCP 服务器和它的地址始终没有露面——请求、响应、中间事件都经由 OpenAI 托管的端点中转。
+
+# 边界不是抹掉，是挑明
+
+**隧道不是用来抹掉网络边界的，而是把这条边界变得显式。**客户端向隧道控制平面做身份认证，产品那侧只认 OpenAI 托管的端点，私有 MCP 地址只在客户环境内部使用。隧道的访问权绑定在客户已有的 OpenAI 组织和工作区上下文、以及配置好的隧道身份上，而不是另起一条有独立访问模型的网络通路。
+
+光选对网络方向还不够。客户端跑在客户环境里，它的行为必须可检查、且刻意收窄：客户要能搞清楚跑的是什么代码、开了什么出站路径、被允许触达哪些私有服务。
+
+<div className="not-prose my-8 rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-100">
+  <div className="font-semibold">有一笔账文章没算。</div>
+  <div className="mt-2">
+    第三方隧道商的"元数据暴露面"确实消失了，但它没有蒸发，而是转移到了 OpenAI 自己身上——所有 MCP
+    流量现在都过 OpenAI
+    托管的端点。对已经把数据交给它家模型的团队，这是笔划算的合并；但它同时也把你和这家供应商绑得更深，做评审时该把这层依赖写进去。
+  </div>
+</div>
+
+![信任边界一目了然：左边是 OpenAI 托管的端点和隧道服务，右边是客户环境里的客户端和私有服务器，唯一穿过网络边界的是一条由客户端主动发起的出站 HTTPS——MCP 服务器没有入站防火墙规则，也没有公网监听](/static/images/secure-mcp-tunnel/image2.png)
+
+# 让 MCP 开发保持本地手感
+
+隧道客户端应该像个开发者工具，而不是一个网络工程项目。开发者在笔记本上跑一个 MCP 服务器，旁边启动隧道客户端，就能把它接进 ChatGPT 或 Codex——不开公网端点，也不用等 VPN、防火墙规则或对等连接的变更审批。
+
+服务器从笔记本挪到 Kubernetes、虚拟机或别的客户自控环境时，同一套流程原样延续。关键是心智模型不变：客户端跑在私有服务器旁边，先验证它能摸到服务器，再由它发起面向 OpenAI 的连接。健康检查、就绪探测、日志和本地管理界面，都是为了出问题时这条回路查得清楚，而不是把隧道养成一个运维项目。
+
+开发体验也长在 Codex 里。客户端带一个 Codex 插件，把配置变成一段有引导的流程，开发者不用先学会每个命令行参数、配置档和控制平面细节。插件的目标不是造一条一次性的本地捷径：它产出的配置形态，团队在服务器迁去生产环境时可以直接沿用。随客户端打包的 assistant 工作流也是同一个思路：它能读到客户端暴露的本地隧道上下文，帮开发者对着真实配置排查——当前激活的是哪个配置档、生成了什么配置、本地服务器可不可达、客户端启动到了哪一步。排障因此成了开发循环的一部分，而不是一条单独的上报路径。
+
+![同一套本地循环，从笔记本用到生产：不管私有 MCP 服务器跑在笔记本、Kubernetes 还是虚拟机上，客户端的位置、私有边界、通向 OpenAI 的出站路径都一样，Codex 插件生成的配置可以一路带过去](/static/images/secure-mcp-tunnel/image3.png)
+
+# 客户端为什么要开源
+
+隧道客户端是开源的、客户自己运行的软件，就住在客户边界内、私有服务器旁边。客户和安全评审员可以直接检查这份跑在自己环境里的代码：它做了什么、开了什么出站连接、怎么在本地转发 MCP 请求、什么配置在控制它的触达范围。透明让信任模型和架构对得上：OpenAI 托管隧道服务，但跑在客户环境里的代码小、可审、归客户管。
+
+# 企业鉴权，不开大口子
+
+私有 MCP 服务器很少是裸奔的匿名内部端点，它们可能依赖 OAuth、私有 CA、出站代理，或者在 MCP 这一跳上用客户端证书。支持它们，意味着把企业网络的这些既有假设当成隧道设计的一部分，而不是丢给客户自己绕的例外。
+
+关键约束不变：MCP 服务器必须继续私有。面向 MCP 服务器的 OAuth 发现流程走隧道路径，托管产品由此学会怎么鉴权，服务器不用监听公网。客户这侧，客户端可以按本地环境配置：自定义 CA 证书链、代理设置、MCP 一侧的 mTLS。
+
+边界同样是挑明的：隧道不会自动让每个相关的企业端点都对 OpenAI 可达。授权服务器如果是私有的，执行 OAuth 流程的那个组件仍然得自己够得着它。这是刻意的设计：**Secure MCP Tunnel 给的是一条通向指定私有工具的窄路，不是一座通用的网络桥。**
+
+# 不止 MCP
+
+MCP 是模型工具的主要形态，但早期客户的 alpha 测试暴露了一个紧挨着的问题：不是每个私有工作流都已经封装成了 MCP 服务器，很多重要的工作流就是防火墙后面现成的 REST API。如果隧道只解决 MCP 的可达性，团队还是得为这些相邻的私有 API 另开公网端点、另找隧道商、另修 VPN。
+
+Harpoon 把同一套窄连接模型延伸到批准过的 REST 目标上。客户不是暴露任意 URL，而是在客户端上注册带标签的目标；OpenAI 侧的调用方通过隧道调用这些标签，实际的 HTTP 请求仍然从客户环境内部、私有服务旁边发出。标签不是通用网络桥：调用被客户自己注册的目标、允许的方法、响应大小上限、超时、重定向行为和隧道访问控制框死。批准过的 OpenAI 工作流由此拿到一条通向客户私有 API 的受控路径，客户不用开入站口子，OpenAI 也不用拿到类似 VPN 的身份。"窄路"能不能一直窄，架构本身管不住——Harpoon 的边界完全取决于客户怎么注册目标，方法和路径注册得宽，窄路自然就宽了，真正兜底的是客户侧的治理和评审流程。而且从 MCP 隧道延伸到通用 REST 转发，这个产品自己就在演示"窄路有自然变宽的压力"。
+
+---
+
+# 后记
+
+这篇文章的技术含量是刻意压低的：出站反向隧道、长轮询、开源客户端，每一件都是网络工程里的旧零件。有意思的是 OpenAI 把"无聊"当成卖点来写——企业客户要的不是聪明的新协议，是能过安全评审、能被自己人看懂、坏了知道去哪查的东西。
+
+对正在选型的团队，这篇文章真正有用的不是产品本身，而是它顺手给出的评审框架。任何一条"让 AI 够到内网工具"的路，都值得问三个问题：
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-sky-500 bg-sky-50 px-5 py-4 text-sm leading-7 text-sky-950 dark:bg-sky-950/30 dark:text-sky-100">
+  <div>1. 信任链上多了谁？</div>
+  <div className="mt-1">2. 边界是被挑明了还是被抹掉了？</div>
+  <div className="mt-1">3. 出了问题在哪一侧排查？</div>
+</div>
+
+拿这三个问题去衡量 ngrok、VPN、自建代理和这条隧道，答案自然会浮出来。
+
+# 参考资料
+
+- [Making Private MCP Servers Reachable Without Making Them Public](https://developers.openai.com/blog/connect-private-mcp-servers-to-openai-products) — 原文
+- [tunnel-client](https://github.com/openai/tunnel-client) — 开源的隧道客户端仓库
+- [Secure MCP Tunnel 使用指南](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) — 官方配置文档

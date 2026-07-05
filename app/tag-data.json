@@ -1,7 +1,12 @@
 {
   "招聘观察": 1,
   "职场成长": 1,
-  "ai": 1,
+  "ai": 4,
+  "claude": 2,
+  "agent": 1,
+  "security": 2,
+  "mcp": 1,
+  "openai": 1,
   "interview": 1,
   "llm": 1,
   "自传": 1
