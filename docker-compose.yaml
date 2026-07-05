@@ -1,9 +1,7 @@
 services:
   syoka-blog:
-    image: syoka-blog:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: docker.io/teneous/syoka-blog:latest
+    pull_policy: always
     ports:
       - "3000:3000"
     environment:
