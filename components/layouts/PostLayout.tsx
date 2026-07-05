@@ -32,7 +32,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
     <SectionContainer>
       <ScrollTopAndComment />
       <article>
-        <div className="relative">
+        <div className="relative overflow-hidden">
           {/* 装饰背景 */}
           <div className="absolute inset-0 -z-10">
             <div className="absolute top-0 -left-1/4 h-[500px] w-[500px] rounded-full bg-violet-100/5 blur-3xl dark:bg-violet-900/5" />
