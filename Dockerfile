@@ -1,4 +1,4 @@
-FROM node:22.5.1-slim AS base
+FROM node:22-slim AS base
 
 FROM base AS deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
