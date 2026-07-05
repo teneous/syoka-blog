@@ -141,29 +141,29 @@ export const projects: Project[] = [
     status: 'active',
     isPrivate: true,
   },
-  {
-    title: {
-      en: 'CPR Exam Monitoring & Scoring',
-      zh: '医疗 CPR 考试自动监控评分',
-    },
-    domain: {
-      en: 'Computer Vision / Assessment',
-      zh: '视觉监控 / 考试评分',
-    },
-    description: {
-      en: 'An automated monitoring and scoring direction for CPR exam training scenarios, observing procedural actions and assessment signals.',
-      zh: '面向 CPR 考试训练场景的自动监控与评分方向，观察操作流程、动作规范和评估信号。',
-    },
-    role: {
-      en: 'Designed the scoring dimensions, monitoring flow, event capture, and review-oriented assessment output.',
-      zh: '设计评分维度、监控流程、事件采集，以及面向复盘的评分输出。',
-    },
-    impact: {
-      en: 'Helps make practical assessment more structured, traceable, and easier to review after training.',
-      zh: '让实操考试评估更结构化、可追溯，也更便于训练后的复盘。',
-    },
-    stack: ['Vision', 'Event Detection', 'Scoring', 'Review'],
-    status: 'completed',
-    isPrivate: true,
-  },
+  // {
+  //   title: {
+  //     en: 'CPR Exam Monitoring & Scoring',
+  //     zh: '医疗 CPR 考试自动监控评分',
+  //   },
+  //   domain: {
+  //     en: 'Computer Vision / Assessment',
+  //     zh: '视觉监控 / 考试评分',
+  //   },
+  //   description: {
+  //     en: 'An automated monitoring and scoring direction for CPR exam training scenarios, observing procedural actions and assessment signals.',
+  //     zh: '面向 CPR 考试训练场景的自动监控与评分方向，观察操作流程、动作规范和评估信号。',
+  //   },
+  //   role: {
+  //     en: 'Designed the scoring dimensions, monitoring flow, event capture, and review-oriented assessment output.',
+  //     zh: '设计评分维度、监控流程、事件采集，以及面向复盘的评分输出。',
+  //   },
+  //   impact: {
+  //     en: 'Helps make practical assessment more structured, traceable, and easier to review after training.',
+  //     zh: '让实操考试评估更结构化、可追溯，也更便于训练后的复盘。',
+  //   },
+  //   stack: ['Vision', 'Event Detection', 'Scoring', 'Review'],
+  //   status: 'completed',
+  //   isPrivate: true,
+  // },
 ]
