@@ -13,6 +13,7 @@ import {
 export type SiteLanguage = 'en' | 'zh'
 
 const STORAGE_KEY = 'syoka-studio-language'
+const COOKIE_NAME = 'syoka-studio-language'
 const EVENT_NAME = 'syoka-language-change'
 
 type LanguageContextValue = {
@@ -23,31 +24,53 @@ type LanguageContextValue = {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null)
 
-const getStoredLanguage = (): SiteLanguage => {
-  if (typeof window === 'undefined') return 'zh'
+const getBrowserLanguage = (): SiteLanguage => {
+  if (typeof window === 'undefined') return 'en'
+  return window.navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en'
+}
+
+const getStoredLanguage = (fallbackLanguage?: SiteLanguage): SiteLanguage => {
+  if (typeof window === 'undefined') return fallbackLanguage ?? 'en'
   const stored = window.localStorage.getItem(STORAGE_KEY)
-  return stored === 'en' ? 'en' : 'zh'
+  if (stored === 'en' || stored === 'zh') return stored
+  return fallbackLanguage ?? getBrowserLanguage()
 }
 
 export function setSiteLanguage(language: SiteLanguage) {
   if (typeof window === 'undefined') return
   window.localStorage.setItem(STORAGE_KEY, language)
+  document.cookie = `${COOKIE_NAME}=${language}; path=/; max-age=31536000; samesite=lax`
+  document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en'
   window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: language }))
 }
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<SiteLanguage>('zh')
+export function LanguageProvider({
+  children,
+  initialLanguage = 'en',
+}: {
+  children: ReactNode
+  initialLanguage?: SiteLanguage
+}) {
+  const [language, setLanguage] = useState<SiteLanguage>(initialLanguage)
 
   useEffect(() => {
-    setLanguage(getStoredLanguage())
+    const nextLanguage = getStoredLanguage(initialLanguage)
+    setLanguage(nextLanguage)
+    document.documentElement.lang = nextLanguage === 'zh' ? 'zh-CN' : 'en'
+
     const onChange = (event: Event) => {
       const customEvent = event as CustomEvent<SiteLanguage>
-      setLanguage(customEvent.detail === 'zh' ? 'zh' : 'en')
+      const nextLanguage = customEvent.detail === 'zh' ? 'zh' : 'en'
+      setLanguage(nextLanguage)
+      document.documentElement.lang = nextLanguage === 'zh' ? 'zh-CN' : 'en'
     }
+
     window.addEventListener(EVENT_NAME, onChange)
     const onStorage = (event: StorageEvent) => {
       if (event.key === STORAGE_KEY) {
-        setLanguage(event.newValue === 'en' ? 'en' : 'zh')
+        const nextLanguage = event.newValue === 'zh' ? 'zh' : 'en'
+        setLanguage(nextLanguage)
+        document.documentElement.lang = nextLanguage === 'zh' ? 'zh-CN' : 'en'
       }
     }
     window.addEventListener('storage', onStorage)
@@ -55,7 +78,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       window.removeEventListener(EVENT_NAME, onChange)
       window.removeEventListener('storage', onStorage)
     }
-  }, [])
+  }, [initialLanguage])
 
   const updateLanguage = useCallback((nextLanguage: SiteLanguage) => {
     setLanguage(nextLanguage)

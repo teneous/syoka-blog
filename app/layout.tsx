@@ -3,6 +3,7 @@ import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
 import { Space_Grotesk } from 'next/font/google'
+import { cookies, headers } from 'next/headers'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
@@ -11,7 +12,7 @@ import SectionContainer from '@/components/layouts/SectionContainer'
 import Header from '@/components/navigation/Header'
 import Footer from '@/components/navigation/Footer'
 import DevToolsDetector from '@/components/common/DevToolsDetector'
-import { LanguageProvider } from '@/components/common/useLanguage'
+import { LanguageProvider, type SiteLanguage } from '@/components/common/useLanguage'
 
 const space_grotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -59,12 +60,25 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+const getInitialLanguage = async (): Promise<SiteLanguage> => {
+  const cookieStore = await cookies()
+  const storedLanguage = cookieStore.get('syoka-studio-language')?.value
+
+  if (storedLanguage === 'zh' || storedLanguage === 'en') {
+    return storedLanguage
+  }
+
+  const headerStore = await headers()
+  return headerStore.get('x-syoka-default-language') === 'zh' ? 'zh' : 'en'
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const basePath = process.env.BASE_PATH || ''
+  const initialLanguage = await getInitialLanguage()
 
   return (
     <html
-      lang={siteMetadata.language}
+      lang={initialLanguage === 'zh' ? 'zh-CN' : siteMetadata.language}
       className={`${space_grotesk.variable} scroll-smooth`}
       suppressHydrationWarning
     >
@@ -74,7 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
       <body className="bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
         <ThemeProviders>
-          <LanguageProvider>
+          <LanguageProvider initialLanguage={initialLanguage}>
             <SectionContainer>
               <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
                 <Header />
