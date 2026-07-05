@@ -5,17 +5,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libc6 \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY patches ./patches
 
 RUN ls -la /app
-RUN npm install -g pnpm
-RUN pnpm install --shamefully-hoist
+RUN npm install -g pnpm@10.7.1
+RUN pnpm install --frozen-lockfile --shamefully-hoist
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN npm install -g pnpm
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN pnpm run build
 
@@ -40,4 +40,3 @@ ENV PORT=3000
 
 ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]
-
