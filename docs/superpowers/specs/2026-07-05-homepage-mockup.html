@@ -1,0 +1,705 @@
+<title>Syoka 首页改版 Mockup</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f8fafc;
+    --panel: #ffffff;
+    --canvas: #f8fafc;
+    --border: #e5e7eb;
+    --border-soft: #eef0f4;
+    --dash: #d1d5db;
+    --text: #0b0f19;
+    --text-2: #4b5563;
+    --text-3: #8b93a1;
+    --violet: #7c3aed;
+    --violet-soft: rgba(124, 58, 237, 0.14);
+    --violet-bg: rgba(124, 58, 237, 0.05);
+    --violet-border: rgba(124, 58, 237, 0.22);
+    --cyan: #0891b2;
+    --emerald: #059669;
+    --emerald-bg: rgba(16, 185, 129, 0.06);
+    --emerald-border: rgba(16, 185, 129, 0.26);
+    --btn-bg: #0b0f19;
+    --btn-text: #ffffff;
+    --grid-line: rgba(148, 163, 184, 0.1);
+    --flow-start: #6366f1;
+    --flow-mid: #8b5cf6;
+    --flow-end: #06b6d4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #030712;
+      --bg-soft: #0b1120;
+      --panel: #0a101d;
+      --canvas: rgba(17, 24, 39, 0.8);
+      --border: #1f2937;
+      --border-soft: #141c2a;
+      --dash: #374151;
+      --text: #f4f6fa;
+      --text-2: #a3adbd;
+      --text-3: #69748a;
+      --violet: #818cf8;
+      --violet-soft: rgba(99, 102, 241, 0.13);
+      --violet-bg: rgba(99, 102, 241, 0.06);
+      --violet-border: rgba(129, 140, 248, 0.24);
+      --cyan: #22d3ee;
+      --emerald: #34d399;
+      --emerald-bg: rgba(16, 185, 129, 0.08);
+      --emerald-border: rgba(16, 185, 129, 0.28);
+      --btn-bg: #f4f6fa;
+      --btn-text: #0b0f19;
+      --grid-line: rgba(148, 163, 184, 0.07);
+      --flow-start: #4f56c8;
+      --flow-mid: #818cf8;
+      --flow-end: #22d3ee;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #030712;
+    --bg-soft: #0b1120;
+    --panel: #0a101d;
+    --canvas: rgba(17, 24, 39, 0.8);
+    --border: #1f2937;
+    --border-soft: #141c2a;
+    --dash: #374151;
+    --text: #f4f6fa;
+    --text-2: #a3adbd;
+    --text-3: #69748a;
+    --violet: #818cf8;
+    --violet-soft: rgba(99, 102, 241, 0.13);
+    --violet-bg: rgba(99, 102, 241, 0.06);
+    --violet-border: rgba(129, 140, 248, 0.24);
+    --cyan: #22d3ee;
+    --emerald: #34d399;
+    --emerald-bg: rgba(16, 185, 129, 0.08);
+    --emerald-border: rgba(16, 185, 129, 0.28);
+    --btn-bg: #f4f6fa;
+    --btn-text: #0b0f19;
+    --grid-line: rgba(148, 163, 184, 0.07);
+    --flow-start: #4f56c8;
+    --flow-mid: #818cf8;
+    --flow-end: #22d3ee;
+  }
+  :root[data-theme='light'] {
+    --bg: #ffffff;
+    --bg-soft: #f8fafc;
+    --panel: #ffffff;
+    --canvas: #f8fafc;
+    --border: #e5e7eb;
+    --border-soft: #eef0f4;
+    --dash: #d1d5db;
+    --text: #0b0f19;
+    --text-2: #4b5563;
+    --text-3: #8b93a1;
+    --violet: #7c3aed;
+    --violet-soft: rgba(124, 58, 237, 0.14);
+    --violet-bg: rgba(124, 58, 237, 0.05);
+    --violet-border: rgba(124, 58, 237, 0.22);
+    --cyan: #0891b2;
+    --emerald: #059669;
+    --emerald-bg: rgba(16, 185, 129, 0.06);
+    --emerald-border: rgba(16, 185, 129, 0.26);
+    --btn-bg: #0b0f19;
+    --btn-text: #ffffff;
+    --grid-line: rgba(148, 163, 184, 0.1);
+    --flow-start: #6366f1;
+    --flow-mid: #8b5cf6;
+    --flow-end: #06b6d4;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, -apple-system, 'SF Pro Text', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- mock nav ---------- */
+  .nav { border-bottom: 1px solid var(--border); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .wordmark { font-weight: 700; letter-spacing: -0.02em; font-size: 1.05rem; }
+  .wordmark span { color: var(--violet); }
+  .nav-links { display: flex; gap: 26px; font-size: 0.86rem; color: var(--text-2); }
+  .nav-links .active { color: var(--text); font-weight: 600; }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 64px 0 0; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--text-3);
+  }
+  .eyebrow::before { content: ''; width: 22px; height: 2px; background: var(--violet); border-radius: 2px; }
+  h1 {
+    margin: 18px 0 0;
+    font-size: clamp(2rem, 4.6vw, 3.35rem);
+    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+    max-width: 24ch;
+  }
+  .hl {
+    background: linear-gradient(transparent 72%, var(--violet-soft) 72%);
+    padding: 0 2px;
+  }
+  .hero-sub {
+    margin: 22px 0 0;
+    max-width: 600px;
+    font-size: 1rem;
+    line-height: 1.9;
+    color: var(--text-2);
+  }
+  .hero-cta { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 6px;
+    font-size: 0.88rem; font-weight: 500;
+    border: 1px solid transparent;
+    transition: opacity 0.15s ease, border-color 0.15s ease;
+  }
+  .btn-primary { background: var(--btn-bg); color: var(--btn-text); }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-ghost { border-color: var(--border); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--text-3); }
+
+  /* ---------- pipeline canvas ---------- */
+  .pipeline-band { padding: 48px 0 8px; }
+  .canvas-shadow { position: relative; }
+  .canvas-shadow::after {
+    content: '';
+    position: absolute; inset: 0;
+    transform: translate(14px, 14px);
+    border: 1px solid var(--violet-soft);
+    border-radius: 12px;
+    pointer-events: none;
+  }
+  .canvas {
+    position: relative;
+    z-index: 1;
+    border: 1px solid var(--border);
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+      var(--canvas);
+    background-size: 28px 28px, 28px 28px, auto;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 1px 2px rgba(11, 15, 25, 0.04);
+  }
+  .pipeline {
+    position: relative;
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr) 206px;
+    gap: 22px;
+    align-items: stretch;
+  }
+
+  .flow-svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    display: none;
+  }
+  @media (min-width: 961px) { .flow-svg { display: block; } }
+  .rail { stroke: var(--dash); stroke-width: 1.2; opacity: 0.5; fill: none; }
+  #lineGrad stop:nth-of-type(1) { stop-color: var(--flow-start); }
+  #lineGrad stop:nth-of-type(2) { stop-color: var(--flow-mid); }
+  #lineGrad stop:nth-of-type(3) { stop-color: var(--flow-end); }
+  #arrow path { fill: var(--flow-mid); }
+  .flowline {
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-dasharray: 14 260;
+    animation: dashmove 3.4s linear infinite;
+  }
+  @keyframes dashmove {
+    from { stroke-dashoffset: 274; }
+    to { stroke-dashoffset: 0; }
+  }
+
+  .endpoint {
+    position: relative; z-index: 2;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 22px 20px;
+    display: flex; flex-direction: column; justify-content: center; gap: 9px;
+    overflow: hidden;
+  }
+  .endpoint::before {
+    content: '';
+    position: absolute; top: 0; left: 20px; right: auto;
+    width: 34px; height: 2px;
+    background: var(--violet);
+    opacity: 0.7;
+  }
+  .ep-icon {
+    width: 40px; height: 40px; border-radius: 9px;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--violet);
+    margin-bottom: 4px;
+  }
+  .ep-kicker {
+    font-size: 0.64rem; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--text-3);
+  }
+  .endpoint h3 { margin: 0; font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; }
+  .endpoint p { margin: 0; font-size: 0.79rem; color: var(--text-2); line-height: 1.65; }
+
+  .system {
+    position: relative; z-index: 2;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 18px 18px 16px;
+  }
+  .system-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+    padding-bottom: 13px; margin-bottom: 13px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .system-head h3 { margin: 0; font-size: 0.92rem; font-weight: 600; }
+  .arch-tag {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 0.71rem; font-weight: 500; color: var(--text-2);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 10px; background: var(--bg-soft);
+  }
+  .arch-tag svg { color: var(--violet); }
+
+  .arch-frame {
+    position: relative;
+    border: 1.5px dashed var(--dash);
+    border-radius: 10px;
+    padding: 13px;
+    overflow: hidden;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .scan {
+    position: absolute; inset: 0 auto 0 0; width: 90px;
+    background: linear-gradient(90deg, transparent, var(--violet-soft), transparent);
+    animation: scan 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes scan {
+    0%, 10% { transform: translateX(-90px); opacity: 0; }
+    30% { opacity: 1; }
+    72%, 100% { transform: translateX(780px); opacity: 0; }
+  }
+
+  .layer { position: relative; }
+  .layer-label {
+    margin: 0 0 6px;
+    font-size: 0.62rem; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-3);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .layer-label::after { content: ''; flex: 1; height: 1px; background: var(--border-soft); }
+
+  .nodes-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .node {
+    display: flex; align-items: center; gap: 11px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: 9px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .node:hover { border-color: var(--violet-border); transform: translateY(-1px); }
+  .node-icon {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .node h4 { margin: 0; font-size: 0.88rem; font-weight: 600; }
+  .node p { margin: 2px 0 0; font-size: 0.72rem; color: var(--text-3); line-height: 1.5; }
+  .ic-violet { color: var(--violet); }
+  .ic-cyan { color: var(--cyan); }
+  .ic-emerald { color: var(--emerald); }
+
+  .bar {
+    display: flex; align-items: center; gap: 11px;
+    padding: 11px 14px;
+    border-radius: 9px;
+    border: 1px solid;
+  }
+  .bar h4 { margin: 0; font-size: 0.86rem; font-weight: 600; }
+  .bar p { margin: 0; font-size: 0.72rem; color: var(--text-3); flex: 1; min-width: 160px; }
+  .bar .hint { font-size: 0.67rem; font-weight: 500; white-space: nowrap; }
+  .bar .node-icon { background: var(--panel); }
+  .bar-violet { border-color: var(--violet-border); background: var(--violet-bg); }
+  .bar-violet .node-icon { border-color: var(--violet-border); }
+  .bar-violet .hint { color: var(--violet); }
+  .bar-emerald { border-color: var(--emerald-border); background: var(--emerald-bg); }
+  .bar-emerald .node-icon { border-color: var(--emerald-border); }
+  .bar-emerald .hint { color: var(--emerald); }
+
+  .m-arrow { display: flex; justify-content: center; color: var(--text-3); }
+  @media (min-width: 961px) { .m-arrow { display: none; } }
+
+  /* ---------- quiet sections ---------- */
+  section.block { padding: 68px 0 8px; }
+  .sec-head { margin-bottom: 32px; }
+  .sec-kicker {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 0.66rem; font-weight: 600; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--text-3);
+    margin-bottom: 10px;
+  }
+  .sec-kicker::before { content: ''; width: 18px; height: 2px; background: var(--violet); border-radius: 2px; }
+  .sec-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .sec-head h2 { margin: 0; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.02em; }
+  .sec-head .sub { margin: 6px 0 0; font-size: 0.85rem; color: var(--text-3); }
+  .sec-link { font-size: 0.84rem; font-weight: 500; color: var(--text-2); white-space: nowrap; }
+  .sec-link:hover { color: var(--text); }
+
+  .cap-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+  .cap {
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    display: flex; flex-direction: column; gap: 8px;
+    transition: border-color 0.25s ease;
+  }
+  .cap:hover { border-top-color: var(--violet); }
+  .cap-head { display: flex; align-items: center; gap: 9px; }
+  .cap h3 { margin: 0; font-size: 0.98rem; font-weight: 600; }
+  .cap p { margin: 0; font-size: 0.83rem; color: var(--text-2); line-height: 1.75; }
+  .cap .kw { margin-top: 2px; font-size: 0.74rem; color: var(--text-3); letter-spacing: 0.01em; }
+
+  .post-list { display: flex; flex-direction: column; }
+  .post {
+    display: grid; grid-template-columns: 110px 1fr auto;
+    gap: 16px; align-items: baseline;
+    padding: 16px 0;
+    border-top: 1px solid var(--border-soft);
+  }
+  .post:hover h3 { color: var(--violet); }
+  .post time { font-size: 0.78rem; color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .post h3 { margin: 0; font-size: 0.94rem; font-weight: 500; transition: color 0.15s ease; }
+  .post .tags { font-size: 0.74rem; color: var(--text-3); }
+
+  .cta {
+    margin: 76px 0 0;
+    border-top: 1px solid var(--border);
+    padding: 60px 0 88px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 28px; flex-wrap: wrap;
+  }
+  .cta h2 { margin: 10px 0; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; max-width: 22ch; text-wrap: balance; }
+  .cta p { margin: 0; font-size: 0.88rem; color: var(--text-2); }
+
+  /* ---------- design notes ---------- */
+  .notes { border-top: 1px solid var(--border); background: var(--bg-soft); padding: 40px 0 64px; }
+  .notes h2 { font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); margin: 0 0 18px; font-weight: 600; }
+  .notes ol { margin: 0; padding-left: 20px; max-width: 72ch; }
+  .notes li { font-size: 0.85rem; color: var(--text-2); margin-bottom: 10px; }
+  .notes b { color: var(--text); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 960px) {
+    .pipeline { grid-template-columns: 1fr; gap: 12px; }
+    .nodes-2 { grid-template-columns: 1fr; }
+    .cap-row { grid-template-columns: repeat(2, 1fr); }
+    .post { grid-template-columns: 1fr; gap: 4px; }
+    .scan { display: none; }
+  }
+  @media (max-width: 560px) {
+    .cap-row { grid-template-columns: 1fr; }
+    .nav-links { gap: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flowline { animation: none; stroke-dasharray: none; opacity: 0.5; }
+    .scan { animation: none; display: none; }
+    .node:hover { transform: none; }
+  }
+</style>
+
+<!-- ============ MOCK NAV ============ -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <div class="wordmark">Syoka<span>.</span></div>
+    <nav class="nav-links">
+      <a class="active" href="#">首页</a>
+      <a href="#">项目</a>
+      <a href="#">文章</a>
+      <a href="#">关于</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Agent · Architecture · Infra · Data</span>
+    <h1>从业务痛点,到<span class="hl">可交付</span>的解决方案</h1>
+    <p class="hero-sub">
+      我是 Syoka,长期深耕 Agent、系统架构、基建、数据工程。
+      擅长把模糊的业务问题拆解成清晰的技术方案,再做成真正上线、持续生长的产品。
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#">查看项目
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+      <a class="btn btn-ghost" href="#">了解方向</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PIPELINE(主视觉) ============ -->
+<div class="pipeline-band">
+  <div class="wrap">
+    <div class="canvas-shadow">
+      <div class="canvas">
+        <div class="pipeline">
+
+          <svg class="flow-svg" viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop stop-color="#6366f1" stop-opacity="0.3"/>
+                <stop offset="0.5" stop-color="#8b5cf6" stop-opacity="0.85"/>
+                <stop offset="1" stop-color="#06b6d4" stop-opacity="0.6"/>
+              </linearGradient>
+              <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0 0 L8 4 L0 8 Z" fill="#8b5cf6" opacity="0.85"/>
+              </marker>
+            </defs>
+            <g class="rails">
+              <path class="rail" d="M104 148 C146 92 174 72 214 86"/>
+              <path class="rail" d="M104 150 C148 150 172 150 214 150"/>
+              <path class="rail" d="M104 152 C146 208 176 230 214 216"/>
+              <path class="rail" d="M786 106 C834 108 858 134 896 148" marker-end="url(#arrow)"/>
+              <path class="rail" d="M786 150 C836 150 858 150 896 150" marker-end="url(#arrow)"/>
+              <path class="rail" d="M786 194 C834 192 858 166 896 152" marker-end="url(#arrow)"/>
+            </g>
+            <g stroke="url(#lineGrad)">
+              <path class="flowline" d="M104 148 C146 92 174 72 214 86"/>
+              <path class="flowline" style="animation-delay:0.5s" d="M104 150 C148 150 172 150 214 150"/>
+              <path class="flowline" style="animation-delay:1s" d="M104 152 C146 208 176 230 214 216"/>
+              <path class="flowline" style="animation-delay:1.6s" d="M786 106 C834 108 858 134 896 148"/>
+              <path class="flowline" style="animation-delay:2.1s" d="M786 150 C836 150 858 150 896 150"/>
+              <path class="flowline" style="animation-delay:2.6s" d="M786 194 C834 192 858 166 896 152"/>
+            </g>
+          </svg>
+
+          <!-- 输入 -->
+          <article class="endpoint">
+            <div class="ep-icon">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+            </div>
+            <span class="ep-kicker">输入 · 业务信号</span>
+            <h3>业务痛点</h3>
+            <p>用户痛点、市场信号与产品假设</p>
+          </article>
+
+          <div class="m-arrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+          </div>
+
+          <!-- 工程能力体系 -->
+          <article class="system">
+            <div class="system-head">
+              <h3>工程能力体系</h3>
+              <span class="arch-tag">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>
+                系统架构 · 定边界,立规则
+              </span>
+            </div>
+
+            <div class="arch-frame">
+              <span class="scan"></span>
+
+              <div class="layer">
+                <p class="layer-label">应用层 · Applications</p>
+                <div class="nodes-2">
+                  <div class="node">
+                    <span class="node-icon ic-violet">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+                    </span>
+                    <div>
+                      <h4>Agent</h4>
+                      <p>编排 · RAG · 工具接入</p>
+                    </div>
+                  </div>
+                  <div class="node">
+                    <span class="node-icon ic-cyan">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+                    </span>
+                    <div>
+                      <h4>小程序与多端</h4>
+                      <p>小程序 · Web · 后端集成</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="layer">
+                <p class="layer-label">平台层 · AI Infra</p>
+                <div class="bar bar-violet">
+                  <span class="node-icon ic-violet">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+                  </span>
+                  <h4>AI 基建</h4>
+                  <p>模型接入 · 网关 · 评估 · 工作流</p>
+                  <span class="hint">↑ 支撑上层应用</span>
+                </div>
+              </div>
+
+              <div class="layer">
+                <p class="layer-label">数据底座 · Data</p>
+                <div class="bar bar-emerald">
+                  <span class="node-icon ic-emerald">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                  </span>
+                  <h4>数据工程</h4>
+                  <p>采集 · 建模 · 指标 · 调度</p>
+                  <span class="hint">↑ 为全链路供数</span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <div class="m-arrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+          </div>
+
+          <!-- 输出 -->
+          <article class="endpoint">
+            <div class="ep-icon">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+            </div>
+            <span class="ep-kicker">输出 · 结果</span>
+            <h3>可交付方案</h3>
+            <p>方案设计、产品落地与持续迭代</p>
+          </article>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 能力矩阵 ============ -->
+<section class="block">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-kicker">Focus</span>
+      <div class="sec-row">
+        <h2>长期深耕的四个方向</h2>
+        <p class="sub">从数据底座到应用层,构成一套完整的工程能力</p>
+      </div>
+    </div>
+    <div class="cap-row">
+      <div class="cap">
+        <div class="cap-head">
+          <span class="ic-violet">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+          </span>
+          <h3>Agent</h3>
+        </div>
+        <p>把 Agent 嵌进真实业务流程和权限边界,而不是停在 demo。</p>
+        <span class="kw">编排 · RAG · 工具接入 · 评估闭环</span>
+      </div>
+      <div class="cap">
+        <div class="cap-head">
+          <span class="ic-cyan">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>
+          </span>
+          <h3>系统架构</h3>
+        </div>
+        <p>为系统定边界、立规则,让架构支撑业务的长期演进。</p>
+        <span class="kw">边界划分 · 服务治理 · 可观测性 · 演进规则</span>
+      </div>
+      <div class="cap">
+        <div class="cap-head">
+          <span class="ic-violet">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+          </span>
+          <h3>基建</h3>
+        </div>
+        <p>把 AI 能力平台化,让多个业务场景持续、低成本地接入。</p>
+        <span class="kw">LLM 网关 · MCP · 评估 · 工作流</span>
+      </div>
+      <div class="cap">
+        <div class="cap-head">
+          <span class="ic-emerald">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+          </span>
+          <h3>数据工程</h3>
+        </div>
+        <p>从采集到指标,把散落的数据变成可复用的资产与决策底座。</p>
+        <span class="kw">ETL / ELT · OLAP · 指标体系 · 调度</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 最新文章 ============ -->
+<section class="block">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-kicker">Writing</span>
+      <div class="sec-row">
+        <h2>最新文章</h2>
+        <a class="sec-link" href="#">全部文章 →</a>
+      </div>
+    </div>
+    <div class="post-list">
+      <a class="post" href="#">
+        <time>2026-06-18</time>
+        <h3>Agent 工具编排的边界:什么进工作流,什么留给模型</h3>
+        <span class="tags">Agent · 工程实践</span>
+      </a>
+      <a class="post" href="#">
+        <time>2026-05-27</time>
+        <h3>指标体系不是报表:数据底座的三层建模思路</h3>
+        <span class="tags">数据工程</span>
+      </a>
+      <a class="post" href="#">
+        <time>2026-04-30</time>
+        <h3>小程序 + LLM:轻量入口背后的工程取舍</h3>
+        <span class="tags">小程序 · AI 基建</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 交流 CTA ============ -->
+<div class="wrap">
+  <div class="cta">
+    <div>
+      <span class="sec-kicker">Contact</span>
+      <h2>对这些方向感兴趣?随时来聊</h2>
+      <p>有任何产品想法,或者商业痛点,欢迎写信给我,一起交流。</p>
+    </div>
+    <a class="btn btn-ghost" href="mailto:kevinto@foxmail.com">写封邮件
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<!-- ============ 设计说明(非页面内容) ============ -->
+<section class="notes">
+  <div class="wrap">
+    <h2>设计说明 · 本区块不属于页面内容</h2>
+    <ol>
+      <li><b>四个方向定稿为 Agent / 系统架构 / 基建 / 数据工程</b>(小程序从"方向"退出,仅作为 pipeline 应用层里的一种交付形态保留);Hero 副标题、eyebrow、能力四卡全部同步。</li>
+      <li><b>CTA 定稿:</b>"有任何产品想法,或者商业痛点,欢迎写信给我,一起交流。"</li>
+      <li><b>暗色主题降紫:</b>暗色主色从紫罗兰 #a78bfa 移到更冷的靛蓝 #818cf8,紫色底/光晕/错位描边的透明度整体下调约 35%,流光线在暗色下改为靛蓝→青的渐变;浅色模式配色不变。</li>
+      <li><b>能力层级为架构堆叠:</b>应用层(Agent、小程序)→ 平台层(AI 基建)→ 数据底座(数据工程),系统架构作为虚线外框。</li>
+      <li><b>页面结构:</b>Hero → Pipeline → 四个方向 → 最新文章 → 交流 CTA;无案例区、无信任数字。</li>
+    </ol>
+  </div>
+</section>
