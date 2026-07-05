@@ -1,19 +1,20 @@
+# syntax=docker/dockerfile:1.7
 FROM public.ecr.aws/docker/library/node:22-slim AS base
+WORKDIR /app
 
 FROM base AS deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libc6 \
     && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
+RUN npm install -g pnpm@10.7.1
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY patches ./patches
 
-RUN ls -la /app
-RUN npm install -g pnpm@10.7.1
-RUN pnpm install --frozen-lockfile --shamefully-hoist
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm config set store-dir /pnpm/store && \
+    pnpm install --frozen-lockfile --shamefully-hoist
+
+FROM deps AS builder
 COPY . .
 
 ENV NODE_OPTIONS="--max-old-space-size=4096"
@@ -21,7 +22,6 @@ RUN pnpm run build
 
 
 FROM base AS runner
-WORKDIR /app
 
 ENV NODE_ENV=production
 
