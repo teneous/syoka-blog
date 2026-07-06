@@ -14,6 +14,7 @@
   --font-sans:
     var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-display: 'Songti SC', 'Noto Serif SC', 'STSong', 'SimSun', Georgia, serif;
 
   /* Colors */
   --color-primary-50: oklch(0.971 0.014 343.198);
@@ -167,219 +168,255 @@
   }
 }
 
-@keyframes engineering-flow {
-  0% {
-    opacity: 0;
-    stroke-dashoffset: 620;
+@keyframes pipeline-dash {
+  from {
+    stroke-dashoffset: 274;
   }
-  16%,
-  72% {
-    opacity: 0.92;
-  }
-  100% {
-    opacity: 0;
-    stroke-dashoffset: -160;
+  to {
+    stroke-dashoffset: 0;
   }
 }
 
-@keyframes engineering-frame-pulse {
+@keyframes pipeline-scan {
   0%,
-  100% {
-    box-shadow: inset 0 0 0 rgba(139, 92, 246, 0);
-  }
-  50% {
-    box-shadow: inset 0 0 26px rgba(139, 92, 246, 0.1);
-  }
-}
-
-@keyframes engineering-scan-line {
-  0% {
-    transform: translateX(-140%);
+  10% {
+    transform: translateX(-90px);
     opacity: 0;
   }
-  24%,
-  72% {
+  30% {
     opacity: 1;
   }
+  72%,
   100% {
-    transform: translateX(760%);
+    transform: translateX(780px);
     opacity: 0;
   }
 }
 
-@keyframes engineering-node-sheen {
-  0% {
-    transform: translateX(-120%);
-    opacity: 0;
+.pipeline-flowline {
+  stroke-dasharray: 14 260;
+  animation: pipeline-dash 3.4s linear infinite;
+}
+
+.pipeline-scan {
+  animation: pipeline-scan 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pipeline-flowline {
+    animation: none;
+    stroke-dasharray: none;
+    opacity: 0.5;
   }
-  35% {
-    opacity: 0.75;
-  }
-  100% {
-    transform: translateX(520%);
-    opacity: 0;
+
+  .pipeline-scan {
+    display: none;
+    animation: none;
   }
 }
 
-@keyframes engineering-bus-flow {
-  0% {
-    background-position: 120% 0;
-    opacity: 0.18;
+/* ---------- 光子环绕 logo(Header wordmark) ---------- */
+:root {
+  --photon-from: #7c3aed; /* violet-600 */
+  --photon-to: #0891b2; /* cyan-600 */
+}
+.dark {
+  --photon-from: #818cf8; /* indigo-400 */
+  --photon-to: #22d3ee; /* cyan-400 */
+}
+
+@keyframes photon-flow {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.photon-beam {
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 16 84;
+  animation: photon-flow 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.photon-beam-2 {
+  stroke-width: 1.5;
+  opacity: 0.75;
+  animation-duration: 3.8s;
+  animation-timing-function: linear;
+  animation-direction: reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photon-beam {
+    animation: none;
+    stroke-dasharray: none;
+    opacity: 0.35;
+  }
+}
+
+/* ---------- Hero:氛围光斑漂移 + 制图定位符 + 呼吸点 + 滚动提示 ---------- */
+@keyframes hero-drift-a {
+  from {
+    transform: translate(-8%, 0) scale(1);
+  }
+  to {
+    transform: translate(6%, 8%) scale(1.1);
+  }
+}
+@keyframes hero-drift-b {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(-14%, 12%) scale(0.94);
+  }
+}
+.hero-blob-a {
+  will-change: transform;
+  animation: hero-drift-a 26s ease-in-out infinite alternate;
+}
+.hero-blob-b {
+  will-change: transform;
+  animation: hero-drift-b 32s ease-in-out infinite alternate;
+}
+
+.hero-marks {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M4 0v8M0 4h8' stroke='rgba(11,15,25,0.18)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 72px 72px;
+  background-position: 20px 30px;
+  -webkit-mask-image: radial-gradient(ellipse 56% 52% at 26% 30%, black 20%, transparent 74%);
+  mask-image: radial-gradient(ellipse 56% 52% at 26% 30%, black 20%, transparent 74%);
+}
+.dark .hero-marks {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M4 0v8M0 4h8' stroke='rgba(255,255,255,0.16)' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+@keyframes hero-pulse {
+  0%,
+  100% {
+    opacity: 1;
   }
   50% {
-    opacity: 0.62;
-  }
-  100% {
-    background-position: -120% 0;
-    opacity: 0.18;
+    opacity: 0.35;
   }
 }
+.hero-pulse {
+  animation: hero-pulse 2.6s ease-in-out infinite;
+}
 
-@keyframes engineering-data-lift {
+@keyframes hero-scroll-hint {
   0% {
-    transform: translateY(42%);
+    transform: scaleX(0);
     opacity: 0;
   }
-  28%,
-  76% {
-    opacity: 0.75;
+  40% {
+    transform: scaleX(1);
+    opacity: 0.8;
   }
   100% {
-    transform: translateY(-38%);
+    transform: scaleX(1);
     opacity: 0;
   }
 }
-
-.engineering-rail {
-  stroke: rgba(79, 70, 229, 0.28);
-  stroke-dasharray: 4 10;
-  stroke-width: 1.35;
+.scroll-hint-line {
+  transform-origin: left;
+  animation: hero-scroll-hint 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
-.dark .engineering-rail {
-  stroke: rgba(148, 163, 184, 0.3);
+@media (prefers-reduced-motion: reduce) {
+  .hero-blob-a,
+  .hero-blob-b,
+  .hero-pulse,
+  .scroll-hint-line {
+    animation: none;
+  }
 }
 
-.engineering-flow {
-  animation: engineering-flow 5.8s cubic-bezier(0.45, 0, 0.2, 1) infinite;
-  filter: drop-shadow(0 0 8px rgba(79, 70, 229, 0.5));
-  stroke-dasharray: 122 500;
-  stroke-dashoffset: 620;
-  stroke-width: 3.1;
+/* ---------- 载入五拍浮现(Hero) + 滚动渐显(其余区块) ---------- */
+.hero-rise {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hero-rise.is-in {
+  opacity: 1;
+  transform: none;
 }
 
-.dark .engineering-flow {
-  filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.65));
+.reveal-init {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-init.is-visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal-init.reveal-scale {
+  transform: translateY(36px) scale(0.985);
+}
+.reveal-init.reveal-scale.is-visible {
+  transform: none;
 }
 
-.engineering-flow-secondary {
-  animation-duration: 6.6s;
-  filter: drop-shadow(0 0 8px rgba(8, 145, 178, 0.45));
-  stroke-dasharray: 88 500;
-  stroke-width: 2.5;
+@media (prefers-reduced-motion: reduce) {
+  .hero-rise,
+  .reveal-init {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
-.dark .engineering-flow-secondary {
-  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.5));
+/* ---------- Pipeline 卡片:暗色下的玻璃质感 ---------- */
+.pipeline-panel {
+  background-color: #fff;
+}
+.dark .pipeline-panel {
+  background-color: transparent;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-.engineering-frame-pulse {
-  animation: engineering-frame-pulse 5.6s ease-in-out infinite;
+/* ---------- 鼠标跟随高光(Pipeline 端点卡 / 节点) ---------- */
+.glare {
+  position: relative;
+  overflow: hidden;
 }
-
-.engineering-scan-line {
-  animation: engineering-scan-line 6.8s ease-in-out infinite;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(79, 70, 229, 0.14),
-    rgba(14, 165, 233, 0.12),
-    transparent
-  );
-}
-
-.dark .engineering-scan-line {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(139, 92, 246, 0.1),
-    rgba(34, 211, 238, 0.1),
-    transparent
-  );
-}
-
-.engineering-node-sheen {
-  animation: engineering-node-sheen 7.2s ease-in-out infinite;
-  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.13), transparent);
-}
-
-.dark .engineering-node-sheen {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
-}
-
-.engineering-bus-line {
+.glare::after {
+  content: '';
   position: absolute;
-  z-index: 20;
-  right: 1rem;
-  left: 1rem;
-  height: 1px;
-  animation: engineering-bus-flow 5.8s ease-in-out infinite;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(79, 70, 229, 0.2),
-    rgba(14, 165, 233, 0.5),
-    rgba(5, 150, 105, 0.24),
-    transparent
+  inset: 0;
+  background: radial-gradient(
+    260px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(124, 58, 237, 0.08),
+    transparent 62%
   );
-  background-size: 240% 100%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
 }
-
-.dark .engineering-bus-line {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(139, 92, 246, 0.12),
-    rgba(34, 211, 238, 0.5),
-    rgba(16, 185, 129, 0.18),
-    transparent
+.dark .glare::after {
+  background: radial-gradient(
+    260px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.08),
+    transparent 62%
   );
 }
-
-.engineering-bus-line-top {
-  top: 43%;
+.glare:hover::after {
+  opacity: 1;
 }
-
-.engineering-bus-line-bottom {
-  top: 72%;
-  animation-delay: 1.3s;
-}
-
-.engineering-data-lift {
-  position: absolute;
-  z-index: 20;
-  bottom: 16%;
-  left: 50%;
-  width: 1px;
-  height: 44%;
-  animation: engineering-data-lift 5.2s ease-in-out infinite;
-  background: linear-gradient(
-    180deg,
-    transparent,
-    rgba(5, 150, 105, 0.58),
-    rgba(14, 165, 233, 0.36),
-    transparent
-  );
-}
-
-.dark .engineering-data-lift {
-  background: linear-gradient(
-    180deg,
-    transparent,
-    rgba(16, 185, 129, 0.55),
-    rgba(34, 211, 238, 0.34),
-    transparent
-  );
+@media (prefers-reduced-motion: reduce) {
+  .glare::after {
+    display: none;
+  }
 }
 
 /* Utility styles */

@@ -4,9 +4,9 @@ import Link from '@/components/common/Link'
 import Script from 'next/script'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
-import Trend from './Trend'
 import LanguageToggle from './LanguageToggle'
 import LocalizedNavTitle from './LocalizedNavTitle'
+import PhotonMark from './PhotonMark'
 
 const Header = () => {
   return (
@@ -19,7 +19,12 @@ const Header = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* 标题 */}
-          <Link href="/" aria-label={siteMetadata.headerTitle}>
+          <Link
+            href="/"
+            aria-label={siteMetadata.headerTitle}
+            className="flex items-center gap-2.5"
+          >
+            <PhotonMark />
             <div className="text-lg font-medium tracking-tight text-gray-900 transition-colors duration-200 hover:text-violet-600 dark:text-gray-100 dark:hover:text-violet-400">
               {typeof siteMetadata.headerTitle === 'string' ? siteMetadata.headerTitle : null}
             </div>
@@ -44,7 +49,6 @@ const Header = () => {
             <div className="flex items-center space-x-4">
               <LanguageToggle />
               <ThemeSwitch />
-              <Trend />
               <MobileNav />
             </div>
           </div>
