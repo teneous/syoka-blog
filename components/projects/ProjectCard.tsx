@@ -22,7 +22,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   stack,
 }) => {
   return (
-    <article className="accent-line-top pipeline-panel group flex h-full flex-col rounded-2xl border border-gray-200 p-7.5 transition-[border-color,transform] duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:border-violet-300 motion-reduce:hover:translate-y-0 dark:border-white/[0.09] dark:hover:border-indigo-400/40">
+    <article className="pipeline-panel group flex h-full flex-col rounded-2xl border border-gray-200 p-7.5 transition-[border-color,transform] duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:border-violet-300 motion-reduce:hover:translate-y-0 dark:border-white/[0.09] dark:hover:border-indigo-400/40">
       <div className="flex-grow">
         <p className="mb-4 block font-mono text-[0.68rem] font-medium tracking-[0.16em] text-gray-500 uppercase dark:text-gray-500">
           <LocalizedText en={domain.en} zh={domain.zh} />

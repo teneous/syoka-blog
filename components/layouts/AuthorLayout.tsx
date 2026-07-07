@@ -32,7 +32,7 @@ export default function AuthorLayout({ children, content }: Props) {
         </div>
 
         <div className="grid items-start gap-8 xl:grid-cols-[320px_1fr]">
-          <aside className="accent-line-top pipeline-panel rounded-2xl border border-gray-200 p-7 dark:border-white/[0.09]">
+          <aside className="pipeline-panel rounded-2xl border border-gray-200 p-7 dark:border-white/[0.09]">
             <div className="flex flex-col items-center">
               {avatar && (
                 <div className="rounded-full bg-[conic-gradient(from_200deg,#7c3aed,#0891b2,#7c3aed)] p-[3px] dark:bg-[conic-gradient(from_200deg,#818cf8,#22d3ee,#818cf8)]">
@@ -70,7 +70,7 @@ export default function AuthorLayout({ children, content }: Props) {
             </div>
           </aside>
 
-          <section className="accent-line-top pipeline-panel rounded-2xl border border-gray-200 p-10 dark:border-white/[0.09]">
+          <section className="pipeline-panel rounded-2xl border border-gray-200 p-10 dark:border-white/[0.09]">
             <div className="prose dark:prose-invert prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-gray-950 prose-p:text-gray-700 prose-strong:text-gray-950 prose-a:text-violet-600 dark:prose-headings:text-white dark:prose-p:text-gray-300 dark:prose-strong:text-white dark:prose-a:text-indigo-400 max-w-none marker:text-violet-600 dark:marker:text-indigo-400">
               {children}
             </div>

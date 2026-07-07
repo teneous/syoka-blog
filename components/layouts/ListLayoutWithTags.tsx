@@ -96,7 +96,7 @@ export default function ListLayout({
         return (
           <article
             key={slug}
-            className="accent-line-top pipeline-panel group rounded-2xl border border-gray-200 p-7.5 transition-colors duration-300 hover:border-violet-300 dark:border-white/[0.09] dark:hover:border-indigo-400/40"
+            className="pipeline-panel group rounded-2xl border border-gray-200 p-7.5 transition-colors duration-300 hover:border-violet-300 dark:border-white/[0.09] dark:hover:border-indigo-400/40"
           >
             <div className="flex items-center gap-4">
               <time
