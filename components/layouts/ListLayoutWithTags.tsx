@@ -26,7 +26,7 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
   const nextPage = currentPage + 1 <= totalPages
 
   return (
-    <div className="mt-16 flex items-center justify-between">
+    <div className="mt-16 mb-8 flex items-center justify-between">
       <div className="flex-1">
         {prevPage ? (
           <Link
