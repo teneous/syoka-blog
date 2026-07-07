@@ -41,7 +41,8 @@ export default function Page() {
     <AuthorLayout content={mainContent}>
       <div className="space-y-10">
         <section>
-          <h2>
+          <h2 className="flex items-center gap-2.5">
+            <span className="h-2 w-2 shrink-0 rounded-sm bg-violet-600 dark:bg-indigo-400" />
             <LocalizedText en="Profile" zh="简介" />
           </h2>
           <p>
@@ -59,7 +60,8 @@ export default function Page() {
         </section>
 
         <section>
-          <h2>
+          <h2 className="flex items-center gap-2.5">
+            <span className="h-2 w-2 shrink-0 rounded-sm bg-violet-600 dark:bg-indigo-400" />
             <LocalizedText en="Directions" zh="关注方向" />
           </h2>
           <ul>
@@ -72,7 +74,8 @@ export default function Page() {
         </section>
 
         <section>
-          <h2>
+          <h2 className="flex items-center gap-2.5">
+            <span className="h-2 w-2 shrink-0 rounded-sm bg-violet-600 dark:bg-indigo-400" />
             <LocalizedText en="Ongoing Conversations" zh="长期交流" />
           </h2>
           <ul>

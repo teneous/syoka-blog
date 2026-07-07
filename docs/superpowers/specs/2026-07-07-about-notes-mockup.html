@@ -1,0 +1,352 @@
+<title>Syoka About · Notes 页 UI 重刷 Mockup v3</title>
+<style>
+  /* ============================================================
+     v2:只重刷 UI(配色/字体/间距/描边),不改任何结构。
+     About = 原 AuthorLayout 的头像卡 + 正文卡两栏,<ul> 项目符号不变。
+     Notes = 原 ListLayoutWithTags 的卡片式列表,不改成发丝线扁平行。
+     ============================================================ */
+  :root {
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    /* 弃用宋体:中文语境下衬线大字容易显"呆",改用加粗无衬线 + 收紧字距 + 渐变描边 */
+    --h-grad: linear-gradient(180deg, #0b0f19, #3c4250);
+
+    --bg: #f3f4f8;
+    --bg-soft: #e9ebf2;
+    --nav-bg: rgba(243, 244, 248, 0.78);
+    --card-bg: #ffffff;
+    --card-soft-bg: #fbfbfd;
+    --border: #e1e4ec;
+    --border-soft: #e8eaf1;
+    --text: #0b0f19;
+    --text-2: #4b5563;
+    --text-3: #878e9c;
+    --violet: #6d5ae0;
+    --violet-bg: rgba(109, 90, 224, 0.06);
+    --violet-border: rgba(109, 90, 224, 0.22);
+    --violet-2: #06b6d4;
+    --edge-light: 0 1px 2px rgba(11, 15, 25, 0.04), 0 16px 40px -28px rgba(11, 15, 25, 0.22);
+    --tag-bg: rgba(11, 15, 25, 0.04);
+    --tag-text: #4b5563;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a0a0e;
+      --bg-soft: #111116;
+      --nav-bg: rgba(10, 10, 14, 0.62);
+      --card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+      --card-soft-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+      --border: rgba(255, 255, 255, 0.09);
+      --border-soft: rgba(255, 255, 255, 0.06);
+      --text: #f5f5f7;
+      --text-2: #a5a8b4;
+      --text-3: #6e717d;
+      --violet: #818cf8;
+      --violet-bg: rgba(99, 102, 241, 0.08);
+      --violet-border: rgba(129, 140, 248, 0.28);
+      --violet-2: #22d3ee;
+      --h-grad: linear-gradient(180deg, #ffffff 20%, #a7aab6);
+      --edge-light: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      --tag-bg: rgba(255, 255, 255, 0.05);
+      --tag-text: #a5a8b4;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #0a0a0e;
+    --bg-soft: #111116;
+    --nav-bg: rgba(10, 10, 14, 0.62);
+    --card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    --card-soft-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+    --border: rgba(255, 255, 255, 0.09);
+    --border-soft: rgba(255, 255, 255, 0.06);
+    --text: #f5f5f7;
+    --text-2: #a5a8b4;
+    --text-3: #6e717d;
+    --violet: #818cf8;
+    --violet-bg: rgba(99, 102, 241, 0.08);
+    --violet-border: rgba(129, 140, 248, 0.28);
+    --violet-2: #22d3ee;
+    --h-grad: linear-gradient(180deg, #ffffff 20%, #a7aab6);
+    --edge-light: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --tag-bg: rgba(255, 255, 255, 0.05);
+    --tag-text: #a5a8b4;
+  }
+  :root[data-theme='light'] {
+    --bg: #f3f4f8;
+    --bg-soft: #e9ebf2;
+    --nav-bg: rgba(243, 244, 248, 0.78);
+    --card-bg: #ffffff;
+    --card-soft-bg: #fbfbfd;
+    --border: #e1e4ec;
+    --border-soft: #e8eaf1;
+    --text: #0b0f19;
+    --text-2: #4b5563;
+    --text-3: #878e9c;
+    --violet: #6d5ae0;
+    --violet-bg: rgba(109, 90, 224, 0.06);
+    --violet-border: rgba(109, 90, 224, 0.22);
+    --violet-2: #06b6d4;
+    --h-grad: linear-gradient(180deg, #0b0f19, #3c4250);
+    --edge-light: 0 1px 2px rgba(11, 15, 25, 0.04), 0 16px 40px -28px rgba(11, 15, 25, 0.22);
+    --tag-bg: rgba(11, 15, 25, 0.04);
+    --tag-text: #4b5563;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, -apple-system, 'SF Pro Text', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  .mono { font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace; }
+
+  /* ---------- nav ---------- */
+  .nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(14px); background: var(--nav-bg); border-bottom: 1px solid var(--border-soft); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 62px; }
+  .wordmark { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.02em; font-size: 1.02rem; }
+  .wordmark span { color: var(--violet); }
+  .nav-links { display: flex; gap: 26px; font-size: 0.86rem; color: var(--text-2); }
+  .nav-links .active { color: var(--text); font-weight: 600; }
+
+  /* ---------- 页头(结构不变,只重刷字体/间距) ---------- */
+  .page-head { padding: 60px 0 44px; }
+  .page-kicker {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: ui-monospace, monospace; font-size: 0.66rem; font-weight: 500;
+    letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px;
+  }
+  .page-kicker i { width: 6px; height: 6px; border-radius: 50%; background: var(--violet); }
+  .page-head h1 {
+    margin: 0; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+    font-size: clamp(2.2rem, 3.6vw, 3.1rem);
+    background: var(--h-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+    padding-bottom: 0.05em;
+  }
+  .page-head .sub { margin: 18px 0 0; max-width: 56ch; font-size: 0.96rem; line-height: 1.9; color: var(--text-2); }
+
+  /* ============ ABOUT:原有网格结构完全不变(xl:grid-cols-[320px_1fr]) ============ */
+  .about-grid { display: grid; gap: 32px; align-items: start; }
+  @media (min-width: 1200px) { .about-grid { grid-template-columns: 320px 1fr; } }
+
+  .side-card {
+    position: relative; overflow: hidden;
+    border-radius: 14px; border: 1px solid var(--border); background: var(--card-soft-bg);
+    box-shadow: var(--edge-light); padding: 34px 28px 30px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .side-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--violet), var(--violet-2));
+    opacity: 0.75;
+  }
+  .avatar-ring {
+    width: 136px; height: 136px; border-radius: 50%; padding: 3px;
+    background: conic-gradient(from 200deg, var(--violet), var(--violet-2), var(--violet));
+    display: flex; align-items: center; justify-content: center;
+  }
+  .avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--card-soft-bg); display: block; }
+  .side-card h2 { margin: 20px 0 4px; font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; }
+  .side-card .motor { margin: 0; font-size: 0.86rem; color: var(--text-2); }
+  .side-card .mail {
+    margin-top: 22px; display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 18px;
+    font-size: 0.85rem; font-weight: 500; background: var(--card-bg); transition: border-color 0.3s ease;
+  }
+  .side-card .mail:hover { border-color: var(--violet-border); }
+  .socials { margin-top: 20px; display: flex; gap: 16px; }
+  .socials a { color: var(--text-3); transition: color 0.3s ease; }
+  .socials a:hover { color: var(--violet); }
+
+  .content-card { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--border); background: var(--card-bg); box-shadow: var(--edge-light); padding: 40px; }
+  .content-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--violet), var(--violet-2));
+    opacity: 0.75;
+  }
+  .content-card h2 {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.3rem; font-weight: 800; letter-spacing: -0.015em; margin: 0 0 14px;
+  }
+  .content-card h2::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--violet); flex-shrink: 0; }
+  .content-card section + section { margin-top: 36px; padding-top: 36px; border-top: 1px solid var(--border-soft); }
+  .content-card p { margin: 0 0 12px; font-size: 0.98rem; line-height: 1.95; color: var(--text-2); }
+  .content-card ul { margin: 0; padding-left: 1.3em; }
+  .content-card li { margin: 0 0 10px; font-size: 0.98rem; line-height: 1.85; color: var(--text-2); }
+  .content-card li::marker { color: var(--violet); }
+
+  /* ============ NOTES:原有卡片式列表结构完全不变 ============ */
+  .post-card {
+    position: relative; border-radius: 16px; border: 1px solid var(--border);
+    background: var(--card-soft-bg); box-shadow: var(--edge-light);
+    padding: 26px 28px; margin-bottom: 22px; transition: border-color 0.35s ease;
+  }
+  .post-card:hover { border-color: var(--violet-border); }
+  .post-meta { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .post-meta time { font-family: ui-monospace, monospace; font-size: 0.78rem; color: var(--violet); font-weight: 500; }
+  .post-meta .tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .post-meta .tags span {
+    font-family: ui-monospace, monospace; font-size: 0.68rem; color: var(--tag-text);
+    background: var(--tag-bg); border-radius: 999px; padding: 4px 10px;
+  }
+  .post-card h2 {
+    margin: 0 0 10px; font-size: 1.22rem; font-weight: 800;
+    letter-spacing: -0.015em; line-height: 1.4; transition: color 0.3s ease;
+  }
+  .post-card:hover h2 { color: var(--violet); }
+  .post-card .summary { margin: 0 0 16px; font-size: 0.92rem; line-height: 1.85; color: var(--text-2); }
+  .post-card .more {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem;
+    font-weight: 500; color: var(--violet);
+  }
+  .post-card .more svg { transition: transform 0.3s ease; }
+  .post-card:hover .more svg { transform: translateX(3px); }
+
+  .pager { display: flex; align-items: center; justify-content: space-between; margin-top: 40px; font-size: 0.85rem; }
+  .pager span.dim { color: var(--text-3); }
+  .pager a { color: var(--text-2); transition: color 0.3s ease; }
+  .pager a:hover { color: var(--violet); }
+
+  .divider-label {
+    text-align: center; padding: 40px 0; font-family: ui-monospace, monospace;
+    font-size: 0.66rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--text-3);
+    background: var(--bg-soft); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
+  .notes-block { border-top: 1px solid var(--border); background: var(--bg-soft); padding: 36px 0 56px; }
+  .notes-block h2 { font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); margin: 0 0 16px; font-weight: 600; }
+  .notes-block ol { margin: 0; padding-left: 20px; max-width: 76ch; }
+  .notes-block li { font-size: 0.85rem; color: var(--text-2); margin-bottom: 10px; }
+  .notes-block b { color: var(--text); }
+</style>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <div class="wordmark">
+      <svg width="26" height="26" viewBox="0 0 48 48" aria-hidden="true">
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--violet)"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+        <circle cx="24" cy="24" r="4.5" fill="var(--violet)"/>
+        <ellipse cx="24" cy="24" rx="19" ry="8" transform="rotate(-26 24 24)" fill="none" stroke="url(#g1)" stroke-width="2" opacity="0.8"/>
+        <ellipse cx="24" cy="24" rx="19" ry="8" transform="rotate(46 24 24)" fill="none" stroke="url(#g1)" stroke-width="1.5" opacity="0.5"/>
+      </svg>
+      Syoka <span>Studio</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#">首页</a>
+      <a href="#">项目</a>
+      <a href="#">文章</a>
+      <a class="active" href="#">关于</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= ABOUT(结构 = 原 AuthorLayout,不变) ================= -->
+<div class="wrap">
+  <div class="page-head">
+    <span class="page-kicker"><i></i>About</span>
+    <h1>关于</h1>
+    <p class="sub">记录 AI Agent、系统架构、数据平台方向的技术判断、项目实践和长期观察。</p>
+  </div>
+
+  <div class="about-grid">
+    <aside class="side-card">
+      <div class="avatar-ring">
+        <img class="avatar" src="https://api.dicebear.com/9.x/notionists/svg?seed=syoka&backgroundColor=transparent" alt="avatar" />
+      </div>
+      <h2>Syoka</h2>
+      <p class="motor">Attention is all you need</p>
+      <a class="mail mono" href="mailto:syoka9471@gmail.com">syoka9471@gmail.com</a>
+      <div class="socials">
+        <a href="#" aria-label="GitHub"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a>
+        <a href="#" aria-label="LinkedIn"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></a>
+      </div>
+    </aside>
+
+    <section class="content-card">
+      <section>
+        <h2>简介</h2>
+        <p>我主要关注 AI Agent & Agent 基建生态、系统架构、数据平台。</p>
+        <p>这个站点会记录一些技术判断、项目实践和长期观察，方便和对这些方向感兴趣的人保持交流。</p>
+      </section>
+      <section>
+        <h2>关注方向</h2>
+        <ul>
+          <li>AI Agent & Agent 基建生态</li>
+          <li>系统架构</li>
+          <li>数据平台</li>
+        </ul>
+      </section>
+      <section>
+        <h2>长期交流</h2>
+        <ul>
+          <li>对 AI Agent、系统架构、数据平台方向感兴趣的人</li>
+          <li>对这个赛道有长期观察、实践或问题意识的人</li>
+          <li>关于技术趋势、工程实践和产品形态的长期交流</li>
+        </ul>
+      </section>
+    </section>
+  </div>
+</div>
+
+<div class="divider-label">设计说明 · 以下单独展示 Notes 列表页的 UI 重刷效果 · 两页彼此独立,不互相导航拼接</div>
+
+<!-- ================= NOTES(结构 = 原 ListLayoutWithTags 卡片列表,不变) ================= -->
+<div class="wrap">
+  <div class="page-head">
+    <span class="page-kicker"><i></i>Writing</span>
+    <h1>Notes</h1>
+    <p class="sub">Public thinking on AI systems, architecture, data platforms, product engineering, creative workflows, and team delivery.</p>
+  </div>
+
+  <div class="post-card">
+    <div class="post-meta">
+      <time class="mono">2026-07-05</time>
+      <div class="tags"><span>AI</span><span>Claude</span><span>Agent</span></div>
+    </div>
+    <h2>如何打造高效的人机协作团队</h2>
+    <p class="summary">当 Agent 开始参与真实的工程决策，团队协作的边界和评审方式需要被重新定义。</p>
+    <span class="more">Read more <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></span>
+  </div>
+
+  <div class="post-card">
+    <div class="post-meta">
+      <time class="mono">2026-07-05</time>
+      <div class="tags"><span>AI</span><span>Claude</span><span>Security</span></div>
+    </div>
+    <h2>Anthropic 的安全团队怎么用 Claude Code 造出威胁检测平台</h2>
+    <p class="summary">一次真实的内部工具搭建复盘，关于权限边界、审计链路与人机协作的取舍。</p>
+    <span class="more">Read more <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></span>
+  </div>
+
+  <div class="post-card">
+    <div class="post-meta">
+      <time class="mono">2026-07-05</time>
+      <div class="tags"><span>AI</span><span>MCP</span><span>OpenAI</span><span>Security</span></div>
+    </div>
+    <h2>让私有 MCP 服务器可达，但不公开它</h2>
+    <p class="summary">内网穿透、鉴权与最小暴露面之间的工程取舍，一份可落地的清单。</p>
+    <span class="more">Read more <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></span>
+  </div>
+
+  <div class="pager">
+    <span class="dim">Previous</span>
+    <span class="dim mono">Page 1 of 2</span>
+    <a href="#">Next →</a>
+  </div>
+</div>
+
+<section class="notes-block">
+  <div class="wrap">
+    <h2>设计说明 · 本区块不属于页面内容 · v3 弃用宋体 + 精致细节</h2>
+    <ol>
+      <li><b>不改结构(承 v2):</b>About 保持 AuthorLayout 原有的"头像卡 + 正文卡"两栏网格,`&lt;ul&gt;` 项目符号列表原样保留;Notes 保持原有卡片式列表(每篇一张卡)。</li>
+      <li><b>弃用宋体(v3 核心修正):</b>中文语境下衬线大字容易显"呆板"而不是高级。改用<b>加粗无衬线(font-weight 800)+ 收紧字距(letter-spacing -0.02~-0.03em)</b>,页面大标题("关于" / "Notes")叠加深浅渐变描边(与首页 H1 同款处理),质感更"科技感"而不是"文绉绉"。</li>
+      <li><b>找回精致感(针对"太素"的修正):</b>卡片顶部加 2px 紫→青渐变细线;头像加圆锥渐变光环描边;小节标题("简介""关注方向"等)前加一个 8px 方形色块替代原来空荡的纯文字;page-kicker(等宽小标签 + 呼吸点)呼应首页 Hero 的 eyebrow 写法,弱化"两页各自秃头"的观感。</li>
+      <li><b>Notes 卡片:</b>标题改粗体无衬线,日期改等宽字体 + 主题色高亮,标签胶囊化(仍在卡片内,不改变卡片式结构);hover 只做描边变色 + 标题变色 + 箭头轻移。</li>
+      <li><b>色彩纪律不变:</b>暗色靛蓝 #818cf8、浅色紫 #6d5ae0,新增青色 #22d3ee(暗)/ #06b6d4(浅)作为渐变第二色,与首页 Pipeline 流光配色同源。</li>
+      <li><b>本 mockup 里两页上下堆叠仅为方便你一次看完,实际是两个独立路由,互不导航拼接。</b></li>
+    </ol>
+  </div>
+</section>

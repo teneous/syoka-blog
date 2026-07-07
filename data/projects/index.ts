@@ -10,7 +10,6 @@ export type Project = {
   role: LocalizedString
   impact: LocalizedString
   stack: string[]
-  status: 'active' | 'completed' | 'planning'
   link?: string
   isPrivate?: boolean
 }
@@ -38,7 +37,6 @@ export const projects: Project[] = [
       zh: '把零散提示词式创作转成可管理、可复用的生产流程，更适合团队与持续内容生产。',
     },
     stack: ['AIGC', 'Canvas', 'Workflow', 'Review'],
-    status: 'active',
     isPrivate: true,
   },
   {
@@ -63,7 +61,6 @@ export const projects: Project[] = [
       zh: '把分散的外部信号转成可跟踪的趋势判断与响应材料。',
     },
     stack: ['GEO', 'Crawler', 'NLP', 'Dashboard'],
-    status: 'planning',
     isPrivate: true,
   },
   {
@@ -88,7 +85,6 @@ export const projects: Project[] = [
       zh: '为报表分析、业务洞察和后续 AI 决策链路提供可复用的数据底座。',
     },
     stack: ['ETL/ELT', 'OLAP', 'Scheduler', 'BI'],
-    status: 'completed',
     isPrivate: true,
   },
   {
@@ -113,7 +109,6 @@ export const projects: Project[] = [
       zh: '为 Agent 嵌入既有企业系统提供更稳妥的工程路径，不破坏权限和治理边界。',
     },
     stack: ['Agent', 'RAG', 'Tools', 'Evaluation'],
-    status: 'active',
     isPrivate: true,
   },
   {
@@ -138,7 +133,6 @@ export const projects: Project[] = [
       zh: '把 AI 能力从单点 demo 推向可复用基础设施，支撑多个产品场景持续接入。',
     },
     stack: ['LLM Gateway', 'MCP', 'Workflow', 'Platform'],
-    status: 'active',
     isPrivate: true,
   },
   // {

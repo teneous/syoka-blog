@@ -96,61 +96,53 @@ export default function ListLayout({
         return (
           <article
             key={slug}
-            className="group relative rounded-2xl bg-white/30 p-6 transition-all hover:bg-white/50 dark:bg-gray-800/30 dark:hover:bg-gray-800/50"
+            className="accent-line-top pipeline-panel group rounded-2xl border border-gray-200 p-7.5 transition-colors duration-300 hover:border-violet-300 dark:border-white/[0.09] dark:hover:border-indigo-400/40"
           >
-            {/* 装饰边框 */}
-            <div className="absolute inset-0 rounded-2xl border border-gray-200/50 dark:border-gray-700/50" />
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-transparent to-violet-100/20 opacity-0 transition-opacity group-hover:opacity-100 dark:to-violet-900/20" />
-
-            <div className="relative space-y-5">
-              {/* 日期和标签 */}
-              <div className="flex items-center gap-4 text-sm">
-                <time dateTime={date} className="font-medium text-violet-600 dark:text-violet-400">
-                  {formatDate(date, siteMetadata.locale)}
-                </time>
-                <div className="flex flex-wrap gap-2">
-                  {tags?.map((tag) => (
-                    <Tag key={tag} text={tag} />
-                  ))}
-                </div>
+            <div className="flex items-center gap-4">
+              <time
+                dateTime={date}
+                className="font-mono text-xs font-medium text-violet-600 tabular-nums dark:text-indigo-400"
+              >
+                {formatDate(date, siteMetadata.locale)}
+              </time>
+              <div className="flex flex-wrap gap-2">
+                {tags?.map((tag) => (
+                  <Tag key={tag} text={tag} />
+                ))}
               </div>
+            </div>
 
-              {/* 标题 */}
-              <h2 className="font-serif text-2xl font-medium tracking-tight text-gray-900 dark:text-gray-100">
-                <Link
-                  href={`/blog/${slug}`}
-                  className="decoration-violet-500/30 hover:decoration-violet-500/50 dark:decoration-violet-400/30 dark:hover:decoration-violet-400/50"
+            <h2 className="mt-3.5 text-xl font-extrabold tracking-tight text-gray-950 dark:text-white">
+              <Link href={`/blog/${slug}`} className="decoration-transparent">
+                {title}
+              </Link>
+            </h2>
+
+            <p className="mt-3.5 text-[0.9rem] leading-7 text-gray-600 dark:text-gray-400">
+              {summary}
+            </p>
+
+            <div className="mt-5">
+              <Link
+                href={`/blog/${slug}`}
+                className="group/link inline-flex items-center gap-2 text-sm font-medium text-violet-600 transition-colors hover:text-violet-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                aria-label={`Read "${title}"`}
+              >
+                Read more
+                <svg
+                  className="h-4 w-4 transition-transform group-hover/link:translate-x-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  {title}
-                </Link>
-              </h2>
-
-              {/* 摘要 */}
-              <p className="leading-relaxed text-gray-600 dark:text-gray-400">{summary}</p>
-
-              {/* 阅读更多 */}
-              <div className="pt-2">
-                <Link
-                  href={`/blog/${slug}`}
-                  className="group/link inline-flex items-center gap-2 text-sm font-medium text-violet-600 transition-colors hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
-                  aria-label={`Read "${title}"`}
-                >
-                  Read more
-                  <svg
-                    className="h-4 w-4 transition-transform group-hover/link:translate-x-0.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
-                </Link>
-              </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              </Link>
             </div>
           </article>
         )

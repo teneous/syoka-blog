@@ -1,0 +1,270 @@
+<title>Syoka Projects 页 UI 重刷 Mockup</title>
+<style>
+  /* ============================================================
+     只重刷 UI(配色/字体/间距/描边/状态标),不改卡片网格结构。
+     token 与 About/Notes v3 mockup 完全同源。
+     ============================================================ */
+  :root {
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --h-grad: linear-gradient(180deg, #0b0f19, #3c4250);
+
+    --bg: #f3f4f8;
+    --bg-soft: #e9ebf2;
+    --nav-bg: rgba(243, 244, 248, 0.78);
+    --card-bg: #ffffff;
+    --card-soft-bg: #fbfbfd;
+    --border: #e1e4ec;
+    --border-soft: #e8eaf1;
+    --text: #0b0f19;
+    --text-2: #4b5563;
+    --text-3: #878e9c;
+    --violet: #6d5ae0;
+    --violet-bg: rgba(109, 90, 224, 0.06);
+    --violet-border: rgba(109, 90, 224, 0.22);
+    --violet-2: #06b6d4;
+    --edge-light: 0 1px 2px rgba(11, 15, 25, 0.04), 0 16px 40px -28px rgba(11, 15, 25, 0.22);
+    --tag-bg: rgba(11, 15, 25, 0.04);
+    --tag-text: #4b5563;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a0a0e;
+      --bg-soft: #111116;
+      --nav-bg: rgba(10, 10, 14, 0.62);
+      --card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+      --card-soft-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+      --border: rgba(255, 255, 255, 0.09);
+      --border-soft: rgba(255, 255, 255, 0.06);
+      --text: #f5f5f7;
+      --text-2: #a5a8b4;
+      --text-3: #6e717d;
+      --violet: #818cf8;
+      --violet-bg: rgba(99, 102, 241, 0.08);
+      --violet-border: rgba(129, 140, 248, 0.28);
+      --violet-2: #22d3ee;
+      --h-grad: linear-gradient(180deg, #ffffff 20%, #a7aab6);
+      --edge-light: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      --tag-bg: rgba(255, 255, 255, 0.05);
+      --tag-text: #a5a8b4;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #0a0a0e; --bg-soft: #111116; --nav-bg: rgba(10, 10, 14, 0.62);
+    --card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    --card-soft-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+    --border: rgba(255, 255, 255, 0.09); --border-soft: rgba(255, 255, 255, 0.06);
+    --text: #f5f5f7; --text-2: #a5a8b4; --text-3: #6e717d;
+    --violet: #818cf8; --violet-bg: rgba(99, 102, 241, 0.08); --violet-border: rgba(129, 140, 248, 0.28);
+    --violet-2: #22d3ee; --h-grad: linear-gradient(180deg, #ffffff 20%, #a7aab6);
+    --edge-light: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --tag-bg: rgba(255, 255, 255, 0.05); --tag-text: #a5a8b4;
+  }
+  :root[data-theme='light'] {
+    --bg: #f3f4f8; --bg-soft: #e9ebf2; --nav-bg: rgba(243, 244, 248, 0.78);
+    --card-bg: #ffffff; --card-soft-bg: #fbfbfd;
+    --border: #e1e4ec; --border-soft: #e8eaf1;
+    --text: #0b0f19; --text-2: #4b5563; --text-3: #878e9c;
+    --violet: #6d5ae0; --violet-bg: rgba(109, 90, 224, 0.06); --violet-border: rgba(109, 90, 224, 0.22);
+    --violet-2: #06b6d4; --h-grad: linear-gradient(180deg, #0b0f19, #3c4250);
+    --edge-light: 0 1px 2px rgba(11, 15, 25, 0.04), 0 16px 40px -28px rgba(11, 15, 25, 0.22);
+    --tag-bg: rgba(11, 15, 25, 0.04); --tag-text: #4b5563;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: ui-sans-serif, -apple-system, 'SF Pro Text', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+    line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  .mono { font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace; }
+
+  .nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(14px); background: var(--nav-bg); border-bottom: 1px solid var(--border-soft); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 62px; }
+  .wordmark { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.02em; font-size: 1.02rem; }
+  .wordmark span { color: var(--violet); }
+  .nav-links { display: flex; gap: 26px; font-size: 0.86rem; color: var(--text-2); }
+  .nav-links .active { color: var(--text); font-weight: 600; }
+
+  .page-head { padding: 60px 0 44px; }
+  .page-kicker {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: ui-monospace, monospace; font-size: 0.66rem; font-weight: 500;
+    letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px;
+  }
+  .page-kicker i { width: 6px; height: 6px; border-radius: 50%; background: var(--violet); }
+  .page-head h1 {
+    margin: 0; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+    font-size: clamp(2.2rem, 3.6vw, 3.1rem);
+    background: var(--h-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+    padding-bottom: 0.05em;
+  }
+  .page-head .sub { margin: 18px 0 0; max-width: 60ch; font-size: 0.96rem; line-height: 1.9; color: var(--text-2); }
+
+  /* ============ 卡片网格:结构不变(md:grid-cols-2),只重刷 UI ============ */
+  .proj-grid { display: grid; gap: 22px; grid-template-columns: 1fr; padding: 4px 0 72px; }
+  @media (min-width: 820px) { .proj-grid { grid-template-columns: 1fr 1fr; } }
+
+  .proj-card {
+    position: relative; overflow: hidden; display: flex; flex-direction: column; height: 100%;
+    border-radius: 16px; border: 1px solid var(--border); background: var(--card-soft-bg);
+    box-shadow: var(--edge-light); padding: 30px; transition: border-color 0.35s ease, transform 0.5s var(--ease);
+  }
+  .proj-card:hover { border-color: var(--violet-border); transform: translateY(-2px); }
+  .proj-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--violet), var(--violet-2)); opacity: 0.7;
+  }
+
+  .proj-domain {
+    display: block; margin-bottom: 16px;
+    font-family: ui-monospace, monospace; font-size: 0.68rem; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3);
+  }
+
+  .proj-card h3 { margin: 0 0 14px; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.015em; line-height: 1.4; }
+  .proj-card .desc { margin: 0; font-size: 0.9rem; line-height: 1.85; color: var(--text-2); }
+
+  .proj-facts { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-soft); display: flex; flex-direction: column; gap: 14px; }
+  .fact-label {
+    display: flex; align-items: center; gap: 8px;
+    font-family: ui-monospace, monospace; font-size: 0.64rem; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); margin-bottom: 6px;
+  }
+  .fact-label::before { content: ''; width: 3px; height: 12px; border-radius: 2px; background: var(--violet); }
+  .fact-text { margin: 0; font-size: 0.88rem; line-height: 1.8; color: var(--text-2); }
+
+  .proj-stack { margin-top: auto; padding-top: 22px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .proj-stack span {
+    font-family: ui-monospace, monospace; font-size: 0.7rem; color: var(--tag-text);
+    background: var(--tag-bg); border: 1px solid var(--border-soft); border-radius: 999px; padding: 5px 12px;
+  }
+</style>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <div class="wordmark">
+      <svg width="26" height="26" viewBox="0 0 48 48" aria-hidden="true">
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--violet)"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+        <circle cx="24" cy="24" r="4.5" fill="var(--violet)"/>
+        <ellipse cx="24" cy="24" rx="19" ry="8" transform="rotate(-26 24 24)" fill="none" stroke="url(#g1)" stroke-width="2" opacity="0.8"/>
+        <ellipse cx="24" cy="24" rx="19" ry="8" transform="rotate(46 24 24)" fill="none" stroke="url(#g1)" stroke-width="1.5" opacity="0.5"/>
+      </svg>
+      Syoka <span>Studio</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#">首页</a>
+      <a class="active" href="#">项目</a>
+      <a href="#">文章</a>
+      <a href="#">关于</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="page-head">
+    <span class="page-kicker"><i></i>Works</span>
+    <h1>项目</h1>
+    <p class="sub">一些产品实践、AI 基建、数据系统与工程模式的简要记录。</p>
+  </div>
+
+  <div class="proj-grid">
+    <article class="proj-card">
+              <span class="proj-domain">AIGC / 创意工作流</span>
+      <h3>AIGC 漫剧平台</h3>
+      <p class="desc">以画布方式组织漫剧创作流程，降低策划、素材组织、审核与协作门槛，支持组织级别使用。</p>
+      <div class="proj-facts">
+        <div>
+          <p class="fact-label">工作内容</p>
+          <p class="fact-text">梳理画布式创作流程、素材结构、角色边界，以及从草稿到审核的生产链路。</p>
+        </div>
+        <div>
+          <p class="fact-label">结果方向</p>
+          <p class="fact-text">把零散提示词式创作转成可管理、可复用的生产流程，更适合团队与持续内容生产。</p>
+        </div>
+      </div>
+      <div class="proj-stack"><span>AIGC</span><span>Canvas</span><span>Workflow</span><span>Review</span></div>
+    </article>
+
+    <article class="proj-card">
+              <span class="proj-domain">GEO / 舆情监控</span>
+      <h3>GEO 监控工具</h3>
+      <p class="desc">面向 AI 搜索与生成式回答场景，监控关键词曝光、回答倾向、舆情信号和品牌感知变化。</p>
+      <div class="proj-facts">
+        <div>
+          <p class="fact-label">工作内容</p>
+          <p class="fact-text">设计监控维度、采集路径、分析视图，以及面向预警和复盘的解读流程。</p>
+        </div>
+        <div>
+          <p class="fact-label">结果方向</p>
+          <p class="fact-text">把分散的外部信号转成可跟踪的趋势判断与响应材料。</p>
+        </div>
+      </div>
+      <div class="proj-stack"><span>GEO</span><span>Crawler</span><span>NLP</span><span>Dashboard</span></div>
+    </article>
+
+    <article class="proj-card">
+              <span class="proj-domain">数据基础设施</span>
+      <h3>数据平台</h3>
+      <p class="desc">覆盖数据采集、加工、建模、离线调度与 BI 分析链路的数据平台。</p>
+      <div class="proj-facts">
+        <div>
+          <p class="fact-label">工作内容</p>
+          <p class="fact-text">围绕采集接入、指标建模、任务调度、分析层设计与运行可观测性展开建设。</p>
+        </div>
+        <div>
+          <p class="fact-label">结果方向</p>
+          <p class="fact-text">为报表分析、业务洞察和后续 AI 决策链路提供可复用的数据底座。</p>
+        </div>
+      </div>
+      <div class="proj-stack"><span>ETL/ELT</span><span>OLAP</span><span>Scheduler</span><span>BI</span></div>
+    </article>
+
+    <article class="proj-card">
+              <span class="proj-domain">AI Agent / 企业流程</span>
+      <h3>企业级 Agent</h3>
+      <p class="desc">面向企业场景的 Agent 方向，连接知识、工具、权限、流程编排与评估闭环。</p>
+      <div class="proj-facts">
+        <div>
+          <p class="fact-label">工作内容</p>
+          <p class="fact-text">探索 Agent 边界、工具集成、检索路径、安全约束和流程执行模式。</p>
+        </div>
+        <div>
+          <p class="fact-label">结果方向</p>
+          <p class="fact-text">为 Agent 嵌入既有企业系统提供更稳妥的工程路径，不破坏权限和治理边界。</p>
+        </div>
+      </div>
+      <div class="proj-stack"><span>Agent</span><span>RAG</span><span>Tools</span><span>Evaluation</span></div>
+    </article>
+
+    <article class="proj-card">
+              <span class="proj-domain">AI 基建 / 平台生态</span>
+      <h3>B 端 AI 基建生态</h3>
+      <p class="desc">围绕模型接入、工具编排、工作流组件、评估体系与平台复用的 B 端 AI 基建方向。</p>
+      <div class="proj-facts">
+        <div>
+          <p class="fact-label">工作内容</p>
+          <p class="fact-text">梳理基础设施分层、可复用模块、集成边界，以及平台化能力模型。</p>
+        </div>
+        <div>
+          <p class="fact-label">结果方向</p>
+          <p class="fact-text">把 AI 能力从单点 demo 推向可复用基础设施，支撑多个产品场景持续接入。</p>
+        </div>
+      </div>
+      <div class="proj-stack"><span>LLM Gateway</span><span>MCP</span><span>Workflow</span><span>Platform</span></div>
+    </article>
+  </div>
+</div>
+
+<section style="border-top:1px solid var(--border); background:var(--bg-soft); padding:36px 0 56px;">
+  <div class="wrap">
+    <h2 style="font-size:0.76rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-3); margin:0 0 16px; font-weight:600;">设计说明 · 本区块不属于页面内容</h2>
+    <ol style="margin:0; padding-left:20px; max-width:76ch;">
+      <li style="font-size:0.85rem; color:var(--text-2); margin-bottom:10px;"><b style="color:var(--text)">不改结构:</b>卡片网格(md 两列)、每张卡内的信息层级(domain → 标题 → 简述 → 工作内容/结果方向 → 技术栈)全部保留,只重刷视觉,与 About/Notes 页同一 token 系统。</li>
+      <li style="font-size:0.85rem; color:var(--text-2); margin-bottom:10px;"><b style="color:var(--text)">status 字段已移除:</b>原数据里的 `status: active/planning/completed` 不再渲染,实现阶段直接从 `Project` 类型和各条目里删掉,不保留死字段。</li>
+      <li style="font-size:0.85rem; color:var(--text-2); margin-bottom:10px;"><b style="color:var(--text)">视觉语言:</b>标题加粗无衬线(800 字重),卡片顶部 2px 紫→青渐变细线,"工作内容""结果方向"前用 3px 竖色块替代原来的纯 uppercase 标签,技术栈标签换等宽字体 + 描边胶囊。hover 只做描边变色 + 卡片轻微上浮 2px,不做大幅位移。</li>
+      <li style="font-size:0.85rem; color:var(--text-2); margin-bottom:10px;"><b style="color:var(--text)">色彩纪律不变:</b>暗色靛蓝 #818cf8、浅色紫 #6d5ae0,与首页/About/Notes 一致。</li>
+    </ol>
+  </div>
+</section>
