@@ -1,0 +1,205 @@
+---
+title: 在 Claude Code 里,模型和 effort 挡位该怎么选
+date: '2026-07-19'
+tags: ['AI', 'Claude', 'Agent']
+draft: false
+summary: Claude Code 团队拆解模型选择和 effort 挡位这两个旋钮的机制差异：模型决定固定权重和能力上限，effort 决定 Claude 愿意投入多少工作。诊断失败时该问的不是"要不要调参数"，而是"它没知道，还是没使劲"。
+---
+
+<div className="not-prose my-10 overflow-hidden rounded-xl border border-amber-200/60 bg-gradient-to-br from-amber-50 via-white to-indigo-50 p-6 shadow-sm dark:border-amber-900/40 dark:from-amber-950/30 dark:via-gray-950 dark:to-indigo-950/20">
+  <div className="text-xs font-semibold tracking-[0.22em] text-amber-600 uppercase dark:text-amber-300">
+    Claude Code Notes
+  </div>
+  <h2 className="mt-3 text-2xl font-semibold tracking-tight text-gray-950 dark:text-white">
+    模型决定能力上限，effort 决定投入多少——这是两个独立的旋钮，别再混着调。
+  </h2>
+  <div className="mt-4 max-w-3xl text-sm leading-7 text-gray-700 dark:text-gray-300">
+    Claude Code 团队拆了拆"选模型"和"调
+    effort"背后到底发生了什么：模型换的是哪一组冻结权重在处理你的请求，effort 换的是 Claude
+    愿意读多少文件、跑多少验证、往前走多远才回来找你确认。失败时该问的诊断题只有一个：Claude
+    是没知道，还是没使劲。
+  </div>
+  <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium">
+    <span className="rounded-full bg-white/80 px-3 py-1 text-amber-700 ring-1 ring-amber-200 dark:bg-gray-900/70 dark:text-amber-200 dark:ring-amber-900">
+      原文：Choosing a Claude Model and Effort Level in Claude Code
+    </span>
+    <span className="rounded-full bg-white/80 px-3 py-1 text-indigo-700 ring-1 ring-indigo-200 dark:bg-gray-900/70 dark:text-indigo-200 dark:ring-indigo-900">
+      主题：模型与算力挡位选择
+    </span>
+    <span className="rounded-full bg-white/80 px-3 py-1 text-gray-700 ring-1 ring-gray-200 dark:bg-gray-900/70 dark:text-gray-200 dark:ring-gray-800">
+      类型：机制拆解
+    </span>
+  </div>
+</div>
+
+[Choosing a Claude Model and Effort Level in Claude Code](https://claude.com/blog/claude-model-and-effort-level-in-claude-code) · Lydia Hallie, Claude Code Team · 2026-07-07
+
+Claude Code 给你两个旋钮：模型和 effort。Fable 5 这样的大模型确实比 Sonnet 能力更强，但 effort 管的不只是"思考时间"这么简单——它决定的是 Claude 会读多少文件、做多少验证、把一个多步骤任务往前推多远才回来找你确认。effort 越高，Claude 在给出回复之前完成的动作就越多；effort 越低，Claude 更倾向于向你要更多上下文，而不是自己独立消耗 token 把事情搞清楚。
+
+<div className="not-prose my-10 grid gap-3 md:grid-cols-4">
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-amber-600 dark:text-amber-300">01</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">模型</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      决定一组固定权重，也就是能力上限。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-amber-600 dark:text-amber-300">02</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">effort</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      决定投入多少工作才算完成。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-amber-600 dark:text-amber-300">03</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">怎么选</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      常规任务用小模型，含糊复杂的用大模型。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-amber-600 dark:text-amber-300">04</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">怎么诊断</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      没知道换模型，没使劲调 effort。
+    </div>
+  </div>
+</div>
+
+# 模型选择实际在做什么
+
+你发出的一条消息，会和系统提示词、工具定义、CLAUDE.md、对话历史、你引用过的文件一起，被打包成一次 API 请求。这段文本先被切成 token——一套固定词表里的整数映射。模型要做的事，就是对词表里的每一个 token 都算一遍概率，预测下一个该出现的是谁。
+
+**每个模型的权重都是在训练阶段定型的，等到你真正发请求的时候，它们就是只读的。**你的 prompt 能左右这些权重预测下一个 token 的方向，但改变不了权重本身。
+
+如果某个库在训练时还不存在，它就不会出现在权重里。你可以把文档喂给 Claude，但那只对这一次请求有效——Claude 并不会因此"记住"这个库。Claude 一本正经地调用一个根本不存在的 API 时，不是查找失败，而是权重按训练时学到的模式，生成了一个"看起来很像那么回事"的 token。
+
+<div className="not-prose my-8 rounded-lg border border-gray-200 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-800 dark:border-gray-800 dark:bg-gray-900/70 dark:text-gray-200">
+  <div className="font-semibold">我的理解</div>
+  <div className="mt-2">
+    这其实就是 in-context learning 和"训练"的根本区别。很多人往对话里贴 API
+    文档、报链接，潜意识里以为
+    Claude"学会了"，但严格说这只是在这一次请求里往权重的预测方向上加了一把力，对话一结束就清零。RAG、工具调用、CLAUDE.md
+    这类"喂上下文"的手段，本质上都是给权重打个临时补丁，而不是真的往里面写东西。
+  </div>
+</div>
+
+换模型，换的是用哪一组冻结的权重来处理你的请求。模型每生成一个 token，就把它拼接回去，再重新算一遍下一个 token 的概率——一段 200 token 的回复，意味着权重被完整跑了 200 遍。模型这个设置决定的是谁来处理你的请求、每个输出 token 的单价是多少，但不决定到底会生成多少个 token。
+
+![输入 token 经过权重算出下一段最可能的 token；权重是训练后就锁死的只读数据](/static/images/claude-model-effort-level/image4.png)
+
+# effort 挡位实际在做什么
+
+Claude 生成的 token 大致分三类：思考（你在动作之前、动作之间看到的推理过程）、工具调用（像 Read、Edit 这样带参数的结构化指令块），以及给你的文字（计划、进度更新、总结）。三者都是同一个生成循环里普普通通的输出 token，计费方式也一样。思考产生的 token 会留在这一轮的上下文里，就跟 Claude 读过的一个文件一样，后面还用得上。
+
+![同一个循环，同样的单价，token 说的内容不一样而已](/static/images/claude-model-effort-level/image6.png)
+
+effort 挡位是作为请求的一部分传进去的。模型在训练时就被教过每个 effort 挡位对应什么行为，这些学到的行为被编码进了权重本身。effort 和你输入的 prompt 文本一样，是模型要响应的另一路输入——它决定的是 Claude 要做到多彻底，才能认定任务完成。**这一点在每一轮对话里都会被重新纳入考量，结果就是 Claude 会多生成一些 token，换取更有把握的答案。**
+
+原文举了个具体例子:同样是"修好这个跑不过的测试"，低 effort 大致是读测试文件、改一处、回一句"改好了 42 行"，总共约 400 token；高 effort 会把测试文件、源码、配置都读一遍，中间穿插思考，改完源码再跑一遍测试、回头验证，最后回一句"环境变量没加载，已修好，测试通过"，约 2800 token——差不多是低 effort 的 7 倍。多出来的 token 大多花在多读的文件和跑测试、复核这些步骤上，不是更长的答案本身。
+
+![同一个任务，两档 effort：低 effort 约 400 token，高 effort 约 2800 token，差距主要在多读的文件和跑测试、复核这些步骤上](/static/images/claude-model-effort-level/image7.png)
+
+effort 越高，Claude 越倾向于一开始就给出详细计划。随着执行结果不断返回，Claude 会在过程中修订这份计划、更新它对进度和把握程度的判断——如果第一步就已经把 bug 揪出来了，原计划里剩下的排查步骤就没必要再走一遍。Claude 会明确说出这一点然后跳过，你在 Claude Code 里看到它中途改写任务清单，原因就在这里。
+
+effort 越高，Claude 越倾向于反复核对，但它不会为了简单任务故意刷 token 撑场面——训练团队专门盯着"过度思考"这件事，因为它会拖累效果，而不是提升效果。
+
+# 怎么挑 effort 挡位
+
+多数情况下，用模型的默认 effort 就够——默认挡位下，Claude 花的 token 大致对应大多数人处理同类任务会花的力气。把 effort 当成一个手动开关，只在你对"彻底"还是"快"有明确偏好、且这偏好来自你所在领域或工作类型时才去拨它，而不是每个任务都重新纠结一遍。
+
+文中提到，在用 Opus 4.8 做的测试里，同样的任务、同样的 token 量，默认 effort 挡位给出的结果比 Opus 4.7 的默认挡位更好。这类"内部测试显示新版本比旧版本更好"的说法，原文没有给出评测方法、样本量或者具体指标，读的时候不妨当成厂商自己的定性观察，而不是一个可复现的 benchmark。
+
+# Claude 做错了，该调哪一个
+
+![Claude 做错了之后的判断树：跳过文件/没跑测试/半途而废,该提高 effort;读了所有东西、确实尝试过还是错,该换模型;两者都不是,该修的是上下文、CLAUDE.md 或任务范围](/static/images/claude-model-effort-level/image8.png)
+
+先看你给的上下文——你的 prompt 是不是太含糊？Claude 有没有接到该有的工具和 skill？很多时候，看起来"该调高 effort"的任务其实压根不需要调 effort，真正该修的是上游：prompt、CLAUDE.md，或者任务的范围。
+
+假设上下文已经给够了，Claude 还是做错了，这时候该问的是：它是没使劲儿，还是没那个能耐？
+
+遇到真正棘手的问题——隐蔽的 bug、陌生的领域、架构层面的取舍——选更大的模型。碰到含糊不清的情况，大模型更擅长；具体、明确的执行指令，小模型也能做得很好。不管你给多少上下文，小模型在这类问题上都可能"自信地犯错"，大模型在这一点上更可靠。常规工作——描述清楚的改动、机械式的修改、上下文里已经有答案的代码问题——用小模型就好，没必要为用不上的能力多付钱。
+
+**如果 Claude 已经拿到了所有相关上下文，也确实认真尝试过，结果还是错的，那就是该换更大模型的信号。**如果你一直在用大模型做这类常规任务，降级到小模型通常不会掉质量，反而更快、更省。
+
+反过来，如果 Claude 是因为跳过了该读的文件、没跑测试、没有反复核对而搞砸的，该调的是 effort。这一条在你把 effort 手动调低于模型默认值时尤其管用。
+
+# Fable、Opus、Sonnet：专家、行家与通才
+
+把 Fable 想象成见过其他人少见问题的专家，Opus 是行家，Sonnet 是出色的通才。effort 挡位决定的是每一个"人"愿意在你的任务上花多少时间。
+
+Opus 配低 effort，像是找一个见多识广的行家聊五分钟：他能带来你在代码库里找不到的模式识别和经验教训，但时间有限，读得快而不细。Sonnet 配高 effort，像是请一个真正出色的通才用一整个下午：他会把所有东西都读一遍、跑一遍，彻底搞懂你这份代码具体是怎么回事，只是缺一点"这个我以前见过"的直觉。Fable 哪怕只给低 effort，也像专家扫一眼别人都卡住的问题，看出别人看不出来的地方——你为这份识别力付的钱最贵，所以留着用在真正需要它的地方。
+
+没有哪个组合是全能通吃的。模型选择代表能力上限，effort 代表投入的彻底程度。真实世界里的大多数任务，两者都需要。
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-indigo-500 bg-indigo-50 px-5 py-4 text-sm leading-7 text-indigo-950 dark:bg-indigo-950/30 dark:text-indigo-100">
+  <strong>一个不完全贴切的类比：</strong>
+  "专家一眼看出别人看不出的东西"，和机器学习圈里长期存在的一个张力有点像——Rich Sutton
+  的《苦涩的教训》讲的是通用的、靠算力堆出来的方法长期会赢过针对具体问题手工调校的方法。这里的说法某种意义上是反过来的：Fable
+  之所以强，恰恰是因为它见过的问题分布本身更广、更深，而不是因为它是针对窄领域手工调校出来的模型。真正对应"专才"的类比其实没那么精确，更接近"经验值更高的通才"。
+</div>
+
+# effort、模型与 token 消耗
+
+两者怎么互相作用，取决于任务本身。常规工作，同一个 effort 挡位下，大小模型基本都能做成，曲线很快就会重合。大模型会多花一些 token 用在额外的核对上，而且它每个 token 单价更贵。常规工作降级到小模型，是实打实省钱，而且不掉质量。
+
+![简单任务上，大小模型的质量曲线几乎立刻就重合了；过了那个点，多花的 token 买的是反复核对，不是更高的质量](/static/images/claude-model-effort-level/image9.png)
+
+更难、需要多步骤的工作，情况就反过来了。小模型会在自己能力的边界上反复打转，消耗大量迭代次数才勉强够到目标；大模型用更少的步骤就能达到同样的质量。**大模型每个 token 更贵，但把这类会把小模型逼到极限的工作做完，总花费反而可能更低。更重要的是，有些任务不管把 effort 调多高，小模型都做不出来，只有大模型能做到。**这一点在 Fable 身上体现得最明显：做长链条、多步骤的工作时，它把优势拉得最开——测试里，Fable 完成了 Opus 和 Sonnet 在任何 effort 挡位下都够不到的任务。它每个 token 的单价也最贵，这也是为什么该把它留给真正需要的工作。
+
+![模型决定曲线本身，effort 决定 Claude 愿意往右走多远；同样的质量，大模型能用更少的 token 换到](/static/images/claude-model-effort-level/image10.png)
+
+effort 挡位决定的是 Claude 愿意在这条曲线上走多远，是一种"花钱的倾向"，不是一个固定的 token 目标——同一档 effort，落在曲线上的具体位置会随任务难度浮动，不代表完成任务真的需要走这么远。还有一个细节：effort 影响 token 消耗，但不限制它。唯一硬性的上限是 max_tokens，一旦触顶，回复会被从中截断——这是个很粗暴的控制，主要是 API 开发者才用得上。像"给任务设个预算"，或者在 prompt 里直接说"简洁点"这种软性约束效果更好，模型被训练成把这类要求当成方向去遵循，而不是撞墙才停。
+
+<div className="not-prose my-8 rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-100">
+  <div className="font-semibold">这套设计不是 Claude Code 独有的。</div>
+  <div className="mt-2">
+    OpenAI o 系列模型的 reasoning_effort 参数、Claude API 本身的 extended thinking
+    budget，走的都是同一条路：把"模型想多久、做多少验证"做成一个显式可调的旋钮，而不是完全交给模型自己判断。区别在于
+    Claude Code
+    这里把它和"读文件、跑工具、多轮核对"这些动作也绑在了一起，而不只是内部推理的长度。顺带一提，上面两张曲线图原文自己也标了"仅作示意，不是从
+    benchmark 数据里画出来的"——和前面 Opus 4.8 那条测试结论一样，是定性说法，不是可复现的量化结果。
+  </div>
+</div>
+
+# 动手前先问自己两个问题
+
+<div className="not-prose my-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950">
+  <div className="text-sm font-semibold text-gray-950 dark:text-white">调参前自查清单</div>
+  <div className="mt-4 space-y-3 text-sm leading-6 text-gray-700 dark:text-gray-300">
+    <label className="flex gap-3">
+      <input type="checkbox" disabled className="mt-1 h-4 w-4 rounded border-gray-300" />
+      <span>Claude 该拿到的上下文、工具和 skill，是不是都给全了？</span>
+    </label>
+    <label className="flex gap-3">
+      <input type="checkbox" disabled className="mt-1 h-4 w-4 rounded border-gray-300" />
+      <span>上下文给够、也确实认真尝试之后还错——这是"没知道"，该换更大模型。</span>
+    </label>
+    <label className="flex gap-3">
+      <input type="checkbox" disabled className="mt-1 h-4 w-4 rounded border-gray-300" />
+      <span>跳过了该读的文件、没跑测试、没反复核对——这是"没使劲"，该调高 effort。</span>
+    </label>
+    <label className="flex gap-3">
+      <input type="checkbox" disabled className="mt-1 h-4 w-4 rounded border-gray-300" />
+      <span>常规、描述清楚的活，先问能不能降级到更便宜的模型或默认 effort。</span>
+    </label>
+  </div>
+</div>
+
+大多数时候，这两个设置你根本不用去想。结果不理想的时候，先问一句：Claude 是不知道，还是没使劲儿？根据答案再调整。
+
+---
+
+# 后记
+
+这篇文章最有意思的地方，不是关于 Claude Code 具体怎么用，而是把"模型"和"投入"这两件长期被混在一起的事情干脆利落地拆开了。以前谈"要不要用更贵的模型"，默认的潜台词往往是"要不要让它想久一点、多做一点"；这篇把这两个维度做成了两个独立的旋钮，逼着你去想清楚：你缺的到底是能力，还是耐心。放到别的 agent 产品或者自己搭的 agent loop 上，这套诊断框架——"没知道"还是"没使劲"——基本可以直接搬过去用，不需要围着 Claude Code 这个具体产品打转。
+
+也要记住这是厂商自己的博客：Fable"完成了 Opus 和 Sonnet 在任何 effort 下都够不到的任务"、Opus 4.8 默认挡位"同 token 量下比 4.7 更好"，这两个关键论据都只是一句断言，没有给出测试集、样本量或对照方法，没法复核，看方向就好，别当成有严格测量支撑的结论。
+
+# 参考资料
+
+- [Choosing a Claude Model and Effort Level in Claude Code](https://claude.com/blog/claude-model-and-effort-level-in-claude-code) — 原文
+- [Reasoning models - OpenAI API](https://platform.openai.com/docs/guides/reasoning) — reasoning_effort 参数，同类设计的另一个实现
+- [Extended thinking - Claude Docs](https://docs.claude.com/en/docs/build-with-claude/extended-thinking) — Claude API 里对应的 thinking budget 机制
+- [The Bitter Lesson](http://www.incompleteideas.net/IncIdeas/BitterLesson.html) — Rich Sutton，"专才 vs 通才"张力的经典参照

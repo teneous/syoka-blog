@@ -1,0 +1,253 @@
+---
+title: Loop engineering 入门：怎么给 Claude Code 设计一个 loop
+date: '2026-07-19'
+tags: ['AI', 'Claude', 'Agent']
+draft: false
+summary: Claude Code 团队给"loop"下了一个明确定义——agent 反复干活直到满足某个停止条件——并按触发方式和停止条件拆出四种 loop：手动的、有目标的、定时的、主动的。附带怎么维持代码质量、怎么控制 token 花费的具体做法。
+---
+
+<div className="not-prose my-10 overflow-hidden rounded-xl border border-teal-200/60 bg-gradient-to-br from-teal-50 via-white to-violet-50 p-6 shadow-sm dark:border-teal-900/40 dark:from-teal-950/30 dark:via-gray-950 dark:to-violet-950/20">
+  <div className="text-xs font-semibold tracking-[0.22em] text-teal-600 uppercase dark:text-teal-300">
+    Claude Code Notes
+  </div>
+  <h2 className="mt-3 text-2xl font-semibold tracking-tight text-gray-950 dark:text-white">
+    loop 就是 agent 反复干活，直到满足某个停止条件——不同的触发方式和停止条件，决定了该用哪种 loop。
+  </h2>
+  <div className="mt-4 max-w-3xl text-sm leading-7 text-gray-700 dark:text-gray-300">
+    X 上关于"loop engineering"的说法很多，但都没把"loop 到底是什么"讲清楚。Claude Code
+    团队按触发方式、停止条件、适用场景把它拆成四类：手动的 turn-based、带目标的 goal-based、定时的
+    time-based，以及不需要人在场的 proactive
+    loop。选错类型，要么白白耗人力盯着，要么在你没注意的时候把 token 烧没了。
+  </div>
+  <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium">
+    <span className="rounded-full bg-white/80 px-3 py-1 text-teal-700 ring-1 ring-teal-200 dark:bg-gray-900/70 dark:text-teal-200 dark:ring-teal-900">
+      原文：Loop Engineering: Getting Started with Loops
+    </span>
+    <span className="rounded-full bg-white/80 px-3 py-1 text-violet-700 ring-1 ring-violet-200 dark:bg-gray-900/70 dark:text-violet-200 dark:ring-violet-900">
+      主题：agent loop 设计
+    </span>
+    <span className="rounded-full bg-white/80 px-3 py-1 text-gray-700 ring-1 ring-gray-200 dark:bg-gray-900/70 dark:text-gray-200 dark:ring-gray-800">
+      类型：实践指南
+    </span>
+  </div>
+</div>
+
+[Loop Engineering: Getting Started with Loops](https://claude.com/blog/getting-started-with-loops) · Delba de Oliveira, Michael Segner · 2026-06-30
+
+X 上关于"loop engineering"或者"设计 loop 而不是写 prompt"的讨论很多，但你要是想搞清楚 loop 到底是什么，会发现每个人给的答案都不太一样。Claude Code 团队给了一个明确定义：**loop 就是 agent 反复干一轮又一轮的活，直到满足某个停止条件。**他们按四个维度给 loop 分类：怎么被触发、怎么停下来、用 Claude Code 的哪个原语实现、最适合哪类任务。不是所有任务都需要复杂的 loop——先从最简单的方案开始,这几种模式挑着用就行。
+
+<div className="not-prose my-10 grid gap-3 md:grid-cols-4">
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-teal-600 dark:text-teal-300">01</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">Turn-based</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      你发一句 prompt，人来判断做得够不够。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-teal-600 dark:text-teal-300">02</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">Goal-based</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      /goal 定好"完成"是什么样。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-teal-600 dark:text-teal-300">03</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">Time-based</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      /loop、/schedule 按间隔触发。
+    </div>
+  </div>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+    <div className="text-xs font-semibold text-teal-600 dark:text-teal-300">04</div>
+    <div className="mt-2 text-sm font-medium text-gray-950 dark:text-white">Proactive</div>
+    <div className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-400">
+      事件或排期触发，人不在场。
+    </div>
+  </div>
+</div>
+
+# Turn-based loop：最基本的那种
+
+- **触发方式**：一条用户 prompt
+- **停止条件**：Claude 自己判断任务做完了、需要更多上下文，或者 effort 预算用完了
+- **适合**：不属于固定流程或排期的短任务
+- **怎么控制花费**：把 prompt 写具体，用 skill 强化验证步骤，减少来回轮数
+
+你发的每一条 prompt，都会启动一个由你主导每一轮的手动 loop。Claude 收集上下文、动手做、检查自己的成果，需要就重复一遍，然后回复你。这就是所谓的 agentic loop。
+
+![收集上下文、动手做、验证成果，循环往复，直到 Claude 判断任务完成，或者 effort 预算用完](/static/images/loop-engineering-getting-started/image1.png)
+
+比如你让 Claude 做一个点赞按钮：它读你的代码、改代码、跑测试，然后交回来一个它*相信*能用的东西。接下来是你手动检查，再写下一句 prompt。
+
+你可以把手动检查的步骤写成一份 SKILL.md，让 Claude 自己把这套验证从头跑到尾，覆盖更多它本该检查却没检查的地方。这份 skill 应该带上能让 Claude _看到_、*测量*或者*操作*结果的工具或连接器——检查项越量化，Claude 自我验证起来就越容易。比如：
+
+```
+---
+name: verify-frontend-change
+description: Verify any UI change end-to-end before declaring it done.
+---
+
+# Verifying frontend changes
+Never report a UI change as complete based on a successful edit alone. Verify it the way a human reviewer would:
+
+1. Start the dev server and open the edited page in the browser.
+
+2. Interact with the change directly. For a new control (button, input, toggle): click it, confirm the expected state change, and screenshot before/after.
+
+3. Check the browser console: zero new errors or warnings.
+
+4. Use the Chrome Devtools MCP, run a performance trace and audit Core Web Vitals.
+
+If any step fails, fix the issue and rerun from step 1 — do not hand back partially verified work.
+```
+
+# Goal-based loop：用 /goal 定义"完成"
+
+- **触发方式**：你实时手动发一条 prompt
+- **停止条件**：达成目标，或者到了你设的最大轮数
+- **适合**：有明确验收标准的任务
+- **怎么控制花费**：定具体的完成标准，明确轮数上限，比如"最多试 5 次"
+
+有些任务一轮搞不定，尤其是复杂一点的。让 agent 能反复迭代，效果通常更好。用 `/goal` 定义"完成"长什么样，就能延长 Claude 持续迭代的时间。
+
+**你把成功标准定清楚之后，Claude 就不用自己判断"这样算不算差不多了"然后提前收工。**每次 Claude 想停下来，都会有一个评估模型去核对你设的条件，不满足就打回去继续干，直到达标或者到了你定的轮数上限。这也是为什么可测量的硬性标准——比如测试通过数、某个分数门槛——效果特别好：
+
+```
+/goal get the homepage Lighthouse score to 90 or above, stop after 5 tries.
+```
+
+![Claude 干活，评估模型核对你设的条件——没达标就打回去继续干，达标或者到轮数上限才让 loop 结束](/static/images/loop-engineering-getting-started/image2.png)
+
+<div className="not-prose my-8 rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-100">
+  <div className="font-semibold">分数会被"打上去"，不代表问题被解决了。</div>
+  <div className="mt-2">
+    把单一数字当停止条件，最怕的是 Goodhart 定律那种效应：一旦分数本身成了目标，agent
+    找到的最短路径不一定是你想要的那条。Lighthouse
+    分数可以靠删图片、砍字体、关掉某些无障碍特性刷上去，测试通过数也可以靠改测试本身而不是改实现来凑。deterministic
+    criteria
+    确实好用，但最好搭配一条兜底的人工抽查，或者让完成标准本身尽量贴近你真正在意的结果，而不是一个容易被绕过的代理指标。
+  </div>
+</div>
+
+# Time-based loop：用 /loop 和 /schedule 定时触发
+
+- **触发方式**：设定的时间间隔
+- **停止条件**：你手动取消，或者工作本身完成了（比如 PR 合并了、队列清空了）
+- **适合**：周期性重复的工作，或者需要跟外部系统打交道
+- **怎么控制花费**：间隔拉长一点，或者改成按事件触发而不是按时间触发
+
+有些 agent 工作是周期性的：任务本身不变，变的只是输入，比如每天早上总结一遍 Slack 消息。还有些工作依赖外部系统，最简单的对接方式就是按固定间隔去检查一次，根据变化做出反应——比如一个可能随时收到 code review 或者 CI 跑失败的 PR。
+
+对付这类场景，可以用 `/loop` 触发 Claude 按间隔重跑一条 prompt：
+
+```
+/loop 5m check my PR, address review comments, and fix failing CI
+```
+
+`/loop` 跑在你自己的电脑上，你把它关了它就停了。想让这个 loop 挪到云端常驻，用 `/schedule` 建一个 routine。
+
+# Proactive loop：不需要人在场的循环
+
+- **触发方式**：一个事件或者一份排期，全程没有人实时在场
+- **停止条件**：每个具体任务在目标达成时退出；整条 routine 会一直跑，直到你把它关掉
+- **适合**：持续不断、定义清楚的重复性工作——bug 报告、issue 分诊、迁移、依赖升级之类
+- **怎么控制花费**：日常工作路由给更小更快的模型，只有需要判断力的地方才用最强的模型
+
+前面几种原语，加上 auto mode、dynamic workflows（研究预览阶段）这些 Claude Code 功能，可以组合成一个能长时间运行的 loop。比如处理用户反馈，你可以这样拼：
+
+1. 用 `/schedule`（研究预览阶段）跑一个 routine，定期检查有没有新的反馈
+2. 用 `/goal` 定义"处理完了"是什么样，用 skills 记录怎么验证
+3. 用 dynamic workflows 编排多个 agent：分诊每条反馈、修复、review 修复结果
+4. 用 auto mode，让整条 routine 不用停下来问权限
+
+拼起来大概长这样：
+
+```
+/schedule every hour: check #project-feedback for bug reports. /goal: don't stop until every report found this run is triaged, actioned, and responded to. When fixing a bug, use a workflow to explore three solutions in parallel worktrees and have a judge adversarially review them.
+```
+
+另一种常见搭法是围着 bug 报告转的一整条流水线：`/schedule` 常驻盯着 Slack 或 GitHub 上的 bug 报告，主 agent 拿到之后自己反复迭代，直到验证 skill 判定通过，再开一个 PR；另一个 agent 负责 review 这个 PR，review 完通知你。**人没有被排除在外，只是往后挪到了流水线的最后一环：决定合不合并。**routine 本身一直跑，你在不在电脑前都一样。
+
+![整条 routine 常驻云端：/schedule 盯反馈来源，主 agent 循环直到验证通过，开 PR，第二个 agent review 后通知你，最后由你决定要不要合并](/static/images/loop-engineering-getting-started/image3.png)
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-violet-500 bg-violet-50 px-5 py-4 text-sm leading-7 text-violet-950 dark:bg-violet-950/30 dark:text-violet-100">
+  <strong>这一步的代价被文章一笔带过了。</strong>
+  turn-based loop 出错，最坏结果是你多改一次 prompt；proactive loop 是 auto mode + 定时触发 +
+  能自己拉起多个 agent 的组合，出错的代价是它在你没看着的时候，对着 Slack、代码库、CI
+  这些真实系统连续动作好几个小时。上线前至少要有审计日志、明确的权限边界，以及"出问题能立刻叫停"的开关——这些不是加分项，是把
+  auto mode 用在无人值守场景下的前提条件。
+</div>
+
+# 怎么维护代码质量
+
+**loop 产出的质量，取决于它周围的系统，而不只是 loop 本身设计得好不好。**设计这套系统时要注意：
+
+- **让代码库本身保持干净**：Claude 会顺着代码库里已有的模式和约定走
+- **给 Claude 一种验证自己成果的办法**：用 skill 把"什么叫做得好"写下来
+- **让文档触手可及**：框架和库的文档要跟得上最新的最佳实践
+- **用另一个 agent 做 code review**：一个带着新鲜上下文的 reviewer，不会被主 agent 自己的推理过程带偏。可以用内置的 `/code-review` skill，或者 Code Review for GitHub
+
+某一次结果不达标的时候，不要只顾着把这一个问题修掉——尽量把这次教训编码进系统里，让以后每一轮迭代都受益。
+
+<div className="not-prose my-8 rounded-lg border border-gray-200 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-800 dark:border-gray-800 dark:bg-gray-900/70 dark:text-gray-200">
+  <div className="font-semibold">我的理解</div>
+  <div className="mt-2">
+    "reviewer 带着新鲜上下文所以更客观"这句话有个隐藏前提：如果干活的 agent 和 review 的 agent
+    用的是同一个基座模型，两者共享的是训练带来的系统性盲区，而不只是这一轮对话里的推理偏见。它能抓住主
+    agent 图省事漏掉的粗心错误，但对模型本身"不知道自己不知道"的那类系统性偏差，检出率没法保证。这和
+    Anthropic 另一篇讲人机团队的文章里提到的 Doer-Verifier 结构是同一个局限。
+  </div>
+</div>
+
+# 怎么控制 token 花费
+
+要控制 token 花费，loop 得有清楚的边界：
+
+- **给任务挑对原语和模型**：小任务不需要多 agent、也不需要复杂 loop；有些活用更便宜、更快的模型就够
+- **定清楚成功和停止的标准**：把"完成"描述得足够具体，Claude 才能更快收敛到答案（但也别定得太窄，早早收工反而不到位）
+- **大规模跑之前先小范围试**：dynamic workflows 一次能拉起几百个 agent，先在一小片任务上摸清用量再铺开
+- **确定性的活交给脚本**：跑一段脚本比让 Claude 每次都重新推理一遍步骤便宜。比如一个处理 PDF 的 skill，可以直接带上一段填表脚本，让 Claude 每次调用它，而不是每次都重新推导一遍怎么填
+- **routine 别跑得比需要的更勤**：检查间隔要匹配你盯的那个东西实际变化的速度
+- **盯着用量**：`/usage` 能按 skill、subagent、MCP 拆解最近的用量；不带参数的 `/goal` 会显示目前已经跑了多少轮、花了多少 token；`/workflows` 能看到每个 agent 的 token 用量，随时可以叫停某个 agent
+
+**模型和 effort 挡位怎么选，是决定一个 loop 到底花多少钱的最大杠杆之一。**
+
+<div className="not-prose my-8 rounded-lg border border-gray-200 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-800 dark:border-gray-800 dark:bg-gray-900/70 dark:text-gray-200">
+  <div className="font-semibold">这句话和另一篇的结论是同一件事。</div>
+  <div className="mt-2">
+    Claude Code 团队另一篇讲怎么选模型和 effort
+    挡位的文章里，把这两个维度拆得很清楚：模型决定能力上限，effort 决定投入多少工作才算完成。放在
+    loop 的语境下重新看一遍这个框架会更实用——proactive loop 里，日常分诊、机械修复交给小模型、低
+    effort；真正需要判断力的那一步（比如判断某个方案能不能上线）留给大模型、高 effort。loop
+    的边界管的是"跑不跑""跑多久"，模型和 effort 管的是"每一步花多少"，两层杠杆叠在一起才是真实成本。
+  </div>
+</div>
+
+# 一张表总结四种 loop
+
+| Loop       | 你交出去的是 | 什么时候用                     | 用什么实现                       |
+| ---------- | ------------ | ------------------------------ | -------------------------------- |
+| Turn-based | 检查这一步   | 你还在探索、还在做决定         | 自定义验证 skill                 |
+| Goal-based | 停止条件     | 你已经知道"完成"长什么样       | `/goal`                          |
+| Time-based | 触发时机     | 活儿发生在你项目之外，按排期来 | `/loop`、`/schedule`             |
+| Proactive  | 整条 prompt  | 工作持续不断而且定义清楚       | 以上全部，加上 dynamic workflows |
+
+# 怎么上手
+
+想开始用 loop，先看看你手头已经在做的工作：挑一件你自己是瓶颈的任务，问自己能不能把其中一块交出去——验证步骤你写得出来吗？"完成"的标准够不够清楚？这件事是不是按排期发生的？
+
+想清楚之后，把 loop 跑起来，观察它在哪儿卡住、在哪儿又管得太宽，然后大胆去迭代它。
+
+---
+
+# 后记
+
+这篇文章最有价值的地方不是四种 loop 的分类本身——那更像是给已经在做的事情起了个名字——而是"停止条件"这个视角。以前谈 agent 自动化，大家默认关心的是"能不能自动跑起来"；这篇把重点放在"它怎么知道该停了"，这其实是风险和成本真正的开关：turn-based 靠人判断，goal-based 靠一个可测量的条件，time-based 靠外部事件，proactive 干脆把这个判断也交给了系统本身。停止条件越往后一种走，效率越高，但出错时的兜底也越依赖你在系统设计阶段就想清楚的东西，而不是运行时能补救的东西。
+
+也要留意这篇同样是厂商博客：`/goal`、`/schedule`、dynamic workflows 这些具体命令和研究预览功能，只在 Claude Code 里存在，读的时候可以把"四种 loop"这个分类框架带走，但别默认自己手头的工具链已经有对应实现。
+
+# 参考资料
+
+- [Loop Engineering: Getting Started with Loops](https://claude.com/blog/getting-started-with-loops) — 原文
+- [在 Claude Code 里，模型和 effort 挡位该怎么选](/blog/26/claude-model-effort-level) — 站内相关：token 花费的另一半杠杆
