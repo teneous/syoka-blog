@@ -5,6 +5,7 @@ import { useLanguage } from '@/components/common/useLanguage'
 const navLabels: Record<string, { en: string; zh: string }> = {
   Home: { en: 'Home', zh: '首页' },
   Works: { en: 'Works', zh: '项目' },
+  Invest: { en: 'Invest', zh: '投资产品' },
   Notes: { en: 'Notes', zh: '笔记' },
   About: { en: 'About', zh: '关于' },
 }

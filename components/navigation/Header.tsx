@@ -6,6 +6,7 @@ import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import LanguageToggle from './LanguageToggle'
 import LocalizedNavTitle from './LocalizedNavTitle'
+import NavLinkContent from './NavLinkContent'
 import PhotonMark from './PhotonMark'
 
 const Header = () => {
@@ -41,7 +42,9 @@ const Header = () => {
                     href={link.href}
                     className="text-sm font-medium text-gray-700 transition-colors duration-200 hover:text-violet-600 dark:text-gray-300 dark:hover:text-violet-400"
                   >
-                    <LocalizedNavTitle title={link.title} />
+                    <NavLinkContent badge={link.badge}>
+                      <LocalizedNavTitle title={link.title} />
+                    </NavLinkContent>
                   </Link>
                 ))}
             </nav>
