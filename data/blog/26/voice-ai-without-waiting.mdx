@@ -1,0 +1,45 @@
+---
+title: '语音 AI 在查资料时，为什么不该让对话停下来'
+date: '2026-09-12'
+tags: ['AI', 'OpenAI', '语音交互', '工程']
+draft: true
+summary: '读 OpenAI 的实时语音工程文章：把持续对话和后台工作分开之后，还要处理等待、打断，以及已经过时的结果。'
+---
+
+[How we built a realtime system for responsive voice AI in six months](https://openai.com/index/continuous-voice-interaction-with-gpt-live/) · Justin Uberti、Zahan Malkani / OpenAI · 2026-08-03
+
+<p className="text-sm text-gray-500 dark:text-gray-400">
+  中文选读 · 红字是原文重点，黄底是我的想法
+</p>
+
+OpenAI 介绍了 GPT-Live 的实时语音架构：模型可以同时听和说，需要深入推理或调用工具时，把工作交到后台。<strong className="text-red-700 dark:text-red-400">工具返回得慢，不应该让声音也停下来。</strong>长对话需要压缩上下文时，系统先准备好接替的模型实例，再切换过去，尽量保持通话连续。
+
+## 等待的这几秒，用户还能做什么
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    我更在意的，是后台工作没有完成时，用户还能不能继续改变主意。假设我正在让语音助手比较两款产品，说到一半又想起来，预算要降一点。它如果只能等第一轮搜索结束再听下一句话，这几秒就只能干等；它如果一直能听，新的预算就能及时进入任务。
+  </p>
+  <p className="mt-4">
+    但能接着说话，也可能掩盖后台根本没有进展的问题。一直回答“我正在查”，并没有让等待更有用。如果由我来设计这个过程，我会让助手简短说明正在等什么，同时允许用户补条件、换方向或取消。已经知道的内容可以先说；还没查到的，不能拿一段流畅的话补上。
+  </p>
+</div>
+
+## 对话往前走了，旧结果怎么办
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    接着上面的例子：第一次搜索用的是旧预算，第二次用的是新预算。如果第一批结果反而更晚回来，助手该采用哪一批？我会给每次查询记下它对应的条件，收到结果后先对照当前问题。已经不适用的结果可以留作记录，但不该突然插进正在进行的对话里。
+  </p>
+  <p className="mt-4">
+    这也是我想实际验证的地方。只测“多久开始出声”，很容易把一句没有内容的回应也算作快。我会另外记录：多久拿到第一条有用的信息、用户补充条件后有没有生效、取消后还有没有继续做事。测试时故意让工具变慢，再连续改两次条件，比只看一段顺畅的演示更能说明问题。
+  </p>
+</div>
+
+## 我会先做一个小实验
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    先选一个只查信息、不替人下单的场景，把“说话”和“等工具结果”分开。让用户在查询中途纠正一个条件，再观察助手能否自然地接住，并且只使用仍然有效的结果。这个实验通过之后，再考虑加入会改变外部系统的操作。对我来说，值得追求的体验是：事情还没办完，但人始终知道进展，也随时能把方向改过来。
+  </p>
+</div>

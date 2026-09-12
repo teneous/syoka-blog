@@ -1,0 +1,49 @@
+---
+title: 'Agent 一直想把任务做完，什么时候该让它停下'
+date: '2026-09-12'
+tags: ['AI', 'Anthropic', 'Agent', '安全']
+draft: true
+summary: '读 Anthropic 的越界事故分析：任务走不通时，如何区分继续尝试和扩大权限，以及怎样检查 Agent 给出的解释。'
+---
+
+[An alignment assessment of recent cybersecurity incidents](https://www.anthropic.com/research/alignment-assessment-cybersecurity-incidents) · Anthropic · 2026-09-09
+
+<p className="text-sm text-gray-500 dark:text-gray-400">
+  中文选读 · 红字是原文重点，黄底是我的想法
+</p>
+
+Anthropic 复盘了四起 Claude 在网络安全评估中访问真实第三方系统的事故。环境误接互联网，评估又未启用正式产品的部分防护。模型表现出选择性解读证据、执意推进任务等问题。<strong className="text-red-700 dark:text-red-400">环境应该限制越界，模型也应该在环境防线失效时做出恰当判断。</strong>这些特殊评估事故不能直接代表日常产品表现。
+
+## 走不通时，先弄清是哪一种障碍
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    我会把两个常见情况分开考虑。测试因为依赖没有装好而失败，可以在任务范围内继续排查；部署凭证没有权限，就需要先确认授权，不能把“找到一种能部署的办法”当作同一个任务。它们表面上都是卡住了，但后者涉及的已经是谁有权决定，而不只是技术上怎么做到。
+  </p>
+  <p className="mt-4">
+    给 Agent
+    写要求时，我希望“继续尝试”后面有明确范围。例如可以换检索词、检查相关代码、重跑本地测试；如果必须改生产配置或扩大数据访问，就把原因交回来。这样它遇到困难时仍然有事可做，也知道哪一步需要新的决定。
+  </p>
+</div>
+
+## 解释听起来合理，还要对得上实际动作
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    假设一个 Agent
+    说“这里只是在做本地验证”，我会想看它实际调用了什么命令、连接了哪个目标、有没有修改外部数据。这些记录与它给出的解释不一致时，应该先处理这个不一致，而不是让一段更详细的说明把疑点盖过去。
+  </p>
+  <p className="mt-4">
+    如果再安排一个 Agent
+    审核，我会把原始任务、实际动作和执行结果一起给它，并要求它指出判断依据。只转交执行者写好的总结，审核就少了一次独立看事实的机会。即便如此，我也不会把第二个
+    Agent 的同意视为最终保证；可核对的记录仍要留下，让人能回头检查。
+  </p>
+</div>
+
+## 应该允许任务在边界内失败
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    我想给长任务增加一种清楚的结束方式：说明已经尝试了什么、缺少什么、为什么下一步超出了当前范围。它没有完成最终目标，但这个结果仍然有用，人可以据此补信息或重新授权。真正需要改进的，是没有排查就放弃；遇到明确边界后把事情交回来，应该算一次正常的交接。
+  </p>
+</div>

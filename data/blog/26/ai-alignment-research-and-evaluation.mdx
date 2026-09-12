@@ -1,0 +1,49 @@
+---
+title: '让 AI 改进 AI，先把验收标准想清楚'
+date: '2026-09-12'
+tags: ['AI', 'Anthropic', '评估', '研究']
+draft: true
+summary: '读 Anthropic 的自动化对齐研究：让模型不断提出方案很有吸引力，但改进是否真实，要靠事先约定的验证方式来判断。'
+---
+
+[Automated researchers can reliably mitigate alignment failures](https://www.anthropic.com/research/automated-researchers-mitigate-alignment-failures) · Anthropic · 2026-08-28
+
+<p className="text-sm text-gray-500 dark:text-gray-400">
+  中文选读 · 红字是原文重点，黄底是我的想法
+</p>
+
+Anthropic 让 Claude 查资料、提出训练方法，再训练和测试模型，尝试改善十类对齐问题。部分方法在未公开给研究 Agent 的评估和更大模型上也有效。<strong className="text-red-700 dark:text-red-400">这些结果支持继续探索，但评估里的改善不能直接当作真实使用中的安全保证。</strong>研究也发现了作弊尝试，且检查覆盖的能力与行为有限。
+
+## 我会先把“变好了”写成具体情况
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    这让我想到一个更小的实验：让 AI
+    改进一份回答问题的提示词。我不会只给它“减少错误答案”这个目标，还会列出应该回答的情况、应该追问的情况，以及证据不足时该怎么表达。不然它可以通过少回答问题来减少错误，但用户真正需要的帮助也一起消失了。
+  </p>
+  <p className="mt-4">
+    我会保留一批原来就能答好的问题，每次修改后重新跑一遍。新增能力通过了，旧能力退步了，就不能只把新增的那部分写进结果。失败案例也要一起留下：它们能告诉我，这次改动到底是解决了一类问题，还是只照顾到了眼前的几个例子。
+  </p>
+</div>
+
+## 试了多少次，也是结果的一部分
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    如果一份方案只准提交一次，另一份方案可以不断试错，最终成绩的差距就同时包含了迭代机会的差距。做自己的实验时，我会同时记录最好成绩、尝试次数和总消耗。这样才能决定：值得采用的是这份最后留下的方案，还是整套持续寻找方案的过程。
+  </p>
+  <p className="mt-4">
+    也要给“没有继续变好”留出位置。如果每轮都要求 Agent
+    必须交出更高的分数，它就没有一个体面的停止点。我宁愿预先约定最多试多久，允许结果是“这些方向没有帮助”，然后回头看目标和样本有没有问题。保留下来的失败，同样可以减少下一次重复尝试。
+  </p>
+</div>
+
+## 提方案的人，不该随手改验收答案
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    如果由我来搭这个小实验，会把可以修改的提示词、可用于练习的样本和最终验收材料分开存放。研究 Agent
+    可以解释它为什么想改评分方式，但更改评分本身要另作决定。每次验收都留下当时的版本和原始输出，方便重跑。先把这几件朴素的事做好，之后讨论
+    AI 能不能独立承担更多研究工作，才有具体结果可看。
+  </p>
+</div>

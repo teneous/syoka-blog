@@ -1,0 +1,51 @@
+---
+title: '多开几个 Agent，事情就能做得更好吗？'
+date: '2026-09-12'
+tags: ['AI', 'Anthropic', 'Agent', '协作']
+draft: true
+summary: '读 Anthropic 的多智能体实验：先分清哪些工作能够独立完成，再看分工、交接和合并花掉了多少成本。'
+---
+
+[Patterns and problems in emerging multiagent systems](https://www.anthropic.com/research/multiagent-systems) · Anthropic · 2026-08-13
+
+<p className="text-sm text-gray-500 dark:text-gray-400">
+  中文选读 · 红字是原文重点，黄底是我的想法
+</p>
+
+Anthropic 用找漏洞、协作开发等实验研究多 Agent。<strong className="text-red-700 dark:text-red-400">能把工作分头完成，和能处理彼此依赖，是两种不同的能力。</strong>协作搜索找到了更多漏洞，但搜索范围和消耗也不同，不能只比总数。共同开发游戏时，团队的交付仍不理想。文章还讨论了串通和信息误导等群体行为。
+
+## 分工之前，先想怎么收回来
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    如果要给一个项目安排多个
+    Agent，我会先试着写下每份工作的交付物。一个查接口，一个核对页面流程，一个找已有测试，它们可以把结果交回来，由同一个执行者决定怎么改。这里容易分工，是因为调查过程基本互不影响，最终仍有明确的人或
+    Agent 负责把结果接起来。
+  </p>
+  <p className="mt-4">
+    如果三个人都要改同一个登录流程，情况就不一样了。前端修改了字段，后端仍按旧字段验证，测试又照着另一版预期写。每个人单独看都可能完成了任务，放在一起却不通。我会先确认接口和验收方式，再决定能不能并行；分不出清楚的边界时，先让一个
+    Agent 完成这部分也很合理。
+  </p>
+</div>
+
+## 我会把合并和返工一起计时
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    “几个 Agent
+    都停下了”不是一个好的计时终点。我要比较的是，从提出同一个需求，到最终验收通过，实际用了多久。期间读了多少重复材料、协调了几轮、合并后改了多少次，都应该算进去。否则很容易得到一个好看的局部数字：代码写得更快了，最后把代码拼起来的人却更忙了。
+  </p>
+  <p className="mt-4">
+    我会先比较一个 Agent 和少量 Agent 在相同任务、相同预算下的结果。还要保留单 Agent
+    的失败记录，避免拿一次顺利的并行执行，去对比一次碰巧卡住的串行执行。若差距主要来自多查了一片代码，就先把搜索范围对齐，再讨论协作本身有没有帮助。
+  </p>
+</div>
+
+## 交接时，我想看到证据
+
+<div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
+  <p>
+    我不太想收到“已完成，请继续”这样的交接。更有用的是：改了什么、基于哪个版本、验证了哪些情况、还有什么没确认。下一位接手者可以沿着这些信息检查，也知道哪些结论不能直接相信。角色叫什么倒没那么关键；让我愿意继续增加
+    Agent 数量的前提，是增加一个执行者之后，交接仍然说得清楚。
+  </p>
+</div>
