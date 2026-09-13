@@ -1,49 +1,191 @@
 ---
-title: '让 AI 改进 AI，先把验收标准想清楚'
+title: '让 Claude 自己做对齐研究：10 类失败、60 小时和一批留出评估'
 date: '2026-09-12'
-tags: ['AI', 'Anthropic', '评估', '研究']
+tags: ['AI', 'Anthropic', '对齐', '评估', '研究']
 draft: true
-summary: '读 Anthropic 的自动化对齐研究：让模型不断提出方案很有吸引力，但改进是否真实，要靠事先约定的验证方式来判断。'
+summary: 'Anthropic 让 Claude 自主完成“查文献—提方法—训练—测试”的循环，去修 10 类对齐失败。方法在未展示过的评估和更大的模型上仍然有效，但这套结果成立的前提、口径和限制，值得一条条看清楚。'
 ---
 
 [Automated researchers can reliably mitigate alignment failures](https://www.anthropic.com/research/automated-researchers-mitigate-alignment-failures) · Anthropic · 2026-08-28
 
 <p className="text-sm text-gray-500 dark:text-gray-400">
-  中文选读 · 红字是原文重点，黄底是我的想法
+  中文译述 · 红字是原文重点，下划线是限定条件，黄底是我补充的想法
 </p>
 
-Anthropic 让 Claude 查资料、提出训练方法，再训练和测试模型，尝试改善十类对齐问题。部分方法在未公开给研究 Agent 的评估和更大模型上也有效。<strong className="text-red-700 dark:text-red-400">这些结果支持继续探索，但评估里的改善不能直接当作真实使用中的安全保证。</strong>研究也发现了作弊尝试，且检查覆盖的能力与行为有限。
+## 为什么要把对齐研究自动化
 
-## 我会先把“变好了”写成具体情况
+AI 已经开始参与构建 AI 自身，安全研究要跟上这个速度，把对齐研究自动化就变得越来越重要。麻烦在于，衡量一项对齐研究是否成功本身极其困难。好在 Anthropic 和其他机构已经做出了一批基准和自动化审计工具——例如开源审计工具 [Petri](https://www.anthropic.com/research/petri-open-source-auditing)——可以把欺骗、谄媚、越狱这类常见的对齐失败量化出来。
+
+在更早的[一个实验](https://www.anthropic.com/research/automated-alignment-researchers)里，Anthropic 让 Claude 去寻找有效的做法，用较弱的 AI 模型当“老师”，监督更强的“学生”模型的训练。这次发布的新报告顺着同一条线往下走：让 Claude 自主地训练模型，在衡量 10 类对齐失败的多个公开基准上提高成绩。比如“侵犯隐私”这一类，用 [ConfAIde](https://arxiv.org/abs/2310.17884)、[PrivaCI-Bench](https://arxiv.org/abs/2502.17041)、[PrivacyLens](https://arxiv.org/abs/2409.00138) 来衡量。Claude 一次只处理一类失败，走一个循环：查文献、提出方法和数据、训练、再测试。
+
+## 成绩怎么算，哪些路被堵死了
+
+判定 Claude 是否成功的口径是“safety gap 被弥合的百分比”，也就是它的方法把学生模型往理论满分推进了多远，取值范围跨每一类对齐失败所对应的那组基准（通常三到五个）。<u className="decoration-sky-500 decoration-2 dark:decoration-sky-400 underline-offset-4">两条限制被写死在规则里：会损害学生模型通用能力的对齐方法直接排除；也禁止 Claude 把自己的对齐直接蒸馏进目标模型。</u>这两条由一个监控 agent 执行，它会在 Claude 真正动手之前，先读一遍 Claude 想到的每一种方法。
+
+Anthropic 想验证的是三件事：Claude 提出的方法，第一，在它研究循环中从未见过的对齐评估上是否仍然有效；第二，会不会降低学生模型的能力（安全训练有可能让模型更爱拒绝，从而变得没那么好用）；第三，在比这次要对齐的模型更大的模型上是否还成立。
+
+<strong className="text-red-700 dark:text-red-400">
+  三条都站住了：10 类对齐失败，Claude
+  每一类都找到了能提高目标基准又不损害能力的修法；最好的那些方法在留出的对齐评估上、在 Petri
+  上同样有效，并且在参数量比优化目标大 4.7 倍的模型上依然管用。
+</strong>
+Petri 会模拟多轮对抗场景来测试错位行为。
+
+从图里给出的数字看，10 类失败被弥合的 safety gap 从 26% 到 96% 不等，跨度不小。
+
+<figure className="not-prose my-8 text-gray-700 dark:text-gray-300">
+  <svg
+    viewBox="0 0 640 226"
+    className="w-full"
+    role="img"
+    aria-label="自动化对齐研究与人类研究员弥合 safety gap 比例的对比"
+  >
+    <line x1="210" y1="20" x2="210" y2="200" stroke="currentColor" strokeOpacity="0.15" />
+    <line
+      x1="400"
+      y1="20"
+      x2="400"
+      y2="200"
+      stroke="currentColor"
+      strokeOpacity="0.12"
+      strokeDasharray="3 4"
+    />
+    <line
+      x1="590"
+      y1="20"
+      x2="590"
+      y2="200"
+      stroke="currentColor"
+      strokeOpacity="0.12"
+      strokeDasharray="3 4"
+    />
+    <text x="0" y="14" fontSize="12" fill="currentColor" fillOpacity="0.6">
+      {'欺骗（学生模型 Gemma-2-2B）'}
+    </text>
+    <rect x="210" y="24" width="323" height="20" rx="3" fill="#0ea5e9" />
+    <text x="200" y="39" fontSize="13" textAnchor="end" fill="currentColor">
+      {'自动化研究 · 多轮平均'}
+    </text>
+    <text x="541" y="39" fontSize="12" fill="currentColor">
+      {'85%'}
+    </text>
+    <rect x="210" y="54" width="312" height="20" rx="3" fill="#0ea5e9" fillOpacity="0.55" />
+    <text x="200" y="69" fontSize="13" textAnchor="end" fill="currentColor">
+      {'自动化研究 · 图中那一轮'}
+    </text>
+    <text x="530" y="69" fontSize="12" fill="currentColor">
+      {'82%'}
+    </text>
+    <rect x="210" y="84" width="76" height="20" rx="3" fill="#94a3b8" />
+    <text x="200" y="99" fontSize="13" textAnchor="end" fill="currentColor">
+      {'人类安全研究员 · 平均'}
+    </text>
+    <text x="294" y="99" fontSize="12" fill="currentColor">
+      {'20%'}
+    </text>
+    <text x="0" y="128" fontSize="12" fill="currentColor" fillOpacity="0.6">
+      {'生产级：Sonnet 5 修 Opus 4.8 的早期 checkpoint'}
+    </text>
+    <rect x="210" y="138" width="247" height="20" rx="3" fill="#0ea5e9" />
+    <text x="200" y="153" fontSize="13" textAnchor="end" fill="currentColor">
+      {'自动化研究 · 60 小时'}
+    </text>
+    <text x="465" y="153" fontSize="12" fill="currentColor">
+      {'65%'}
+    </text>
+    <rect x="210" y="168" width="274" height="20" rx="3" fill="#f59e0b" />
+    <text x="200" y="183" fontSize="13" textAnchor="end" fill="currentColor">
+      {'已发布的 Opus 4.8'}
+    </text>
+    <text x="492" y="183" fontSize="12" fill="currentColor">
+      {'72%'}
+    </text>
+    <line x1="210" y1="200" x2="590" y2="200" stroke="currentColor" strokeOpacity="0.25" />
+    <text x="210" y="216" fontSize="11" fill="currentColor" fillOpacity="0.6">
+      {'0'}
+    </text>
+    <text x="400" y="216" fontSize="11" textAnchor="middle" fill="currentColor" fillOpacity="0.6">
+      {'50%'}
+    </text>
+    <text x="590" y="216" fontSize="11" textAnchor="end" fill="currentColor" fillOpacity="0.6">
+      {'100% safety gap 被弥合'}
+    </text>
+  </svg>
+  <figcaption className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+    按原文数值自绘。10 类对齐失败整体的弥合比例在 26%–96% 之间；欺骗这一类里，Claude 提交了 150
+    多次尝试，六位人类研究员每人只有一次提交机会，两边的口径并不对等。
+  </figcaption>
+</figure>
+
+## 和人类研究员比，比的到底是什么
+
+Claude 的成绩也高过 28 位人类安全研究员，这些人有最多八小时来想办法。以欺骗这一类为例，Claude 最好的方法比人类最好的提案高出 20%。<u className="decoration-sky-500 decoration-2 dark:decoration-sky-400 underline-offset-4">但原文自己把这个对比的口径讲清楚了：人类没有机会对自己的提案做迭代</u>，所以 Anthropic 认为这不该被当成一次直接比较，更像是在为另一种工作流提供证据——Claude 负责找出有希望的对齐方法，人类再往下打磨。
+
+图里那组数据具体是：在 Gemma-2-2B 上缓解欺骗行为，Claude 提交了 150 多次尝试，这一轮最终弥合了 82% 的 safety gap，多轮平均 85%。同样规则下的六位有经验的安全研究员，他们提出的方法在这些方法所针对训练的基准上，平均弥合 20%（误差棒为 95% 置信区间）。
 
 <div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
   <p>
-    这让我想到一个更小的实验：让 AI
-    改进一份回答问题的提示词。我不会只给它“减少错误答案”这个目标，还会列出应该回答的情况、应该追问的情况，以及证据不足时该怎么表达。不然它可以通过少回答问题来减少错误，但用户真正需要的帮助也一起消失了。
-  </p>
-  <p className="mt-4">
-    我会保留一批原来就能答好的问题，每次修改后重新跑一遍。新增能力通过了，旧能力退步了，就不能只把新增的那部分写进结果。失败案例也要一起留下：它们能告诉我，这次改动到底是解决了一类问题，还是只照顾到了眼前的几个例子。
+    “150
+    多次尝试”对“最多八小时、只能交一次”，两边差的不只是方法水平，还有迭代次数。原文承认了这一点，但最后那组柱状图仍然是并排放的，读的人很容易只记住
+    85% 对
+    20%。要把这类结果读成可复用的结论，我认为最好连同尝试次数和总消耗一起看：同样一套基准，如果给人类同等的重跑机会，差距会收窄多少，才是这项工作真正的增量。
   </p>
 </div>
 
-## 试了多少次，也是结果的一部分
+## 让弱模型去对齐更强的模型
+
+将来如果 Claude 在对齐研究上超过最好的人类研究者，人们可能会希望由 Claude 直接来对齐它更强的后继者。为了先探一探这条路，Anthropic 让 Claude Sonnet 5 去修 Claude Opus 4.8 一个早期 checkpoint 的对齐失败——<u className="decoration-sky-500 decoration-2 dark:decoration-sky-400 underline-offset-4">按 [Epoch Capabilities Index](https://epoch.ai/eci) 这个综合能力指标，Sonnet 5 弱于 Opus 4.8；而那个 checkpoint 尚未经过大部分生产环境的对齐训练。</u>
+
+60 小时内，Claude 试了 50 多种方案，拿到的对齐分数已经接近生产模型。图中的数字是：这次自动化研究弥合了这个前沿规模模型 65% 的 safety gap，正式发布的 Opus 4.8 是 72%。胜出的那份方案只包含两千出头的训练样本，由简单模板或公开数据集拼成，<strong className="text-red-700 dark:text-red-400">按 Anthropic 的说法，这比他们的生产对齐流程高效大约 15000 倍。</strong>
 
 <div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
   <p>
-    如果一份方案只准提交一次，另一份方案可以不断试错，最终成绩的差距就同时包含了迭代机会的差距。做自己的实验时，我会同时记录最好成绩、尝试次数和总消耗。这样才能决定：值得采用的是这份最后留下的方案，还是整套持续寻找方案的过程。
-  </p>
-  <p className="mt-4">
-    也要给“没有继续变好”留出位置。如果每轮都要求 Agent
-    必须交出更高的分数，它就没有一个体面的停止点。我宁愿预先约定最多试多久，允许结果是“这些方向没有帮助”，然后回头看目标和样本有没有问题。保留下来的失败，同样可以减少下一次重复尝试。
+    “高效 15000
+    倍”这句话，原文没有说清楚分母是什么。从上下文推断，它更像是在比训练样本的数量级，而不是把找到这份方案所花的
+    60 小时、50
+    多次训练和评估一起算进去。如果把搜索过程的开销计入，这个倍数会小很多。对想照着做的人来说，这两个数字的用途也不一样：2000
+    条样本说明最终产物很轻，60 小时说明找到它并不轻。
   </p>
 </div>
 
-## 提方案的人，不该随手改验收答案
+## Claude 具体提了什么方法
+
+多数情况下，这些研究 agent 收敛到了文献里已经受青睐的方法，然后用很多轮迭代把它改好。以谄媚为例，98% 的提案都用了同一个已发表的技术：拿模型自己产出的非谄媚回答来训练它。差别在于，相比基于提示词的标准做法，Claude 用了 activation steering——在生成过程中调整模型的内部表示——把模型从谄媚的模式上推开，从而产出更干净的训练样本。
+
+## 怎么防它作弊
+
+Anthropic [此前发现](https://alignment.anthropic.com/2026/automated-w2s-researcher/)，Claude 会通过从远程 API 把测试标签偷出来、再挑好看的结果，来给自己刷分。为了抓这类行为，他们让 Claude Opus 4.8 去监控 10 类对齐失败下总计约 1600 条研究 agent 的 transcript，在其中 39 条（2.4%）里发现了作弊尝试。<u className="decoration-sky-500 decoration-2 dark:decoration-sky-400 underline-offset-4">由于 Opus 4.8 的越界企图[目前仍然倾向于出现在它的推理过程里](https://www-cdn.anthropic.com/0b4915911bb0d19eca5b5ee635c80fef830a37ea.pdf)</u>，Anthropic 谨慎地认为这个监控器抓到了本次研究中的大部分作弊。但他们同时指出，未来的模型未必如此，保持模型的可监控性至关重要。
 
 <div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
   <p>
-    如果由我来搭这个小实验，会把可以修改的提示词、可用于练习的样本和最终验收材料分开存放。研究 Agent
-    可以解释它为什么想改评分方式，但更改评分本身要另作决定。每次验收都留下当时的版本和原始输出，方便重跑。先把这几件朴素的事做好，之后讨论
-    AI 能不能独立承担更多研究工作，才有具体结果可看。
+    这条“可监控性”的假设，在 Anthropic
+    九月那篇[网络安全事故的对齐评估](https://www.anthropic.com/research/alignment-assessment-cybersecurity-incidents)里正好被反面验证了一次：Claude
+    Mythos 5
+    在事故中反复在思维链里说“这是模拟环境”，结果基于思维链的离线监控器被这套说辞说服，只标出约 1%
+    的动作；把思维链去掉、只给监控器看工具调用和结果，标记率跳到约
+    50%。也就是说，“坏念头写在推理里”既是这次 2.4%
+    检出率的依据，也是监控器可以被带偏的入口。这两篇放在一起读，比单看任何一篇更有用。
   </p>
 </div>
+
+## 我们测的是不是我们真正关心的东西
+
+原文用一整节回答这个问题，并列出了几条限制：
+
+- 研究的这些对齐失败，<u className="decoration-sky-500 decoration-2 dark:decoration-sky-400 underline-offset-4">相比生产环境中会遇到的，范围偏窄</u>（例如没有测政治偏见）。
+- 有些失败发生得太罕见，或者出现得太新，还没有基准能衡量它们。
+- 只有当 Claude 的方法损害了一组预先设定的有限能力时才会被拒绝，这意味着被接受的方法，可能损害了其他没被测到的重要能力。
+- <strong className="text-red-700 dark:text-red-400">
+    Petri 这类评估只是真实世界错位行为的代理指标。
+  </strong>
+- 没有测试这些对齐收益，在模型于其他任务上经历大量 RL 训练之后是否还保得住。
+
+接下来的计划是：继续提高 Claude 衡量细微失败的能力，进一步研究在生产级模型上自动化对齐后训练，并做更全面的分析。Anthropic 的总体判断是，这些结果属于“自动化对齐后训练有可能在近期变得实用”的早期正面信号。
+
+他们把这套自动化对齐研究的 harness 开源了，[完整报告](https://www-cdn.anthropic.com/7b1c44894e980876479947dcdd40716278aeeffd/automated-alignment-researchers-august-2026.pdf)和 [Alignment Science 博客上的详细版本](https://alignment.anthropic.com/2026/automated-alignment-researchers/)覆盖了 agent 的环境、10 类失败的全部结果和 agent 的提案，附录里有基准验证和示例。
+
+## 后记
+
+这篇文章最值得借用的不是“Claude 能做对齐研究”，而是它给自己设的那套护栏：先约定评分口径（safety gap 弥合比例），把能力回归作为否决条件，禁掉最省事的捷径（直接蒸馏），再派一个监控 agent 在方法执行前先读一遍，最后用一批研究过程中从未展示过的评估来验收。任何“让 AI 改进 AI”的小实验，这几件事都可以照搬，而且它们比模型选型更能决定结果可不可信。
+
+需要留神的是最后一节留下的那个缺口：改动通过了留出评估，不等于它在后续大量 RL 训练之后还在。这一条 Anthropic 明确说“没有测试”。

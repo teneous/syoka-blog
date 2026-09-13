@@ -1,45 +1,336 @@
 ---
-title: '语音 AI 在查资料时，为什么不该让对话停下来'
+title: 'GPT-Live 的实时语音系统：让声音不停下来'
 date: '2026-09-12'
-tags: ['AI', 'OpenAI', '语音交互', '工程']
+tags: ['AI', 'OpenAI', '语音交互', '工程', '架构']
 draft: true
-summary: '读 OpenAI 的实时语音工程文章：把持续对话和后台工作分开之后，还要处理等待、打断，以及已经过时的结果。'
+summary: 'OpenAI 讲 GPT-Live 六个月里重做的实时语音架构：把 turn detector 从音频路径上拿掉，媒体走专用快路径，深度思考异步委派，连 WebRTC 的握手都重新压了一遍。'
 ---
 
-[How we built a realtime system for responsive voice AI in six months](https://openai.com/index/continuous-voice-interaction-with-gpt-live/) · Justin Uberti、Zahan Malkani / OpenAI · 2026-08-03
+[How we built a realtime system for responsive voice AI in six months](https://openai.com/index/continuous-voice-interaction-with-gpt-live/) · Justin Uberti、Zahan Malkani（OpenAI 技术团队）· 2026-08-03
 
 <p className="text-sm text-gray-500 dark:text-gray-400">
-  中文选读 · 红字是原文重点，黄底是我的想法
+  中文译述 · 红字是原文重点，下划线是限定条件，黄底是我补充的想法
 </p>
 
-OpenAI 介绍了 GPT-Live 的实时语音架构：模型可以同时听和说，需要深入推理或调用工具时，把工作交到后台。<strong className="text-red-700 dark:text-red-400">工具返回得慢，不应该让声音也停下来。</strong>长对话需要压缩上下文时，系统先准备好接替的模型实例，再切换过去，尽量保持通话连续。
+对语音 AI 来说，知道什么时候该开口，比听上去要难。人跟人之间交接发言权只用几分之一秒，而此前的语音 AI 跟不上这个节奏。它们的回合制架构依赖一种叫 turn detector 的小模型，这个模型的任务不太好做：猜早了，用户被打断；猜晚了，回应显得迟钝。而且只有等它做完判断，那个大得多的 LLM 才能开始干活。
 
-## 等待的这几秒，用户还能做什么
+[GPT-Live](https://openai.com/index/introducing-gpt-live/) 是 OpenAI 的第三代语音系统，<strong className="text-red-700 dark:text-red-400">它把 turn detector 从音频路径上直接拿掉了。</strong>它的语音模型是全双工的，能一边听一边说，于是不再需要一个单独的检测器，对话也显得更即时、更自然。需要更深的推理或者用工具时，GPT-Live 还可以去咨询 GPT-5.5 这样的前沿模型，而不打断对话本身的流动。
+
+要把这种体验做到规模化，需要一套围绕低延迟重新设计的系统架构。和典型的请求—响应式推理不同，这套系统把进来的音频流式送进语音模型，把输出的语音流式送回用户，而把委派放在另一条异步路径上处理。过去六个月里，模型推理、上下文管理和媒体传输都被重做了一遍，目的是让语音从头到尾平顺地流动。
+
+这套架构还在核心语音路径和应用逻辑之间划出了一条干净的边界：定制应用行为不会影响响应速度。它支撑着 ChatGPT Voice 里不断增加的能力，包括刚上线的在 ChatGPT 桌面端控制电脑、协调你的 agent。
+
+## 从轮流发言到流式
+
+早期的语音架构继承了文本 LLM 的回合制，只不过每个回合不是文本，而是一段离散的音频。级联式系统里，语音转文字、LLM、文字转语音三者串行执行，这个顺序既增加延迟，又丢掉了语气和节奏这类线索。
+
+speech-to-speech 模型直接处理音频，改进了这一点：让模型原生地理解和生成语音，就能保住转写过程中丢失的细节，回应也更快。但系统仍然靠 turn detector 来决定推理什么时候可以开始。模型承担了交互中更多的部分，交互本身还是回合制的。
+
+GPT-Live 把对话的控制权交给语音模型：音频流进流出模型，更深的推理和工具调用异步发生。<strong className="text-red-700 dark:text-red-400">这个系统的首要任务，是维持一条不中断的媒体循环。</strong>其他工作——调用前沿模型、把对话持久化——都发生在这条实时路径之外。
+
+<figure className="not-prose my-8 text-gray-700 dark:text-gray-300">
+  <svg
+    viewBox="0 68 640 200"
+    className="w-full"
+    role="img"
+    aria-label="GPT-Live 的实时路径与异步委派路径示意"
+  >
+    <rect
+      x="20"
+      y="96"
+      width="92"
+      height="56"
+      rx="8"
+      fill="none"
+      stroke="currentColor"
+      strokeOpacity="0.45"
+    />
+    <text x="66" y="130" fontSize="13" textAnchor="middle" fill="currentColor">
+      {'用户'}
+    </text>
+    <line x1="112" y1="110" x2="180" y2="110" stroke="#0ea5e9" strokeWidth="2" />
+    <polygon points="188,110 178,105 178,115" fill="#0ea5e9" />
+    <text x="148" y="102" fontSize="11" textAnchor="middle" fill="currentColor" fillOpacity="0.7">
+      {'音频'}
+    </text>
+    <line x1="188" y1="140" x2="122" y2="140" stroke="#0ea5e9" strokeWidth="2" />
+    <polygon points="112,140 122,135 122,145" fill="#0ea5e9" />
+    <text x="150" y="158" fontSize="11" textAnchor="middle" fill="currentColor" fillOpacity="0.7">
+      {'语音'}
+    </text>
+    <text x="150" y="176" fontSize="11" textAnchor="middle" fill="currentColor" fillOpacity="0.5">
+      {'WebRTC 快路径'}
+    </text>
+    <rect
+      x="190"
+      y="80"
+      width="200"
+      height="88"
+      rx="8"
+      fill="#0ea5e9"
+      fillOpacity="0.12"
+      stroke="#0ea5e9"
+    />
+    <text x="290" y="116" fontSize="13" textAnchor="middle" fill="currentColor">
+      {'语音模型（全双工）'}
+    </text>
+    <text x="290" y="140" fontSize="12" textAnchor="middle" fill="currentColor" fillOpacity="0.7">
+      {'边听边说，不需要 turn detector'}
+    </text>
+    <line
+      x1="150"
+      y1="196"
+      x2="620"
+      y2="196"
+      stroke="currentColor"
+      strokeOpacity="0.35"
+      strokeDasharray="5 5"
+    />
+    <text x="620" y="190" fontSize="11" textAnchor="end" fill="currentColor" fillOpacity="0.7">
+      {'异步 RPC 边界'}
+    </text>
+    <line
+      x1="270"
+      y1="168"
+      x2="270"
+      y2="204"
+      stroke="currentColor"
+      strokeOpacity="0.5"
+      strokeDasharray="4 3"
+    />
+    <polygon points="270,212 265,202 275,202" fill="currentColor" fillOpacity="0.5" />
+    <rect
+      x="190"
+      y="212"
+      width="160"
+      height="48"
+      rx="8"
+      fill="none"
+      stroke="currentColor"
+      strokeOpacity="0.45"
+    />
+    <text x="270" y="241" fontSize="13" textAnchor="middle" fill="currentColor">
+      {'前沿模型 GPT-5.5'}
+    </text>
+    <line x1="350" y1="236" x2="372" y2="236" stroke="currentColor" strokeOpacity="0.45" />
+    <polygon points="380,236 370,231 370,241" fill="currentColor" fillOpacity="0.45" />
+    <rect
+      x="382"
+      y="212"
+      width="108"
+      height="48"
+      rx="8"
+      fill="none"
+      stroke="currentColor"
+      strokeOpacity="0.45"
+    />
+    <text x="436" y="241" fontSize="13" textAnchor="middle" fill="currentColor">
+      {'工具调用'}
+    </text>
+    <text x="506" y="232" fontSize="11" fill="currentColor" fillOpacity="0.7">
+      {'这一侧变慢，'}
+    </text>
+    <text x="506" y="250" fontSize="11" fill="currentColor" fillOpacity="0.7">
+      {'只拖慢它自己'}
+    </text>
+  </svg>
+  <figcaption className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+    按原文描述自绘的结构示意：音频在一条专用快路径上进出语音模型，委派、工具和其他应用逻辑都放在异步边界之后。
+  </figcaption>
+</figure>
+
+## 让连续推理成为可能
+
+维持这条媒体循环并不总是简单的事。传输、处理、推理中任何一处的延迟，都可能变成能被听见的停顿或杂音。<u className="decoration-sky-500 decoration-2 dark:decoration-sky-400 underline-offset-4">回合制系统可以容忍音频块到达时间的波动，而实时媒体系统必须让每一个音频帧都按时送达。</u>
+
+此前在 ChatGPT Voice 和 Realtime API 上的工作打下了基础：他们已经[重建过语音基础设施](https://openai.com/index/delivering-low-latency-voice-ai-at-scale/)，让音视频直接流式进出系统，延迟更低也更可预测。GPT-Live 把这个设计又往前推了一步，通过一套为连续对话构建的、有状态的新推理系统，把媒体一路流到模型面前。
+
+### 让媒体流得快
+
+一个很早就定下的决定是：把媒体流与应用及业务逻辑明确分开。音频在客户端和语音模型之间走一条专用的快路径；委派、工具调用和其他应用层的工作，都放在一个异步 RPC 边界之后。<strong className="text-red-700 dark:text-red-400">一次慢的工具调用或者某个后端服务变慢，只会拖慢它自己的结果，不会让媒体流停下来。</strong>
+
+这种分离也给定制留出了干净的边界：应用可以改自己的工具、策略和后端行为，而不影响那个负责让音频持续流动的媒体前端。实时路径保持得很小、可预测，只做必须实时完成的事。
+
+媒体前端和推理逻辑用 Go 重写，替换了原先的 Python `asyncio` 实现。这显著改善了帧投递的平滑度：<u className="decoration-sky-500 decoration-2 dark:decoration-sky-400 underline-offset-4">新系统的 p95 与旧系统的 p50 相当。</u>
+
+传输层的基础是 WebRTC。它本来就是为低延迟媒体设计的，能在丢包、时钟漂移和客户端连接变化的情况下继续工作。包晚到时，WebRTC 可以不易察觉地把音频拉长以免出现空档，随后短暂加快播放追回实时进度。
+
+把整个系统里的缓冲和阻塞都压到最小，才谈得上人们在对话中期待的亚秒级响应。
 
 <div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
   <p>
-    我更在意的，是后台工作没有完成时，用户还能不能继续改变主意。假设我正在让语音助手比较两款产品，说到一半又想起来，预算要降一点。它如果只能等第一轮搜索结束再听下一句话，这几秒就只能干等；它如果一直能听，新的预算就能及时进入任务。
-  </p>
-  <p className="mt-4">
-    但能接着说话，也可能掩盖后台根本没有进展的问题。一直回答“我正在查”，并没有让等待更有用。如果由我来设计这个过程，我会让助手简短说明正在等什么，同时允许用户补条件、换方向或取消。已经知道的内容可以先说；还没查到的，不能拿一段流畅的话补上。
+    “p95 追平旧系统的
+    p50”这句话值得单独抄下来：在每一帧都有交付期限的系统里，平均延迟几乎不提供信息，能不能用取决于尾部。文章后面讲生产测试时给出的容量口径改写——从“一块
+    GPU
+    能扛多少请求”改成“系统能维持多少并发会话、且每一帧都按时”——其实是同一件事的另一面。先把指标从均值换成尾部，再把容量从吞吐换成并发会话，两步之后，压测数据才和真实体验对得上。
   </p>
 </div>
 
-## 对话往前走了，旧结果怎么办
+### 有状态的对话怎么续下去
+
+有状态推理有它自己的运维代价：一个语音会话可能长时间活跃，但它的上下文在持续增长，而模型实例会按需求起停。
+
+为此他们做了跨模型实例的无缝切换：需要转移时，在现有实例旁边预热一个替代实例，用当前会话的上下文把它 prefill 好，两边并行推理，等新实例完全就绪再切过去。
+
+同一套机制也支撑动态的上下文压缩。对话进行下去，累积的上下文最终会超过模型的上下文上限。压缩可以把它压回限额内，但这个操作需要时间；而且因为它改变了过去的上下文，还会让模型的 KV 缓存失效——这个缓存保存的是此前已处理 token 的注意力键值——重建这部分状态需要重新 prefill，又引入额外的延迟。
+
+于是压缩也被当成一次受管的切换：原来的模型实例继续聊天，系统在旁边压缩上下文、准备好装着新上下文的替代实例，就绪后再切换，媒体完全不中断。这样系统就能支撑长时间通话，需要时随时压缩。重活留在实时路径之外，即便正在切换，对话也不漏一拍。
+
+<figure className="not-prose my-8 text-gray-700 dark:text-gray-300">
+  <svg
+    viewBox="0 0 640 200"
+    className="w-full"
+    role="img"
+    aria-label="上下文压缩期间两个模型实例的切换时序"
+  >
+    <rect x="60" y="46" width="380" height="28" rx="4" fill="#0ea5e9" fillOpacity="0.85" />
+    <text x="72" y="65" fontSize="12" fill="#ffffff">
+      {'实例 A：继续和用户对话'}
+    </text>
+    <rect x="200" y="94" width="240" height="28" rx="4" fill="#f59e0b" fillOpacity="0.75" />
+    <text x="212" y="113" fontSize="12" fill="#1f2937">
+      {'实例 B：压缩上下文 → 预填 → 并行推理'}
+    </text>
+    <rect x="440" y="94" width="140" height="28" rx="4" fill="#0ea5e9" fillOpacity="0.85" />
+    <text x="452" y="113" fontSize="12" fill="#ffffff">
+      {'实例 B 接管'}
+    </text>
+    <line
+      x1="440"
+      y1="32"
+      x2="440"
+      y2="150"
+      stroke="currentColor"
+      strokeOpacity="0.5"
+      strokeDasharray="4 4"
+    />
+    <text x="446" y="28" fontSize="11" fill="currentColor" fillOpacity="0.75">
+      {'就绪后切换'}
+    </text>
+    <line x1="60" y1="160" x2="580" y2="160" stroke="#22c55e" strokeWidth="3" />
+    <text x="60" y="182" fontSize="11" fill="currentColor" fillOpacity="0.7">
+      {'媒体流全程不中断 →'}
+    </text>
+  </svg>
+  <figcaption className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+    按原文描述自绘：压缩被当成一次受管的实例切换，重活发生在实时路径之外，所以切换期间对话不漏拍。同一套机制也用于按需求起停实例。
+  </figcaption>
+</figure>
+
+## 委派，但不阻塞对话
+
+GPT-Live 能调用已有的前沿模型，这让它很有力量——等于把“说话”和更深的“思考”解耦了。但要让这种双模型架构用起来像一个系统，需要解决两个相关的工程问题。
+
+第一，结果必须回得足够快，才能在正在进行的交流里派上用场，所以整条委派路径的延迟都得压下来：路由、提示处理、推理、工具调用。第二，产品里别处的系统仍然需要离散的消息，所以还得把这段连续进行的对话，表示成它们能理解的形式。
+
+原文在这里给了一段示例音频：GPT-Live 负责快速、自然地接话，GPT-5.5 在后台完成搜索（示例用的是 GPT-5.5 Instant）。
+
+### 让委派快到显得自然
+
+一次委派派发出去之后，优化的目标是“前沿模型产出对这段对话有用的东西”所需要的时间。<u className="decoration-sky-500 decoration-2 dark:decoration-sky-400 underline-offset-4">语音模型可以在前沿模型推理或调用工具期间短暂地把交流维持住，但它掩盖不了一个任意慢的响应。</u>所以整个委派回路——路由、提示处理、推理、工具调用——都被算进了响应预算。
+
+第一个优化是在委派被请求之前，就把前沿模型和它需要的工具准备好：语音会话一开始，应用服务器就为前沿模型创建一个推理会话，并用初始的对话上下文把它 prefill，确保首次委派请求到来之前，提示已经被完整处理过。
+
+这个推理会话在整段语音对话期间保持可用，后续请求使用稳定的会话亲和性。配合 prompt caching，这些做法改善了延迟，同时单个 worker 出故障仍然容易恢复。
+
+推理 effort、输出长度上限、工具 schema、模型与工具之间的往返次数，也都影响对话什么时候能拿到有用的结果，这些杠杆同样被调过。把委派路径上需要做的事压到最少，语音模型才能迅速把前沿模型的结果吸收进来。
+
+### 从连续语音里切出离散回合
+
+尽管语音模型面对的是连续的语音流，它周围的许多系统仍然按“用户回合 / 助手回合”工作，包括 ChatGPT 的对话界面，以及分析和安全基础设施的一部分。于是应用服务器要把这段重叠的、有时含糊的对话拆成一条条离散消息。
+
+音频到达时，服务器用部分转写和时间信号推断此刻是谁握着发言权，并建立一个消息队列。最新的那条消息始终是暂定的：它的文本、时间和说话人归属都可能随着更多语音到来而改变。等某个说话人持续占有发言权足够久、归属可以确信了，服务器才把对应的消息定稿。
+
+说话重叠让这件事更麻烦。用户正在说话时，助手一句简短的应答（比如“嗯嗯”“好的”）不一定要单独成为一条消息；但助手实质性的插话往往应该。同样，即使用户中途插话，显示出来的助手回复也优先保证连贯。
+
+每一种切分策略都在新鲜度和确定性之间做取舍：提交得太早，历史会变得零碎、顺序不稳；等得太久，转写以及依赖转写的功能都会被推迟。所以系统同时维护两种相关的对话视图：一份关于当前状态的推测视图，和一份“究竟说了什么”的权威记录。应用界面里的对话视图能够处理更新，用的是推测视图；而写入分析管线则需要最终的转写。这样，ChatGPT 的其余部分拿到了一份稳定的交流视图，又不必把回合制强加回实时语音路径。
 
 <div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
   <p>
-    接着上面的例子：第一次搜索用的是旧预算，第二次用的是新预算。如果第一批结果反而更晚回来，助手该采用哪一批？我会给每次查询记下它对应的条件，收到结果后先对照当前问题。已经不适用的结果可以留作记录，但不该突然插进正在进行的对话里。
-  </p>
-  <p className="mt-4">
-    这也是我想实际验证的地方。只测“多久开始出声”，很容易把一句没有内容的回应也算作快。我会另外记录：多久拿到第一条有用的信息、用户补充条件后有没有生效、取消后还有没有继续做事。测试时故意让工具变慢，再连续改两次条件，比只看一段顺畅的演示更能说明问题。
+    这里讲的“推测视图 +
+    权威记录”解决的是转写的时效问题，文章没有展开的是委派结果的时效问题：对话一直在往前走，一次委派派出去时的问题，和结果回来时用户关心的问题，可能已经不是同一个。按文中的架构推断，这个判断落在应用服务器一侧，但原文没有说它依据什么来决定一份迟到的结果还要不要说出口。如果要照着这套结构自己搭一版，我会把“每次委派对应的条件”记下来，结果回来时先比对当前问题——这一条属于我的补充，不是原文的做法。
   </p>
 </div>
 
-## 我会先做一个小实验
+## 用更快的协议启动会话
+
+用户按下按钮的那一刻，响应速度就开始计算了。系统必须先建好媒体路径、把音频喂进模型，对话才谈得上开始，所以启动序列的每一段都落在关键路径上。
+
+如前所述，WebRTC 是很强的实时基础，但启动一个原味的 WebRTC 会话，需要的协议握手和网络往返次数多得出人意料。WebRTC 早于 QUIC 这类后来才把“减少往返”当作核心目标的协议，因此它底下那些协议放在一起用时，有时会重复做同样的事——比如每个协议都自带一套抗 DoS 机制，哪怕在完整的 WebRTC 栈里并不需要。
+
+他们分析了这套协议栈，做出 [WARP](https://datatracker.ietf.org/doc/draft-uberti-tsvwg-warp/)（WebRTC Abridged Roundtrip Protocol），<strong className="text-red-700 dark:text-red-400">把媒体与数据的启动从六个网络往返压缩到一个。</strong>WARP 靠的是一组向后兼容的协议改进：把 DTLS 握手搭载在 ICE 上（[SPED](https://datatracker.ietf.org/doc/draft-hancke-webrtc-sped/)）、使用更快的 [DTLS 1.3](https://www.rfc-editor.org/rfc/rfc9147.html) 握手、预先协商 SCTP 握手（[SNAP](https://datatracker.ietf.org/doc/draft-hancke-tsvwg-snap/)），以及预先协商 data channel 而不再走 [DCEP](https://www.rfc-editor.org/rfc/rfc8832.html)。
+
+WARP 被设计成一组开放规范，和 WebRTC 社区的合作者一起做，让整个生态都能受益。相关提案正在 IETF 的 TSVWG 工作组推进，libwebrtc 和 Pion 都已经加入了 WARP 支持，其他 WebRTC 实现也在跟进。
+
+媒体握手优化之后，还剩一处延迟很显眼：WebRTC 连接之前用来交换 SDP 参数的信令往返。为了把它移出关键路径，他们做了一个叫 Instant Connect 的机制，提前协商这些参数，既不预留服务器容量，也不需要改动现有的 WebRTC 实现。Instant Connect 与标准信令流程并行运行：如果预协商的参数有效，服务器可以在第一个媒体包到达时直接把会话具体化；如果参数已经过期或无效，标准信令流程本来就在进行中，客户端可以回退，不增加额外延迟。
+
+两者合起来，从“用户想用”到“媒体真正流动”之间的时间被大幅压缩：SDP 交换离开关键路径，WARP 把传输握手折叠起来，客户端现在可以用一个 UDP 包启动一次会话。
+
+<figure className="not-prose my-8 text-gray-700 dark:text-gray-300">
+  <svg
+    viewBox="0 0 640 170"
+    className="w-full"
+    role="img"
+    aria-label="原味 WebRTC 与 WARP 启动所需网络往返次数对比"
+  >
+    <text x="200" y="56" fontSize="13" textAnchor="end" fill="currentColor">
+      {'原味 WebRTC'}
+    </text>
+    <rect x="210" y="40" width="56" height="22" rx="3" fill="#94a3b8" />
+    <rect x="274" y="40" width="56" height="22" rx="3" fill="#94a3b8" />
+    <rect x="338" y="40" width="56" height="22" rx="3" fill="#94a3b8" />
+    <rect x="402" y="40" width="56" height="22" rx="3" fill="#94a3b8" />
+    <rect x="466" y="40" width="56" height="22" rx="3" fill="#94a3b8" />
+    <rect x="530" y="40" width="56" height="22" rx="3" fill="#94a3b8" />
+    <text x="590" y="80" fontSize="11" textAnchor="end" fill="currentColor" fillOpacity="0.7">
+      {'6 个网络往返'}
+    </text>
+    <text x="200" y="122" fontSize="13" textAnchor="end" fill="currentColor">
+      {'WARP'}
+    </text>
+    <rect x="210" y="106" width="56" height="22" rx="3" fill="#0ea5e9" />
+    <text x="276" y="122" fontSize="12" fill="currentColor">
+      {'1 个往返：客户端用一个 UDP 包就能启动会话'}
+    </text>
+    <line x1="210" y1="146" x2="590" y2="146" stroke="currentColor" strokeOpacity="0.25" />
+    <text x="210" y="162" fontSize="11" fill="currentColor" fillOpacity="0.6">
+      {'媒体与数据就绪所需的往返次数'}
+    </text>
+  </svg>
+  <figcaption className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+    按原文数值自绘。这一步靠的是 SPED、DTLS 1.3、SNAP 和预协商 data channel；另一项 Instant Connect
+    则把 SDP 信令交换整个移出关键路径，两者叠加才有上面的效果。
+  </figcaption>
+</figure>
 
 <div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
   <p>
-    先选一个只查信息、不替人下单的场景，把“说话”和“等工具结果”分开。让用户在查询中途纠正一个条件，再观察助手能否自然地接住，并且只使用仍然有效的结果。这个实验通过之后，再考虑加入会改变外部系统的操作。对我来说，值得追求的体验是：事情还没办完，但人始终知道进展，也随时能把方向改过来。
+    这一节是全文里唯一一处别人可以直接拿走的成果：WARP 是公开草案，而且已经进了 libwebrtc 和
+    Pion，用 WebRTC 做实时应用的团队不必自己实现就能受益。按往返次数与 RTT
+    成正比推断，省掉五个往返带来的绝对收益，在高延迟链路（移动网络、跨区域）上会比在机房内网明显得多——这是我的推断，原文没有给分地域的启动耗时数据。
   </p>
 </div>
+
+## 用真实数据在生产里安全地测
+
+一个系统可以在纸面上很快，真到了语音流量下还是会卡住。在让 GPT-Live 跟用户对话之前，他们跑了一次静默测试：把一小部分、比例逐步提高的生产 ChatGPT Voice 会话同时路由到现有的 Advanced Voice Mode 和新系统。<u className="decoration-sky-500 decoration-2 dark:decoration-sky-400 underline-offset-4">Advanced Voice Mode 照常服务用户，影子路径以只读模式跑推理</u>，于是新系统暴露在真实的客户端、网络、会话长度和地理分布之下，而用户听到的内容没有任何变化。
+
+第一课是容量不能简化成 GPU 吞吐。语音会话会一直开着并持续发送帧，所以 CPU 侧的流处理器、队列和网络路径必须跟着推理一起扩容。真实负载下，某个支撑组件比压测估计的更早饱和，导致推理请求堆积、延迟层层叠加。<strong className="text-red-700 dark:text-red-400">于是容量问题从“一块 GPU 能处理多少请求”改写成了“系统能维持多少并发会话，同时让每一帧都按时送达”。</strong>
+
+这次测试也让地理位置变成了一等问题：把会话路由到远处的容量，会在启动和流传输的好几个环节上增加延迟。他们开始把模型的上线与区域容量、流量调度配置放在一起验证，再按来源地域拆解延迟。把推理搬得离用户更近确实有帮助，但也印证了一个更大的教训：端到端的响应速度取决于路径上的每一个服务，不只是模型服务器。
+
+还有一些故障只有在真实的会话生命周期里才会现身：长会话暴露内存和持久化压力，重连会触发压缩与状态恢复，普通的客户端断开暴露了关闭握手中的竞态。这些问题在短时压测里很少出现，因为它们依赖时间、依赖累积起来的状态，也依赖跨服务边界的行为。
+
+最后，生产测试逼他们改进可观测性和发布控制。他们发现有些指标把不同来源的延迟混在了一起，有些仪表盘的聚合数字掩盖了个别不健康的引擎，测试环境与部署环境之间存在配置漂移。对策是更细粒度的遥测、对照已知良好配置做校验、分阶段放量，以及快速隔离或关停单条路径的能力。这次静默测试于是成了一次提前的上线演练——不只是演练系统能接住多少流量，也演练他们能多快发现、遏制并从故障中恢复。
+
+## 从客户端到模型，都要有响应
+
+把 GPT-Live 做到 ChatGPT 的规模，需要一套围绕一条根本原则重建的系统：声音必须流动。流式推理让全双工模型持续有音频可用，专用媒体路径保证帧被可靠送达，异步委派让更深的思考并行进行，优化过的传输把响应速度一路保持到用户那一端。
+
+这套架构正在变成一个更广的实时交互平台：它支撑 ChatGPT Voice 从对话扩展到 agent 协调，也将成为即将到来的 GPT-Live API 的底座。
+
+## 后记
+
+这篇文章讲的是语音，但它的结构问题和现在很多 agent 产品是同一个：一条必须保持流动的交互路径，加上一堆时快时慢的后台工作。GPT-Live 的答案很朴素——把两者用一个异步边界分开，实时那条路径上只留必须实时完成的事，慢的部分只能拖慢自己。
+
+如果拿它当参照来做自己的系统，我认为有三个口径值得一起抄走：延迟看尾部而不是均值，容量按“能维持多少并发会话且不掉帧”而不是按吞吐，上线前用影子流量在真实网络和真实会话长度上跑一遍。文中那些只在长会话、重连和断开时才出现的故障，说明短时压测漏掉的往往正是上线后最先遇到的。
