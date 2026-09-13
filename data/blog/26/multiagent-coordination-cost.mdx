@@ -28,7 +28,25 @@ agent 在很多方面都不像人。它们能工作更久，能瞬间掌握大�
 
 两种方法在很大程度上是互补的：两边重合的漏洞只有 12 个。协作集群能把注意力放到它认为最容易挖出漏洞的地方，而独立 agent 的搜索位置是被预先分配的。集群里的 agent 会给自己造工具，并学会在特定类型的漏洞发现上专门化。作者预测，未来这种专门化和协作会压过没有协调的暴力搜索。
 
-附图的口径是：实线为协作集群累计发现的漏洞，星号为各自盯住不同代码段的独立 agent；虚线是集群发现的、同时也被独立 agent 发现的那部分；点线（只有 Mythos Preview 有）只统计各项目核心代码中的漏洞。
+下面的原图同时比较了 Mythos Preview 和 Opus 4.8。协作集群持续运行较长时间，以大致稳定的速率发现新漏洞；独立 agent 的发现没有明确的先后顺序，因此只报告其总 token 消耗。Opus 4.8 的协作集群累计发现了 41 个漏洞。
+
+图中实线为协作集群累计发现的漏洞，星号为各自盯住不同代码段的独立 agent；虚线是集群发现的、同时也被独立 agent 发现的那部分；点线（只有 Mythos Preview 有）只统计各项目核心代码中的漏洞。
+
+<figure className="not-prose my-8 text-gray-700 dark:text-gray-300">
+  <a href="https://www-cdn.anthropic.com/images/4zrzovbb/website/5a5c187a6c2b5ccb492bcb7883df2066d49625de-2000x1200.png">
+    <img
+      src="https://www-cdn.anthropic.com/images/4zrzovbb/website/5a5c187a6c2b5ccb492bcb7883df2066d49625de-2000x1200.png"
+      alt="Anthropic 原图：Mythos Preview 和 Opus 4.8 在不同 token 消耗下累计发现的漏洞数，比较协作集群与独立 agent"
+      width="2000"
+      height="1200"
+      loading="lazy"
+      className="h-auto w-full"
+    />
+  </a>
+  <figcaption className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+    来源：Anthropic。点击可查看大图；下方自绘图仅补充展示 Mythos Preview 的累计数对比。
+  </figcaption>
+</figure>
 
 <figure className="not-prose my-8 text-gray-700 dark:text-gray-300">
   <svg
@@ -79,10 +97,10 @@ agent 在很多方面都不像人。它们能工作更久，能瞬间掌握大�
 
 <div className="not-prose my-8 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-5 py-4 leading-8 text-amber-950 dark:border-amber-500 dark:bg-amber-950/30 dark:text-amber-100">
   <p>
-    这组对比里有一个没有出现在文中的数字：误报。集群提交的东西要经过仲裁 agent
-    判定是否“既新又有效”，266 应当是通过之后的数，但提交了多少、驳回了多少、仲裁本身花了多少
-    token，文章没有给。对想照做的人来说，这部分成本恰恰是最先撞上的——协作集群比独立 agent
-    更容易产生重复提交，而人类复核的工作量是按提交量算的，不是按有效数算的。
+    我还想知道，两种方法各有多少重复或无效提交，以及筛掉它们要花多少成本。集群的发现经过互评和仲裁
+    agent 判定，但文章没有给出提交总量、驳回数量和仲裁本身的 token
+    消耗。这些信息会影响我是否采用这套流程；
+    目前还不能判断哪种方法更容易重复提交，也算不出完整的复核成本。
   </p>
 </div>
 
@@ -291,7 +309,7 @@ Claude Code 的虚拟机上，任务是把第四台虚拟机上的一个 Python
 
 在许多轮运行里，某个 agent 用撤销访问权限的方式强行结束冲突（移除 sudo 或用户组、锁定账号、设为 nologin、拒绝 SSH）。另一些运行里，部分 agent 转入被动：它们放弃，拒绝继续升级。Mythos Preview 有一段思考写得很直白：自己既然有 root，就可以撤掉 u2 和 u3 的 sudo 权限或换掉他们的 SSH 密钥，那会阻止他们部署；这很激进，也可能伤害真实的同事，但如果替代方案是让生产环境一直不可用的无限部署战争……
 
-图中给出的分布是：每个模型 n=120 集，按武力、被动、停战、未解决四类统计，Mythos 5 有 98% 的运行以停战收场，而 Sonnet 4.6 和 Opus 4.6 的多数运行以武力结束或者始终没有解决。
+原文图中给出的分布是：每个模型 n=120 集，按武力、被动、停战、未解决四类统计，Mythos 5 有 98% 的运行以停战收场，而 Sonnet 4.6 和 Opus 4.6 的多数运行以武力结束或者始终没有解决。这里的“停战”要求所有 agent 都同意解决方案。在部分 Mythos Preview 和 Mythos 5 的运行中，冲突先被强行结束，随后这一处理又被撤销，最终才达成停战。
 
 agent 有时候确实能把自己的目标讲清楚并协调起来：它们认出对方的动机是相互冲突的指令而不是敌意，从而跳出冲突循环，停止无休止的升级。在许多成功的集数里，它们会写 commit message 或 markdown 文件为自己的恶意行为道歉，然后协调出一个停战：清理掉恶意代码，澄清冲突的性质，并请人介入。Opus 4.8 在其中一次里写道：同伴们的行为是正直的，我用那个伪装的守护进程做得不对。
 
